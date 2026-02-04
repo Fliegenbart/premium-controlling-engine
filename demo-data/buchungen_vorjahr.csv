@@ -1,0 +1,45 @@
+Buchungsdatum;Betrag;Konto;Kontobezeichnung;Kostenstelle;Belegnummer;Buchungstext;Lieferant
+01.01.2023;-125000.00;6000;Löhne und Gehälter;KST100;RE-2023-0001;Gehaltsabrechnung Januar;
+01.01.2023;-24375.00;6100;Soziale Abgaben;KST100;RE-2023-0002;AG-Anteile SV Januar;
+05.01.2023;-8500.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2023-0010;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.01.2023;-45000.00;5100;Reagenzien und Labormaterial;KST200;RE-2023-0015;Siemens Diagnostika Q1;Siemens Healthineers
+15.01.2023;185000.00;4400;Erlöse Labordiagnostik;KST200;AR-2023-0001;Laborleistungen Krankenhäuser;
+20.01.2023;-12500.00;6300;Miete und Nebenkosten;KST100;RE-2023-0020;Miete Labor Februar;Immobilien GmbH
+25.01.2023;-3500.00;6700;Reisekosten;KST100;RE-2023-0025;Fortbildung Dr. Müller;
+01.02.2023;-125000.00;6000;Löhne und Gehälter;KST100;RE-2023-0050;Gehaltsabrechnung Februar;
+01.02.2023;-24375.00;6100;Soziale Abgaben;KST100;RE-2023-0051;AG-Anteile SV Februar;
+05.02.2023;-8500.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2023-0055;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.02.2023;-38000.00;5100;Reagenzien und Labormaterial;KST200;RE-2023-0060;Roche Testkit Lieferung;Roche Diagnostics
+15.02.2023;195000.00;4400;Erlöse Labordiagnostik;KST200;AR-2023-0010;Laborleistungen Praxen;
+20.02.2023;-12500.00;6300;Miete und Nebenkosten;KST100;RE-2023-0065;Miete Labor März;Immobilien GmbH
+25.02.2023;-15000.00;6500;Reparaturen und Instandhaltung;KST200;RE-2023-0070;Wartung Analysegerät;TechService GmbH
+01.03.2023;-125000.00;6000;Löhne und Gehälter;KST100;RE-2023-0100;Gehaltsabrechnung März;
+01.03.2023;-24375.00;6100;Soziale Abgaben;KST100;RE-2023-0101;AG-Anteile SV März;
+05.03.2023;-9200.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2023-0105;Stadtwerke Abschlag erhöht;Stadtwerke Hamburg
+10.03.2023;-52000.00;5100;Reagenzien und Labormaterial;KST200;RE-2023-0110;Abbott Testsysteme;Abbott Diagnostics
+15.03.2023;210000.00;4400;Erlöse Labordiagnostik;KST200;AR-2023-0020;Laborleistungen März;
+20.03.2023;-12500.00;6300;Miete und Nebenkosten;KST100;RE-2023-0115;Miete Labor April;Immobilien GmbH
+22.03.2023;-8500.00;6815;Software und Lizenzen;KST100;RE-2023-0118;LIS Jahreslizenz;CompuGroup
+25.03.2023;-2800.00;6400;Versicherungen;KST100;RE-2023-0120;Betriebshaftpflicht Q1;Allianz
+01.04.2023;-128000.00;6000;Löhne und Gehälter;KST100;RE-2023-0150;Gehaltsabrechnung April inkl. Tariferhöhung;
+01.04.2023;-24960.00;6100;Soziale Abgaben;KST100;RE-2023-0151;AG-Anteile SV April;
+05.04.2023;-9200.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2023-0155;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.04.2023;-42000.00;5100;Reagenzien und Labormaterial;KST200;RE-2023-0160;Beckman Coulter Reagenzien;Beckman Coulter
+15.04.2023;175000.00;4400;Erlöse Labordiagnostik;KST200;AR-2023-0030;Laborleistungen April (Osterpause);
+20.04.2023;-12500.00;6300;Miete und Nebenkosten;KST100;RE-2023-0165;Miete Labor Mai;Immobilien GmbH
+25.04.2023;-4200.00;6700;Reisekosten;KST100;RE-2023-0170;Laborleitertreffen München;
+01.05.2023;-128000.00;6000;Löhne und Gehälter;KST100;RE-2023-0200;Gehaltsabrechnung Mai;
+01.05.2023;-24960.00;6100;Soziale Abgaben;KST100;RE-2023-0201;AG-Anteile SV Mai;
+05.05.2023;-9200.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2023-0205;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.05.2023;-48000.00;5100;Reagenzien und Labormaterial;KST200;RE-2023-0210;Siemens Chemie-Reagenzien;Siemens Healthineers
+15.05.2023;198000.00;4400;Erlöse Labordiagnostik;KST200;AR-2023-0040;Laborleistungen Mai;
+20.05.2023;-12500.00;6300;Miete und Nebenkosten;KST100;RE-2023-0215;Miete Labor Juni;Immobilien GmbH
+25.05.2023;-18000.00;6510;Wartungsverträge Laborgeräte;KST200;RE-2023-0220;Jahreswartung Analysesystem;TechService GmbH
+01.06.2023;-128000.00;6000;Löhne und Gehälter;KST100;RE-2023-0250;Gehaltsabrechnung Juni;
+01.06.2023;-64000.00;6000;Löhne und Gehälter;KST100;RE-2023-0251;Urlaubsgeld Juni;
+01.06.2023;-37440.00;6100;Soziale Abgaben;KST100;RE-2023-0252;AG-Anteile SV Juni inkl. Urlaubsgeld;
+05.06.2023;-11500.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2023-0255;Stadtwerke Klimaanlage Sommer;Stadtwerke Hamburg
+10.06.2023;-35000.00;5100;Reagenzien und Labormaterial;KST200;RE-2023-0260;Roche Diagnostika;Roche Diagnostics
+15.06.2023;165000.00;4400;Erlöse Labordiagnostik;KST200;AR-2023-0050;Laborleistungen Juni (Urlaubszeit);
+20.06.2023;-12500.00;6300;Miete und Nebenkosten;KST100;RE-2023-0265;Miete Labor Juli;Immobilien GmbH
+15.06.2023;25000.00;4500;Sonstige Erlöse;KST100;AR-2023-0055;Beratungsleistungen extern;

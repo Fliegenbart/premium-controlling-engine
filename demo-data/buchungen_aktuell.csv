@@ -1,0 +1,51 @@
+Buchungsdatum;Betrag;Konto;Kontobezeichnung;Kostenstelle;Belegnummer;Buchungstext;Lieferant
+01.01.2024;-138000.00;6000;Löhne und Gehälter;KST100;RE-2024-0001;Gehaltsabrechnung Januar (Neueinstellung MTA);
+01.01.2024;-26910.00;6100;Soziale Abgaben;KST100;RE-2024-0002;AG-Anteile SV Januar;
+05.01.2024;-12800.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2024-0010;Stadtwerke Abschlag ERHÖHT;Stadtwerke Hamburg
+10.01.2024;-65000.00;5100;Reagenzien und Labormaterial;KST200;RE-2024-0015;Siemens Diagnostika Q1 + Sonderbestellung;Siemens Healthineers
+15.01.2024;225000.00;4400;Erlöse Labordiagnostik;KST200;AR-2024-0001;Laborleistungen Krankenhäuser + Neuvertrag Klinikum Nord;
+20.01.2024;-14500.00;6300;Miete und Nebenkosten;KST100;RE-2024-0020;Miete Labor Februar (Indexerhöhung);Immobilien GmbH
+25.01.2024;-5800.00;6700;Reisekosten;KST100;RE-2024-0025;Fortbildung Dr. Müller + Dr. Schmidt;
+28.01.2024;-35000.00;6220;Abschreibungen Laborgeräte;KST200;RE-2024-0028;AfA neues PCR-Gerät;
+01.02.2024;-138000.00;6000;Löhne und Gehälter;KST100;RE-2024-0050;Gehaltsabrechnung Februar;
+01.02.2024;-26910.00;6100;Soziale Abgaben;KST100;RE-2024-0051;AG-Anteile SV Februar;
+05.02.2024;-12800.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2024-0055;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.02.2024;-58000.00;5100;Reagenzien und Labormaterial;KST200;RE-2024-0060;Roche Testkit Lieferung erhöht;Roche Diagnostics
+15.02.2024;235000.00;4400;Erlöse Labordiagnostik;KST200;AR-2024-0010;Laborleistungen Praxen + Neuakquise;
+20.02.2024;-14500.00;6300;Miete und Nebenkosten;KST100;RE-2024-0065;Miete Labor März;Immobilien GmbH
+25.02.2024;-8500.00;6500;Reparaturen und Instandhaltung;KST200;RE-2024-0070;Kleine Reparatur Zentrifuge;TechService GmbH
+01.03.2024;-142000.00;6000;Löhne und Gehälter;KST100;RE-2024-0100;Gehaltsabrechnung März (2. Neueinstellung);
+01.03.2024;-27690.00;6100;Soziale Abgaben;KST100;RE-2024-0101;AG-Anteile SV März;
+05.03.2024;-13500.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2024-0105;Stadtwerke Jahresabrechnung Nachzahlung;Stadtwerke Hamburg
+10.03.2024;-72000.00;5100;Reagenzien und Labormaterial;KST200;RE-2024-0110;Abbott Testsysteme Großbestellung;Abbott Diagnostics
+15.03.2024;258000.00;4400;Erlöse Labordiagnostik;KST200;AR-2024-0020;Laborleistungen März REKORD;
+20.03.2024;-14500.00;6300;Miete und Nebenkosten;KST100;RE-2024-0115;Miete Labor April;Immobilien GmbH
+22.03.2024;-12500.00;6815;Software und Lizenzen;KST100;RE-2024-0118;LIS Jahreslizenz + KI-Modul;CompuGroup
+25.03.2024;-3200.00;6400;Versicherungen;KST100;RE-2024-0120;Betriebshaftpflicht Q1 angepasst;Allianz
+28.03.2024;-35000.00;6220;Abschreibungen Laborgeräte;KST200;RE-2024-0125;AfA PCR-Gerät März;
+01.04.2024;-145000.00;6000;Löhne und Gehälter;KST100;RE-2024-0150;Gehaltsabrechnung April + Tariferhöhung 4%;
+01.04.2024;-28275.00;6100;Soziale Abgaben;KST100;RE-2024-0151;AG-Anteile SV April;
+05.04.2024;-13500.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2024-0155;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.04.2024;-55000.00;5100;Reagenzien und Labormaterial;KST200;RE-2024-0160;Beckman Coulter Reagenzien;Beckman Coulter
+15.04.2024;215000.00;4400;Erlöse Labordiagnostik;KST200;AR-2024-0030;Laborleistungen April;
+20.04.2024;-14500.00;6300;Miete und Nebenkosten;KST100;RE-2024-0165;Miete Labor Mai;Immobilien GmbH
+22.04.2024;-85000.00;6820;Beratungskosten;KST100;RE-2024-0168;Digitalisierungsberatung McKinsey;McKinsey & Company
+25.04.2024;-6500.00;6700;Reisekosten;KST100;RE-2024-0170;Laborleitertreffen + IFCC Kongress;
+28.04.2024;-35000.00;6220;Abschreibungen Laborgeräte;KST200;RE-2024-0175;AfA PCR-Gerät April;
+01.05.2024;-145000.00;6000;Löhne und Gehälter;KST100;RE-2024-0200;Gehaltsabrechnung Mai;
+01.05.2024;-28275.00;6100;Soziale Abgaben;KST100;RE-2024-0201;AG-Anteile SV Mai;
+05.05.2024;-13500.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2024-0205;Stadtwerke Abschlag;Stadtwerke Hamburg
+10.05.2024;-62000.00;5100;Reagenzien und Labormaterial;KST200;RE-2024-0210;Siemens Chemie-Reagenzien Nachbestellung;Siemens Healthineers
+15.05.2024;245000.00;4400;Erlöse Labordiagnostik;KST200;AR-2024-0040;Laborleistungen Mai;
+20.05.2024;-14500.00;6300;Miete und Nebenkosten;KST100;RE-2024-0215;Miete Labor Juni;Immobilien GmbH
+25.05.2024;-22000.00;6510;Wartungsverträge Laborgeräte;KST200;RE-2024-0220;Jahreswartung + PCR-Gerät Wartung;TechService GmbH
+28.05.2024;-35000.00;6220;Abschreibungen Laborgeräte;KST200;RE-2024-0225;AfA PCR-Gerät Mai;
+01.06.2024;-145000.00;6000;Löhne und Gehälter;KST100;RE-2024-0250;Gehaltsabrechnung Juni;
+01.06.2024;-72500.00;6000;Löhne und Gehälter;KST100;RE-2024-0251;Urlaubsgeld Juni (mehr MA);
+01.06.2024;-42413.00;6100;Soziale Abgaben;KST100;RE-2024-0252;AG-Anteile SV Juni inkl. Urlaubsgeld;
+05.06.2024;-15800.00;6310;Nebenkosten (Strom, Wasser);KST100;RE-2024-0255;Stadtwerke Klimaanlage + neues PCR-Gerät;Stadtwerke Hamburg
+10.06.2024;-48000.00;5100;Reagenzien und Labormaterial;KST200;RE-2024-0260;Roche Diagnostika;Roche Diagnostics
+15.06.2024;205000.00;4400;Erlöse Labordiagnostik;KST200;AR-2024-0050;Laborleistungen Juni;
+20.06.2024;-14500.00;6300;Miete und Nebenkosten;KST100;RE-2024-0265;Miete Labor Juli;Immobilien GmbH
+15.06.2024;18000.00;4500;Sonstige Erlöse;KST100;AR-2024-0055;Beratungsleistungen extern (reduziert);
+28.06.2024;-35000.00;6220;Abschreibungen Laborgeräte;KST200;RE-2024-0270;AfA PCR-Gerät Juni;

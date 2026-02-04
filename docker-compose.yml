@@ -1,0 +1,119 @@
+# Premium Controlling Engine - Docker Compose
+# Optimized for Hetzner GEX44 (AMD Ryzen, 64GB RAM)
+# 100% local - no external API needed
+
+services:
+  # Main Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: controlling-engine
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_PATH=/data/controlling.duckdb
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=qwen2.5:14b
+    volumes:
+      - ./data:/data
+      - ./uploads:/app/uploads
+    depends_on:
+      ollama:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 2G
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.controlling.rule=Host(`controlling.${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.controlling.tls=true"
+      - "traefik.http.routers.controlling.tls.certresolver=letsencrypt"
+      - "traefik.http.services.controlling.loadbalancer.server.port=3000"
+
+  # Local LLM with Ollama (REQUIRED for local mode)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: controlling-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_NUM_PARALLEL=2
+    deploy:
+      resources:
+        limits:
+          memory: 32G
+        reservations:
+          memory: 8G
+    # GPU support (uncomment if GPU available)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Model Initializer - Downloads recommended model on first start
+  ollama-init:
+    image: curlimages/curl:latest
+    container_name: controlling-ollama-init
+    depends_on:
+      - ollama
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "⏳ Waiting for Ollama to start..."
+        sleep 10
+        echo "📥 Pulling qwen2.5:14b (best for German + tool calling)..."
+        curl -X POST http://ollama:11434/api/pull -d '{"name": "qwen2.5:14b"}' --no-buffer
+        echo ""
+        echo "✅ Model ready! You can now use the Controlling Agent."
+
+  # Traefik Reverse Proxy (optional, for production with SSL)
+  traefik:
+    image: traefik:v3.0
+    container_name: controlling-traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ADMIN_EMAIL:-admin@example.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_certs:/letsencrypt
+    profiles:
+      - with-traefik
+
+volumes:
+  ollama_data:
+  traefik_certs:
+
+networks:
+  default:
+    name: controlling-network
