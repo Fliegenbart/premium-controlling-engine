@@ -1,6 +1,6 @@
 /**
  * DuckDB Data Engine - Core of Premium Controlling
- * 
+ *
  * Provides SQL-based analytics on booking data with:
  * - Automatic schema inference
  * - Data profiling & quality checks
@@ -8,45 +8,105 @@
  * - Time series analysis
  */
 
-import * as duckdb from '@duckdb/node-api';
+import * as duckdb from 'duckdb';
 import { Booking, DataProfile, VarianceResult, TimeSeriesPoint } from './types';
 
 // Singleton DuckDB instance
 let db: duckdb.Database | null = null;
-let connection: duckdb.Connection | null = null;
 
 /**
  * Initialize DuckDB with in-memory database
- * Persists to disk for session continuity
  */
 export async function initDatabase(persistPath?: string): Promise<void> {
   if (db) return;
-  
-  const instance = await duckdb.createDatabase(persistPath || ':memory:');
-  db = instance;
-  connection = await db.connect();
-  
-  // Enable extensions
-  await connection.run("INSTALL 'parquet'; LOAD 'parquet';");
-  
-  // Create core schemas
-  await connection.run(`
-    CREATE SCHEMA IF NOT EXISTS controlling;
-    CREATE SCHEMA IF NOT EXISTS staging;
-    CREATE SCHEMA IF NOT EXISTS analysis;
-  `);
-  
-  console.log('DuckDB initialized successfully');
+
+  return new Promise((resolve, reject) => {
+    db = new duckdb.Database(persistPath || ':memory:', (err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      // Create core schemas
+      db!.run(
+        `
+        CREATE SCHEMA IF NOT EXISTS controlling;
+        CREATE SCHEMA IF NOT EXISTS staging;
+        CREATE SCHEMA IF NOT EXISTS analysis;
+      `,
+        (err) => {
+          if (err) reject(err);
+          else {
+            console.log('DuckDB initialized successfully');
+            resolve();
+          }
+        }
+      );
+    });
+  });
 }
 
 /**
- * Get database connection (auto-init if needed)
+ * Get database instance (auto-init if needed)
  */
-export async function getConnection(): Promise<duckdb.Connection> {
-  if (!connection) {
+export async function getDatabase(): Promise<duckdb.Database> {
+  if (!db) {
     await initDatabase();
   }
-  return connection!;
+  return db!;
+}
+
+/**
+ * Execute SQL and return rows
+ */
+export async function executeSQL(sql: string): Promise<{
+  columns: string[];
+  rows: Record<string, unknown>[];
+  rowCount: number;
+  executionTimeMs: number;
+}> {
+  const database = await getDatabase();
+  const start = Date.now();
+
+  // Basic SQL injection prevention
+  const sanitized = sql.trim().toLowerCase();
+  if (
+    sanitized.includes('drop') ||
+    sanitized.includes('delete') ||
+    sanitized.includes('truncate')
+  ) {
+    throw new Error('Destructive operations not allowed');
+  }
+
+  return new Promise((resolve, reject) => {
+    database.all(sql, (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      const result = rows as Record<string, unknown>[];
+      resolve({
+        columns: result.length > 0 ? Object.keys(result[0]) : [],
+        rows: result,
+        rowCount: result.length,
+        executionTimeMs: Date.now() - start,
+      });
+    });
+  });
+}
+
+/**
+ * Run SQL without returning results
+ */
+async function runSQL(sql: string): Promise<void> {
+  const database = await getDatabase();
+  return new Promise((resolve, reject) => {
+    database.run(sql, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
 }
 
 /**
@@ -57,14 +117,13 @@ export async function loadBookings(
   tableName: string,
   schema: string = 'controlling'
 ): Promise<{ rowCount: number; profile: DataProfile }> {
-  const conn = await getConnection();
   const fullTableName = `${schema}.${tableName}`;
-  
+
   // Drop existing table
-  await conn.run(`DROP TABLE IF EXISTS ${fullTableName}`);
-  
-  // Create table with proper types
-  await conn.run(`
+  await runSQL(`DROP TABLE IF EXISTS ${fullTableName}`);
+
+  // Create table
+  await runSQL(`
     CREATE TABLE ${fullTableName} (
       id INTEGER,
       posting_date DATE,
@@ -76,59 +135,54 @@ export async function loadBookings(
       vendor VARCHAR,
       customer VARCHAR,
       document_no VARCHAR,
-      text VARCHAR,
-      -- Computed columns
-      year INTEGER AS (YEAR(posting_date)),
-      month INTEGER AS (MONTH(posting_date)),
-      quarter INTEGER AS (QUARTER(posting_date)),
-      is_expense BOOLEAN AS (account >= 5000),
-      is_revenue BOOLEAN AS (account < 5000)
+      text VARCHAR
     )
   `);
-  
-  // Prepare insert statement
-  const stmt = await conn.prepare(`
-    INSERT INTO ${fullTableName} 
-    (id, posting_date, amount, account, account_name, cost_center, profit_center, vendor, customer, document_no, text)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-  
-  // Insert in batches
-  for (let i = 0; i < bookings.length; i++) {
-    const b = bookings[i];
-    await stmt.run([
-      i + 1,
-      b.posting_date,
-      b.amount,
-      b.account,
-      b.account_name,
-      b.cost_center || null,
-      b.profit_center || null,
-      b.vendor || null,
-      b.customer || null,
-      b.document_no,
-      b.text
-    ]);
+
+  // Insert in batches using VALUES
+  const batchSize = 100;
+  for (let i = 0; i < bookings.length; i += batchSize) {
+    const batch = bookings.slice(i, i + batchSize);
+    const values = batch
+      .map((b, idx) => {
+        const id = i + idx + 1;
+        const date = b.posting_date ? `'${b.posting_date}'` : 'NULL';
+        const amount = b.amount || 0;
+        const account = b.account || 0;
+        const accountName = escape(b.account_name || '');
+        const costCenter = b.cost_center ? `'${escape(b.cost_center)}'` : 'NULL';
+        const profitCenter = b.profit_center ? `'${escape(b.profit_center)}'` : 'NULL';
+        const vendor = b.vendor ? `'${escape(b.vendor)}'` : 'NULL';
+        const customer = b.customer ? `'${escape(b.customer)}'` : 'NULL';
+        const docNo = escape(b.document_no || '');
+        const text = escape(b.text || '');
+
+        return `(${id}, ${date}, ${amount}, ${account}, '${accountName}', ${costCenter}, ${profitCenter}, ${vendor}, ${customer}, '${docNo}', '${text}')`;
+      })
+      .join(',\n');
+
+    await runSQL(`INSERT INTO ${fullTableName} VALUES ${values}`);
   }
-  
+
   // Generate profile
   const profile = await profileTable(fullTableName);
-  
+
   return {
     rowCount: bookings.length,
-    profile
+    profile,
   };
+}
+
+function escape(str: string): string {
+  return str.replace(/'/g, "''").replace(/\\/g, '\\\\');
 }
 
 /**
  * Profile a table for data quality
  */
 export async function profileTable(tableName: string): Promise<DataProfile> {
-  const conn = await getConnection();
-  
-  // Basic stats
-  const statsResult = await conn.run(`
-    SELECT 
+  const statsResult = await executeSQL(`
+    SELECT
       COUNT(*) as row_count,
       COUNT(DISTINCT account) as unique_accounts,
       COUNT(DISTINCT cost_center) as unique_cost_centers,
@@ -143,78 +197,60 @@ export async function profileTable(tableName: string): Promise<DataProfile> {
       COUNT(CASE WHEN account IS NULL THEN 1 END) as null_accounts
     FROM ${tableName}
   `);
-  
-  const stats = await statsResult.fetchAllRows();
-  const s = stats[0] as Record<string, unknown>;
-  
+
+  const s = statsResult.rows[0] as Record<string, unknown>;
+
   // Duplicate check
-  const dupResult = await conn.run(`
+  const dupResult = await executeSQL(`
     SELECT document_no, COUNT(*) as cnt
     FROM ${tableName}
     GROUP BY document_no
     HAVING COUNT(*) > 1
     LIMIT 10
   `);
-  const duplicates = await dupResult.fetchAllRows();
-  
-  // Outlier detection (using IQR method)
-  const outlierResult = await conn.run(`
-    WITH stats AS (
-      SELECT 
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY ABS(amount)) as q1,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY ABS(amount)) as q3
-      FROM ${tableName}
-    )
+
+  // Outlier detection (simplified)
+  const outlierResult = await executeSQL(`
     SELECT COUNT(*) as outlier_count
-    FROM ${tableName}, stats
-    WHERE ABS(amount) > q3 + 1.5 * (q3 - q1)
-       OR ABS(amount) < q1 - 1.5 * (q3 - q1)
+    FROM ${tableName}
+    WHERE ABS(amount) > (SELECT AVG(ABS(amount)) + 3 * STDDEV(ABS(amount)) FROM ${tableName})
   `);
-  const outliers = await outlierResult.fetchAllRows();
-  
+
+  const warnings: string[] = [];
+  if (Number(s.null_amounts) > 0) {
+    warnings.push(`${s.null_amounts} Buchungen ohne Betrag`);
+  }
+  if (Number(s.null_dates) > 0) {
+    warnings.push(`${s.null_dates} Buchungen ohne Datum`);
+  }
+  if (dupResult.rows.length > 0) {
+    warnings.push(`${dupResult.rows.length} doppelte Belegnummern gefunden`);
+  }
+
   return {
     rowCount: Number(s.row_count),
     uniqueAccounts: Number(s.unique_accounts),
     uniqueCostCenters: Number(s.unique_cost_centers),
     uniqueDocuments: Number(s.unique_documents),
     dateRange: {
-      min: String(s.min_date),
-      max: String(s.max_date)
+      min: String(s.min_date || ''),
+      max: String(s.max_date || ''),
     },
     totals: {
-      all: Number(s.total_amount),
-      credits: Number(s.total_credits),
-      debits: Number(s.total_debits),
-      balanced: Math.abs(Number(s.total_credits) + Number(s.total_debits)) < 0.01
+      all: Number(s.total_amount) || 0,
+      credits: Number(s.total_credits) || 0,
+      debits: Number(s.total_debits) || 0,
+      balanced: Math.abs(Number(s.total_credits) + Number(s.total_debits)) < 0.01,
     },
     quality: {
       nullAmounts: Number(s.null_amounts),
       nullDates: Number(s.null_dates),
       nullAccounts: Number(s.null_accounts),
-      duplicateDocuments: duplicates.length,
-      outlierCount: Number((outliers[0] as Record<string, unknown>).outlier_count)
+      duplicateDocuments: dupResult.rows.length,
+      outlierCount: Number((outlierResult.rows[0] as Record<string, unknown>).outlier_count),
     },
-    warnings: generateWarnings(s, duplicates)
+    warnings,
   };
-}
-
-function generateWarnings(stats: Record<string, unknown>, duplicates: unknown[]): string[] {
-  const warnings: string[] = [];
-  
-  if (Number(stats.null_amounts) > 0) {
-    warnings.push(`${stats.null_amounts} Buchungen ohne Betrag`);
-  }
-  if (Number(stats.null_dates) > 0) {
-    warnings.push(`${stats.null_dates} Buchungen ohne Datum`);
-  }
-  if (duplicates.length > 0) {
-    warnings.push(`${duplicates.length} doppelte Belegnummern gefunden`);
-  }
-  if (!stats.total_amount || Math.abs(Number(stats.total_credits) + Number(stats.total_debits)) > 0.01) {
-    // This is expected for P&L, not a warning
-  }
-  
-  return warnings;
 }
 
 /**
@@ -222,15 +258,9 @@ function generateWarnings(stats: Record<string, unknown>, duplicates: unknown[])
  */
 export async function analyzeVariance(
   tablePrev: string,
-  tableCurr: string,
-  dimensions: string[] = ['account', 'cost_center']
+  tableCurr: string
 ): Promise<VarianceResult[]> {
-  const conn = await getConnection();
-  
-  const results: VarianceResult[] = [];
-  
-  // Account-level variance
-  const accountVariance = await conn.run(`
+  const result = await executeSQL(`
     WITH prev AS (
       SELECT account, account_name, SUM(amount) as amount_prev, COUNT(*) as count_prev
       FROM ${tablePrev}
@@ -241,14 +271,14 @@ export async function analyzeVariance(
       FROM ${tableCurr}
       GROUP BY account, account_name
     )
-    SELECT 
+    SELECT
       COALESCE(p.account, c.account) as account,
       COALESCE(p.account_name, c.account_name) as account_name,
       COALESCE(p.amount_prev, 0) as amount_prev,
       COALESCE(c.amount_curr, 0) as amount_curr,
       COALESCE(c.amount_curr, 0) - COALESCE(p.amount_prev, 0) as delta_abs,
-      CASE 
-        WHEN COALESCE(p.amount_prev, 0) = 0 THEN 
+      CASE
+        WHEN COALESCE(p.amount_prev, 0) = 0 THEN
           CASE WHEN COALESCE(c.amount_curr, 0) = 0 THEN 0 ELSE 100 END
         ELSE (COALESCE(c.amount_curr, 0) - p.amount_prev) / ABS(p.amount_prev) * 100
       END as delta_pct,
@@ -258,24 +288,18 @@ export async function analyzeVariance(
     FULL OUTER JOIN curr c ON p.account = c.account
     ORDER BY ABS(COALESCE(c.amount_curr, 0) - COALESCE(p.amount_prev, 0)) DESC
   `);
-  
-  const rows = await accountVariance.fetchAllRows();
-  
-  for (const row of rows as Record<string, unknown>[]) {
-    results.push({
-      dimension: 'account',
-      key: String(row.account),
-      label: String(row.account_name),
-      amountPrev: Number(row.amount_prev),
-      amountCurr: Number(row.amount_curr),
-      deltaAbs: Number(row.delta_abs),
-      deltaPct: Number(row.delta_pct),
-      bookingsPrev: Number(row.bookings_prev),
-      bookingsCurr: Number(row.bookings_curr)
-    });
-  }
-  
-  return results;
+
+  return result.rows.map((row) => ({
+    dimension: 'account',
+    key: String(row.account),
+    label: String(row.account_name),
+    amountPrev: Number(row.amount_prev),
+    amountCurr: Number(row.amount_curr),
+    deltaAbs: Number(row.delta_abs),
+    deltaPct: Number(row.delta_pct),
+    bookingsPrev: Number(row.bookings_prev),
+    bookingsCurr: Number(row.bookings_curr),
+  }));
 }
 
 /**
@@ -286,18 +310,15 @@ export async function getTopBookings(
   account: number,
   limit: number = 10
 ): Promise<Booking[]> {
-  const conn = await getConnection();
-  
-  const result = await conn.run(`
+  const result = await executeSQL(`
     SELECT *
     FROM ${tableName}
     WHERE account = ${account}
     ORDER BY ABS(amount) DESC
     LIMIT ${limit}
   `);
-  
-  const rows = await result.fetchAllRows();
-  return rows.map((r: Record<string, unknown>) => ({
+
+  return result.rows.map((r) => ({
     posting_date: String(r.posting_date),
     amount: Number(r.amount),
     account: Number(r.account),
@@ -307,72 +328,7 @@ export async function getTopBookings(
     vendor: r.vendor ? String(r.vendor) : undefined,
     customer: r.customer ? String(r.customer) : undefined,
     document_no: String(r.document_no),
-    text: String(r.text)
-  }));
-}
-
-/**
- * Execute custom SQL query (for agent tool calling)
- */
-export async function executeSQL(sql: string): Promise<{
-  columns: string[];
-  rows: Record<string, unknown>[];
-  rowCount: number;
-  executionTimeMs: number;
-}> {
-  const conn = await getConnection();
-  const start = Date.now();
-  
-  // Validate SQL (basic safety)
-  const sanitized = sql.trim().toLowerCase();
-  if (sanitized.includes('drop') || sanitized.includes('delete') || sanitized.includes('truncate')) {
-    throw new Error('Destructive operations not allowed');
-  }
-  
-  const result = await conn.run(sql);
-  const rows = await result.fetchAllRows() as Record<string, unknown>[];
-  
-  return {
-    columns: rows.length > 0 ? Object.keys(rows[0]) : [],
-    rows,
-    rowCount: rows.length,
-    executionTimeMs: Date.now() - start
-  };
-}
-
-/**
- * Generate time series for forecasting
- */
-export async function getTimeSeries(
-  tableName: string,
-  metric: 'amount' | 'count' = 'amount',
-  groupBy: 'month' | 'quarter' = 'month'
-): Promise<TimeSeriesPoint[]> {
-  const conn = await getConnection();
-  
-  const dateGroup = groupBy === 'month' 
-    ? "DATE_TRUNC('month', posting_date)"
-    : "DATE_TRUNC('quarter', posting_date)";
-  
-  const metricExpr = metric === 'amount' ? 'SUM(amount)' : 'COUNT(*)';
-  
-  const result = await conn.run(`
-    SELECT 
-      ${dateGroup} as period,
-      ${metricExpr} as value,
-      COUNT(*) as transaction_count,
-      COUNT(DISTINCT account) as unique_accounts
-    FROM ${tableName}
-    GROUP BY ${dateGroup}
-    ORDER BY period
-  `);
-  
-  const rows = await result.fetchAllRows();
-  return rows.map((r: Record<string, unknown>) => ({
-    period: String(r.period),
-    value: Number(r.value),
-    transactionCount: Number(r.transaction_count),
-    uniqueAccounts: Number(r.unique_accounts)
+    text: String(r.text),
   }));
 }
 
@@ -393,28 +349,25 @@ export async function decomposeVariance(
     contributionPct: number;
   }>;
 }> {
-  const conn = await getConnection();
-  
   // Get total variance first
-  const totalResult = await conn.run(`
+  const totalResult = await executeSQL(`
     WITH prev AS (SELECT SUM(amount) as total FROM ${tablePrev} WHERE account = ${targetAccount}),
          curr AS (SELECT SUM(amount) as total FROM ${tableCurr} WHERE account = ${targetAccount})
     SELECT COALESCE(curr.total, 0) - COALESCE(prev.total, 0) as variance
     FROM prev, curr
   `);
-  const totalRow = (await totalResult.fetchAllRows())[0] as Record<string, unknown>;
-  const totalVariance = Number(totalRow.variance);
-  
+  const totalVariance = Number((totalResult.rows[0] as Record<string, unknown>).variance);
+
   const drivers: Array<{
     dimension: string;
     key: string;
     contribution: number;
     contributionPct: number;
   }> = [];
-  
+
   // Analyze each dimension
   for (const dim of dimensions) {
-    const dimResult = await conn.run(`
+    const dimResult = await executeSQL(`
       WITH prev AS (
         SELECT ${dim} as key, SUM(amount) as amount
         FROM ${tablePrev}
@@ -427,7 +380,7 @@ export async function decomposeVariance(
         WHERE account = ${targetAccount}
         GROUP BY ${dim}
       )
-      SELECT 
+      SELECT
         COALESCE(p.key, c.key) as key,
         COALESCE(c.amount, 0) - COALESCE(p.amount, 0) as contribution
       FROM prev p
@@ -436,58 +389,77 @@ export async function decomposeVariance(
       ORDER BY ABS(COALESCE(c.amount, 0) - COALESCE(p.amount, 0)) DESC
       LIMIT 5
     `);
-    
-    const dimRows = await dimResult.fetchAllRows();
-    for (const row of dimRows as Record<string, unknown>[]) {
+
+    for (const row of dimResult.rows) {
       const contribution = Number(row.contribution);
       drivers.push({
         dimension: dim,
         key: String(row.key || '(leer)'),
         contribution,
-        contributionPct: totalVariance !== 0 ? (contribution / totalVariance) * 100 : 0
+        contributionPct: totalVariance !== 0 ? (contribution / totalVariance) * 100 : 0,
       });
     }
   }
-  
+
   // Sort by absolute contribution
   drivers.sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution));
-  
+
   return {
     totalVariance,
-    drivers: drivers.slice(0, 10)
+    drivers: drivers.slice(0, 10),
   };
 }
 
 /**
- * Export table to Parquet for persistence
+ * Generate time series for forecasting
  */
-export async function exportToParquet(tableName: string, outputPath: string): Promise<void> {
-  const conn = await getConnection();
-  await conn.run(`COPY ${tableName} TO '${outputPath}' (FORMAT PARQUET, COMPRESSION 'ZSTD')`);
+export async function getTimeSeries(
+  tableName: string,
+  metric: 'amount' | 'count' = 'amount',
+  groupBy: 'month' | 'quarter' = 'month'
+): Promise<TimeSeriesPoint[]> {
+  const dateGroup =
+    groupBy === 'month'
+      ? "DATE_TRUNC('month', posting_date)"
+      : "DATE_TRUNC('quarter', posting_date)";
+
+  const metricExpr = metric === 'amount' ? 'SUM(amount)' : 'COUNT(*)';
+
+  const result = await executeSQL(`
+    SELECT
+      ${dateGroup} as period,
+      ${metricExpr} as value,
+      COUNT(*) as transaction_count,
+      COUNT(DISTINCT account) as unique_accounts
+    FROM ${tableName}
+    GROUP BY ${dateGroup}
+    ORDER BY period
+  `);
+
+  return result.rows.map((r) => ({
+    period: String(r.period),
+    value: Number(r.value),
+    transactionCount: Number(r.transaction_count),
+    uniqueAccounts: Number(r.unique_accounts),
+  }));
 }
 
 /**
- * Import from Parquet
+ * Export to get connection for direct queries
  */
-export async function importFromParquet(inputPath: string, tableName: string): Promise<number> {
-  const conn = await getConnection();
-  await conn.run(`CREATE TABLE ${tableName} AS SELECT * FROM read_parquet('${inputPath}')`);
-  
-  const countResult = await conn.run(`SELECT COUNT(*) as cnt FROM ${tableName}`);
-  const countRow = (await countResult.fetchAllRows())[0] as Record<string, unknown>;
-  return Number(countRow.cnt);
+export async function getConnection(): Promise<duckdb.Database> {
+  return getDatabase();
 }
 
 /**
- * Close database connection
+ * Close database
  */
 export async function closeDatabase(): Promise<void> {
-  if (connection) {
-    await connection.close();
-    connection = null;
-  }
   if (db) {
-    await db.close();
+    db.close();
     db = null;
   }
 }
+
+// Alias for backward compatibility
+export { executeSQL as runQuery };
