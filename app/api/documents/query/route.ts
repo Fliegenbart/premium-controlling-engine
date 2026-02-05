@@ -4,8 +4,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { answerQuestion } from '@/lib/doc-index/tree-reasoner';
-import { searchDocuments } from '@/lib/doc-index/document-store';
+import { searchDocument } from '@/lib/doc-index/tree-reasoner';
+import { searchAllDocuments } from '@/lib/doc-index/document-store';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Frage fehlt' }, { status: 400 });
     }
 
-    const result = await answerQuestion(question, {
+    const result = await searchDocument(question, {
       useOllama,
       ollamaModel,
       anthropicApiKey,
@@ -44,16 +44,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Suchbegriff fehlt (?q=...)' }, { status: 400 });
   }
 
-  const results = searchDocuments(q, 10);
+  const results = searchAllDocuments(q);
 
   return NextResponse.json({
     success: true,
     query: q,
-    results: results.map((r) => ({
+    results: results.slice(0, 10).map((r: { documentId: string; documentTitle: string; node: { title?: string }; excerpt: string; relevanceScore: number }) => ({
       documentId: r.documentId,
       documentTitle: r.documentTitle,
-      nodeTitle: r.node.title,
-      path: r.path,
+      nodeTitle: r.node?.title || '',
       excerpt: r.excerpt,
       relevance: r.relevanceScore,
     })),
