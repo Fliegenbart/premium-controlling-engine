@@ -120,10 +120,7 @@ Beantworte die Frage basierend auf dem Kontext. Wenn der Kontext die Frage nicht
   if (options.useOllama) {
     try {
       const ollama = new OllamaClient();
-      const response = await ollama.generate(prompt, {
-        model: options.ollamaModel,
-        temperature: 0.3,
-      });
+      const response = await ollama.generate(prompt, options.ollamaModel);
       return response;
     } catch (error) {
       console.warn('Ollama nicht verfügbar, verwende Fallback');
