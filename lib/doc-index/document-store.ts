@@ -51,7 +51,7 @@ export function clearDocuments(): void {
 export function searchDocuments(query: string, limit: number = 10): SearchResult[] {
   const results: SearchResult[] = [];
 
-  for (const doc of documents.values()) {
+  for (const doc of Array.from(documents.values())) {
     const nodes = searchTree(doc.tree, query);
 
     for (const node of nodes) {
@@ -133,7 +133,7 @@ export function getStats(): {
   let totalSections = 0;
   let totalSizeBytes = 0;
 
-  for (const doc of documents.values()) {
+  for (const doc of Array.from(documents.values())) {
     totalSections += doc.totalSections;
     totalSizeBytes += doc.sizeBytes;
   }
