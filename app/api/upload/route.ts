@@ -88,8 +88,4 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
   }
 }
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// App Router handles body parsing automatically - no config needed
