@@ -1,303 +1,388 @@
 /**
- * Triple Analysis Engine - Plan vs. Ist vs. Vorjahr
- *
- * Implements three-way variance analysis with:
- * - Plan achievement tracking
- * - Year-over-year comparison
- * - Traffic light status (Ampel)
- * - DuckDB-powered analytics
+ * Triple Analysis: Plan vs. Ist vs. Vorjahr
+ * The heart of controlling - comparing actual vs plan vs previous year
  */
 
-import { getConnection, initDatabase } from './duckdb-engine';
-import { TripleAnalysisResult, TripleAccountDeviation, TopBooking } from './types';
+import {
+  Booking,
+  PlanData,
+  TripleAnalysisResult,
+  TripleAccountDeviation,
+  TripleCostCenterDeviation,
+  TripleAnalysisConfig,
+  TopBooking,
+} from './types';
 
-interface TripleAnalysisOptions {
-  wesentlichkeitAbs?: number; // Materiality threshold absolute
-  wesentlichkeitPct?: number; // Materiality threshold percentage
-  includeTopBookings?: boolean;
-  maxAccounts?: number;
-}
-
-const DEFAULT_OPTIONS: TripleAnalysisOptions = {
-  wesentlichkeitAbs: 5000,
-  wesentlichkeitPct: 5,
-  includeTopBookings: true,
-  maxAccounts: 50,
+const DEFAULT_CONFIG: TripleAnalysisConfig = {
+  wesentlichkeit_abs: 5000,
+  wesentlichkeit_pct: 5,
+  period_vj_name: 'Vorjahr',
+  period_plan_name: 'Plan',
+  period_ist_name: 'Ist',
+  threshold_yellow_pct: 5,
+  threshold_red_pct: 10,
 };
 
-async function fetchAllRows(
-  conn: Awaited<ReturnType<typeof getConnection>>,
-  sql: string
-): Promise<Record<string, unknown>[]> {
-  return new Promise((resolve, reject) => {
-    conn.all(sql, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows as Record<string, unknown>[]);
-    });
-  });
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+// Helper functions
+function groupBy<T>(arr: T[], key: (item: T) => string): Map<string, T[]> {
+  const map = new Map<string, T[]>();
+  for (const item of arr) {
+    const k = key(item);
+    const existing = map.get(k) || [];
+    existing.push(item);
+    map.set(k, existing);
+  }
+  return map;
+}
+
+function sumBy<T>(arr: T[], fn: (item: T) => number): number {
+  return arr.reduce((sum, item) => sum + fn(item), 0);
+}
+
+function getTopBookings(bookings: Booking[], account: number, topN: number = 5): TopBooking[] {
+  return bookings
+    .filter(b => b.account === account)
+    .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
+    .slice(0, topN)
+    .map(b => ({
+      date: b.posting_date,
+      amount: b.amount,
+      text: b.text,
+      vendor: b.vendor,
+      customer: b.customer,
+      document_no: b.document_no,
+    }));
+}
+
+function getStatus(
+  deltaPlanPct: number,
+  isExpense: boolean,
+  thresholdYellow: number,
+  thresholdRed: number
+): 'on_track' | 'over_plan' | 'under_plan' | 'critical' {
+  const absPct = Math.abs(deltaPlanPct);
+
+  // For expenses: positive delta (over plan) is bad
+  // For revenue: negative delta (under plan) is bad
+  const isBad = isExpense ? deltaPlanPct > 0 : deltaPlanPct < 0;
+
+  if (absPct <= thresholdYellow) {
+    return 'on_track';
+  } else if (absPct <= thresholdRed) {
+    return isBad ? 'over_plan' : 'under_plan';
+  } else {
+    return 'critical';
+  }
+}
+
+function generateTripleComment(
+  account: number,
+  accountName: string,
+  deltaPlan: number,
+  deltaPlanPct: number,
+  deltaVJ: number,
+  deltaVJPct: number,
+  status: string
+): string {
+  const isExpense = account >= 5000;
+
+  let comment = '';
+
+  // Plan comparison
+  if (Math.abs(deltaPlanPct) < 5) {
+    comment += `Im Plan. `;
+  } else if (deltaPlan > 0) {
+    comment += isExpense
+      ? `Über Plan um ${formatCurrency(deltaPlan)} (+${deltaPlanPct.toFixed(1)}%). `
+      : `Über Plan um ${formatCurrency(deltaPlan)} (+${deltaPlanPct.toFixed(1)}%). `;
+  } else {
+    comment += isExpense
+      ? `Unter Plan um ${formatCurrency(Math.abs(deltaPlan))} (${deltaPlanPct.toFixed(1)}%). `
+      : `Unter Plan um ${formatCurrency(Math.abs(deltaPlan))} (${deltaPlanPct.toFixed(1)}%). `;
+  }
+
+  // VJ comparison
+  if (deltaVJ > 0) {
+    comment += isExpense
+      ? `Kosten gestiegen vs. VJ um ${formatCurrency(deltaVJ)} (+${deltaVJPct.toFixed(1)}%).`
+      : `Erlöse gestiegen vs. VJ um ${formatCurrency(deltaVJ)} (+${deltaVJPct.toFixed(1)}%).`;
+  } else if (deltaVJ < 0) {
+    comment += isExpense
+      ? `Kosten gesunken vs. VJ um ${formatCurrency(Math.abs(deltaVJ))} (${deltaVJPct.toFixed(1)}%).`
+      : `Erlöse gesunken vs. VJ um ${formatCurrency(Math.abs(deltaVJ))} (${deltaVJPct.toFixed(1)}%).`;
+  } else {
+    comment += `Unverändert vs. VJ.`;
+  }
+
+  return comment;
 }
 
 /**
- * Run triple analysis: Plan vs. Ist vs. Vorjahr
+ * Main triple analysis function
+ * Compares: Vorjahr (VJ) vs. Plan vs. Ist (Actual)
  */
-export async function analyzeTriple(
-  tableVJ: string = 'controlling.bookings_vj',
-  tablePlan: string = 'controlling.bookings_plan',
-  tableIst: string = 'controlling.bookings_ist',
-  options: TripleAnalysisOptions = {}
-): Promise<TripleAnalysisResult> {
-  const opts = { ...DEFAULT_OPTIONS, ...options };
-  await initDatabase();
-  const conn = await getConnection();
+export function analyzeTriple(
+  vjBookings: Booking[],
+  planData: PlanData[],
+  istBookings: Booking[],
+  config: Partial<TripleAnalysisConfig> = {}
+): TripleAnalysisResult {
+  const cfg = { ...DEFAULT_CONFIG, ...config };
 
-  // Get period metadata
-  const metaRows = await fetchAllRows(conn, `
-    WITH vj AS (
-      SELECT
-        MIN(posting_date) as min_date,
-        MAX(posting_date) as max_date,
-        SUM(amount) as total,
-        COUNT(*) as cnt
-      FROM ${tableVJ}
-    ),
-    plan AS (
-      SELECT
-        MIN(posting_date) as min_date,
-        MAX(posting_date) as max_date,
-        SUM(amount) as total,
-        COUNT(*) as cnt
-      FROM ${tablePlan}
-    ),
-    ist AS (
-      SELECT
-        MIN(posting_date) as min_date,
-        MAX(posting_date) as max_date,
-        SUM(amount) as total,
-        COUNT(*) as cnt
-      FROM ${tableIst}
-    )
-    SELECT
-      vj.min_date as vj_min, vj.max_date as vj_max, vj.total as vj_total, vj.cnt as vj_cnt,
-      plan.min_date as plan_min, plan.max_date as plan_max, plan.total as plan_total, plan.cnt as plan_cnt,
-      ist.min_date as ist_min, ist.max_date as ist_max, ist.total as ist_total, ist.cnt as ist_cnt
-    FROM vj, plan, ist
-  `);
-
-  const meta = (metaRows[0] ?? {}) as Record<string, unknown>;
-
-  // Account-level triple variance
-  const varianceRows = await fetchAllRows(conn, `
-    WITH vj AS (
-      SELECT account, account_name, SUM(amount) as amount, COUNT(*) as cnt
-      FROM ${tableVJ}
-      GROUP BY account, account_name
-    ),
-    plan AS (
-      SELECT account, account_name, SUM(amount) as amount, COUNT(*) as cnt
-      FROM ${tablePlan}
-      GROUP BY account, account_name
-    ),
-    ist AS (
-      SELECT account, account_name, SUM(amount) as amount, COUNT(*) as cnt
-      FROM ${tableIst}
-      GROUP BY account, account_name
-    )
-    SELECT
-      COALESCE(vj.account, plan.account, ist.account) as account,
-      COALESCE(vj.account_name, plan.account_name, ist.account_name) as account_name,
-      COALESCE(vj.amount, 0) as amount_vj,
-      COALESCE(plan.amount, 0) as amount_plan,
-      COALESCE(ist.amount, 0) as amount_ist,
-      COALESCE(ist.cnt, 0) as cnt_ist,
-      -- Delta Ist vs Plan
-      COALESCE(ist.amount, 0) - COALESCE(plan.amount, 0) as delta_plan_abs,
-      CASE
-        WHEN COALESCE(plan.amount, 0) = 0 THEN
-          CASE WHEN COALESCE(ist.amount, 0) = 0 THEN 0 ELSE 100 END
-        ELSE (COALESCE(ist.amount, 0) - plan.amount) / ABS(plan.amount) * 100
-      END as delta_plan_pct,
-      -- Delta Ist vs VJ
-      COALESCE(ist.amount, 0) - COALESCE(vj.amount, 0) as delta_vj_abs,
-      CASE
-        WHEN COALESCE(vj.amount, 0) = 0 THEN
-          CASE WHEN COALESCE(ist.amount, 0) = 0 THEN 0 ELSE 100 END
-        ELSE (COALESCE(ist.amount, 0) - vj.amount) / ABS(vj.amount) * 100
-      END as delta_vj_pct,
-      -- Plan vs VJ
-      COALESCE(plan.amount, 0) - COALESCE(vj.amount, 0) as plan_vs_vj_abs,
-      CASE
-        WHEN COALESCE(vj.amount, 0) = 0 THEN
-          CASE WHEN COALESCE(plan.amount, 0) = 0 THEN 0 ELSE 100 END
-        ELSE (COALESCE(plan.amount, 0) - vj.amount) / ABS(vj.amount) * 100
-      END as plan_vs_vj_pct
-    FROM vj
-    FULL OUTER JOIN plan ON vj.account = plan.account
-    FULL OUTER JOIN ist ON COALESCE(vj.account, plan.account) = ist.account
-    WHERE ABS(COALESCE(ist.amount, 0) - COALESCE(plan.amount, 0)) >= ${opts.wesentlichkeitAbs}
-       OR ABS(COALESCE(ist.amount, 0) - COALESCE(vj.amount, 0)) >= ${opts.wesentlichkeitAbs}
-    ORDER BY ABS(COALESCE(ist.amount, 0) - COALESCE(plan.amount, 0)) DESC
-    LIMIT ${opts.maxAccounts}
-  `);
-
-  // Build account deviations with status
-  const byAccount: TripleAccountDeviation[] = [];
-  let greenCount = 0;
-  let yellowCount = 0;
-  let redCount = 0;
-
-  for (const row of varianceRows) {
-    const deltaPlanPct = Number(row.delta_plan_pct);
-    const deltaVjPct = Number(row.delta_vj_pct);
-    const account = Number(row.account);
-    const isExpense = account >= 5000;
-
-    // Determine status (traffic light)
-    let status: 'on_track' | 'over_plan' | 'under_plan' | 'critical';
-    let comment = '';
-
-    // For expenses: under plan = good (green), over plan = bad
-    // For revenue: over plan = good (green), under plan = bad
-    if (isExpense) {
-      if (deltaPlanPct <= -5) {
-        status = 'on_track';
-        comment = 'Kosten unter Plan ✓';
-        greenCount++;
-      } else if (deltaPlanPct > 10) {
-        status = 'critical';
-        comment = 'Deutliche Kostenüberschreitung!';
-        redCount++;
-      } else if (deltaPlanPct > 0) {
-        status = 'over_plan';
-        comment = 'Leichte Planüberschreitung';
-        yellowCount++;
-      } else {
-        status = 'on_track';
-        comment = 'Im Plan';
-        greenCount++;
-      }
-    } else {
-      // Revenue accounts
-      if (deltaPlanPct >= 5) {
-        status = 'on_track';
-        comment = 'Erlöse über Plan ✓';
-        greenCount++;
-      } else if (deltaPlanPct < -10) {
-        status = 'critical';
-        comment = 'Deutliches Erlösdefizit!';
-        redCount++;
-      } else if (deltaPlanPct < 0) {
-        status = 'under_plan';
-        comment = 'Leichtes Erlösdefizit';
-        yellowCount++;
-      } else {
-        status = 'on_track';
-        comment = 'Im Plan';
-        greenCount++;
-      }
-    }
-
-    const deviation: TripleAccountDeviation = {
-      account,
-      account_name: String(row.account_name),
-      amount_vj: Number(row.amount_vj),
-      amount_plan: Number(row.amount_plan),
-      amount_ist: Number(row.amount_ist),
-      delta_plan_abs: Number(row.delta_plan_abs),
-      delta_plan_pct: deltaPlanPct,
-      delta_vj_abs: Number(row.delta_vj_abs),
-      delta_vj_pct: deltaVjPct,
-      plan_vs_vj_abs: Number(row.plan_vs_vj_abs),
-      plan_vs_vj_pct: Number(row.plan_vs_vj_pct),
-      status,
-      comment,
-      bookings_count_ist: Number(row.cnt_ist),
-    };
-
-    // Get top bookings if requested
-    if (opts.includeTopBookings && deviation.bookings_count_ist! > 0) {
-      const topRows = await fetchAllRows(conn, `
-        SELECT posting_date, amount, document_no, text, vendor, customer
-        FROM ${tableIst}
-        WHERE account = ${account}
-        ORDER BY ABS(amount) DESC
-        LIMIT 5
-      `);
-      deviation.top_bookings_ist = topRows.map((r) => ({
-        date: String(r.posting_date),
-        amount: Number(r.amount),
-        document_no: String(r.document_no),
-        text: String(r.text),
-        vendor: r.vendor ? String(r.vendor) : undefined,
-        customer: r.customer ? String(r.customer) : undefined,
-      }));
-    }
-
-    byAccount.push(deviation);
+  // Create plan lookup
+  const planByAccount = new Map<number, PlanData>();
+  for (const p of planData) {
+    planByAccount.set(p.account, p);
   }
 
-  // Calculate plan achievement
-  const totalPlan = Number(meta.plan_total) || 0;
-  const totalIst = Number(meta.ist_total) || 0;
-  const planAchievementPct = totalPlan !== 0 ? (totalIst / totalPlan) * 100 : 100;
+  // Aggregate bookings by account
+  const vjByAccount = groupBy(vjBookings, b => `${b.account}|${b.account_name}`);
+  const istByAccount = groupBy(istBookings, b => `${b.account}|${b.account_name}`);
+
+  // Get all unique accounts
+  const allAccountKeys = new Set([
+    ...vjByAccount.keys(),
+    ...istByAccount.keys(),
+    ...planData.map(p => `${p.account}|${p.account_name}`),
+  ]);
+
+  // Calculate account deviations
+  const accountDeviations: TripleAccountDeviation[] = [];
+  let greenCount = 0, yellowCount = 0, redCount = 0;
+
+  for (const key of allAccountKeys) {
+    const [accountStr, accountName] = key.split('|');
+    const account = parseInt(accountStr);
+    const isExpense = account >= 5000;
+
+    const amountVJ = sumBy(vjByAccount.get(key) || [], b => b.amount);
+    const amountIst = sumBy(istByAccount.get(key) || [], b => b.amount);
+    const planEntry = planByAccount.get(account);
+    const amountPlan = planEntry?.amount || amountVJ; // Use VJ as fallback if no plan
+
+    // Calculate deltas
+    const deltaPlanAbs = amountIst - amountPlan;
+    const deltaPlanPct = amountPlan !== 0 ? (deltaPlanAbs / Math.abs(amountPlan)) * 100 : 0;
+    const deltaVJAbs = amountIst - amountVJ;
+    const deltaVJPct = amountVJ !== 0 ? (deltaVJAbs / Math.abs(amountVJ)) * 100 : 0;
+    const planVsVJAbs = amountPlan - amountVJ;
+    const planVsVJPct = amountVJ !== 0 ? (planVsVJAbs / Math.abs(amountVJ)) * 100 : 0;
+
+    // Check materiality (either vs Plan or vs VJ)
+    const isWesentlich =
+      (Math.abs(deltaPlanAbs) >= cfg.wesentlichkeit_abs && Math.abs(deltaPlanPct) >= cfg.wesentlichkeit_pct) ||
+      (Math.abs(deltaVJAbs) >= cfg.wesentlichkeit_abs && Math.abs(deltaVJPct) >= cfg.wesentlichkeit_pct);
+
+    if (isWesentlich) {
+      const status = getStatus(deltaPlanPct, isExpense, cfg.threshold_yellow_pct, cfg.threshold_red_pct);
+
+      // Count traffic lights
+      if (status === 'on_track') greenCount++;
+      else if (status === 'critical') redCount++;
+      else yellowCount++;
+
+      const istAccountBookings = istByAccount.get(key) || [];
+
+      accountDeviations.push({
+        account,
+        account_name: accountName,
+        amount_vj: amountVJ,
+        amount_plan: amountPlan,
+        amount_ist: amountIst,
+        delta_plan_abs: deltaPlanAbs,
+        delta_plan_pct: deltaPlanPct,
+        delta_vj_abs: deltaVJAbs,
+        delta_vj_pct: deltaVJPct,
+        plan_vs_vj_abs: planVsVJAbs,
+        plan_vs_vj_pct: planVsVJPct,
+        status,
+        comment: generateTripleComment(account, accountName, deltaPlanAbs, deltaPlanPct, deltaVJAbs, deltaVJPct, status),
+        top_bookings_ist: getTopBookings(istBookings, account),
+        bookings_count_ist: istAccountBookings.length,
+      });
+    }
+  }
+
+  // Sort by absolute plan deviation
+  accountDeviations.sort((a, b) => Math.abs(b.delta_plan_abs) - Math.abs(a.delta_plan_abs));
+
+  // Aggregate by cost center
+  const vjByCostCenter = groupBy(vjBookings, b => b.cost_center);
+  const istByCostCenter = groupBy(istBookings, b => b.cost_center);
+  const allCostCenters = new Set([...vjByCostCenter.keys(), ...istByCostCenter.keys()]);
+
+  const costCenterDeviations: TripleCostCenterDeviation[] = [];
+
+  for (const cc of allCostCenters) {
+    const amountVJ = sumBy(vjByCostCenter.get(cc) || [], b => b.amount);
+    const amountIst = sumBy(istByCostCenter.get(cc) || [], b => b.amount);
+    // For cost centers, sum plan by matching accounts
+    const ccAccounts = new Set([
+      ...(vjByCostCenter.get(cc) || []).map(b => b.account),
+      ...(istByCostCenter.get(cc) || []).map(b => b.account),
+    ]);
+    let amountPlan = 0;
+    for (const acc of ccAccounts) {
+      const planEntry = planByAccount.get(acc);
+      if (planEntry) amountPlan += planEntry.amount;
+    }
+    if (amountPlan === 0) amountPlan = amountVJ; // Fallback
+
+    const deltaPlanAbs = amountIst - amountPlan;
+    const deltaPlanPct = amountPlan !== 0 ? (deltaPlanAbs / Math.abs(amountPlan)) * 100 : 0;
+    const deltaVJAbs = amountIst - amountVJ;
+    const deltaVJPct = amountVJ !== 0 ? (deltaVJAbs / Math.abs(amountVJ)) * 100 : 0;
+
+    if (Math.abs(deltaPlanAbs) >= cfg.wesentlichkeit_abs && Math.abs(deltaPlanPct) >= cfg.wesentlichkeit_pct) {
+      const status = getStatus(deltaPlanPct, true, cfg.threshold_yellow_pct, cfg.threshold_red_pct);
+
+      // Find top accounts for this cost center
+      const ccVJByAccount = groupBy(vjByCostCenter.get(cc) || [], b => `${b.account}|${b.account_name}`);
+      const ccIstByAccount = groupBy(istByCostCenter.get(cc) || [], b => `${b.account}|${b.account_name}`);
+      const ccAllAccounts = new Set([...ccVJByAccount.keys(), ...ccIstByAccount.keys()]);
+
+      const topAccounts: { account: number; account_name: string; delta_plan_abs: number; delta_vj_abs: number }[] = [];
+      for (const accKey of ccAllAccounts) {
+        const [accStr, accName] = accKey.split('|');
+        const acc = parseInt(accStr);
+        const vjAmt = sumBy(ccVJByAccount.get(accKey) || [], b => b.amount);
+        const istAmt = sumBy(ccIstByAccount.get(accKey) || [], b => b.amount);
+        const planEntry = planByAccount.get(acc);
+        const planAmt = planEntry?.amount || vjAmt;
+
+        topAccounts.push({
+          account: acc,
+          account_name: accName,
+          delta_plan_abs: istAmt - planAmt,
+          delta_vj_abs: istAmt - vjAmt,
+        });
+      }
+      topAccounts.sort((a, b) => Math.abs(b.delta_plan_abs) - Math.abs(a.delta_plan_abs));
+
+      costCenterDeviations.push({
+        cost_center: cc,
+        amount_vj: amountVJ,
+        amount_plan: amountPlan,
+        amount_ist: amountIst,
+        delta_plan_abs: deltaPlanAbs,
+        delta_plan_pct: deltaPlanPct,
+        delta_vj_abs: deltaVJAbs,
+        delta_vj_pct: deltaVJPct,
+        status,
+        top_accounts: topAccounts.slice(0, 3),
+      });
+    }
+  }
+
+  costCenterDeviations.sort((a, b) => Math.abs(b.delta_plan_abs) - Math.abs(a.delta_plan_abs));
+
+  // Calculate summary
+  const totalVJ = sumBy(vjBookings, b => b.amount);
+  const totalIst = sumBy(istBookings, b => b.amount);
+  const totalPlan = planData.reduce((sum, p) => sum + p.amount, 0) || totalVJ;
+
+  const erloesesVJ = sumBy(vjBookings.filter(b => b.amount > 0), b => b.amount);
+  const erloesesIst = sumBy(istBookings.filter(b => b.amount > 0), b => b.amount);
+  const erloesesPlan = planData.filter(p => p.amount > 0).reduce((sum, p) => sum + p.amount, 0) || erloesesVJ;
+
+  const aufwendungenVJ = sumBy(vjBookings.filter(b => b.amount < 0), b => b.amount);
+  const aufwendungenIst = sumBy(istBookings.filter(b => b.amount < 0), b => b.amount);
+  const aufwendungenPlan = planData.filter(p => p.amount < 0).reduce((sum, p) => sum + p.amount, 0) || aufwendungenVJ;
 
   return {
     meta: {
-      period_vj: `${meta.vj_min} – ${meta.vj_max}`,
-      period_plan: `${meta.plan_min} – ${meta.plan_max}`,
-      period_ist: `${meta.ist_min} – ${meta.ist_max}`,
-      total_vj: Number(meta.vj_total),
+      period_vj: cfg.period_vj_name,
+      period_plan: cfg.period_plan_name,
+      period_ist: cfg.period_ist_name,
+      total_vj: totalVJ,
       total_plan: totalPlan,
       total_ist: totalIst,
-      analyzed_at: new Date().toISOString(),
+      bookings_ist: istBookings.length,
+      wesentlichkeit_abs: cfg.wesentlichkeit_abs,
+      wesentlichkeit_pct: cfg.wesentlichkeit_pct,
     },
     summary: {
       total_delta_plan: totalIst - totalPlan,
-      total_delta_vj: totalIst - Number(meta.vj_total),
-      plan_achievement_pct: planAchievementPct,
+      total_delta_vj: totalIst - totalVJ,
+      erloese_vj: erloesesVJ,
+      erloese_plan: erloesesPlan,
+      erloese_ist: erloesesIst,
+      erloese_delta_plan: erloesesIst - erloesesPlan,
+      erloese_delta_vj: erloesesIst - erloesesVJ,
+      aufwendungen_vj: aufwendungenVJ,
+      aufwendungen_plan: aufwendungenPlan,
+      aufwendungen_ist: aufwendungenIst,
+      aufwendungen_delta_plan: aufwendungenIst - aufwendungenPlan,
+      aufwendungen_delta_vj: aufwendungenIst - aufwendungenVJ,
+      plan_achievement_pct: totalPlan !== 0 ? (totalIst / totalPlan) * 100 : 100,
     },
+    by_account: accountDeviations,
+    by_cost_center: costCenterDeviations,
     traffic_light: {
       green: greenCount,
       yellow: yellowCount,
       red: redCount,
     },
-    by_account: byAccount,
   };
 }
 
 /**
- * Get status color for UI
+ * Parse plan CSV to PlanData array
+ * Expected format: account,account_name,amount
  */
-export function getStatusColor(
-  status: 'on_track' | 'over_plan' | 'under_plan' | 'critical'
-): string {
-  switch (status) {
-    case 'on_track':
-      return 'green';
-    case 'over_plan':
-    case 'under_plan':
-      return 'yellow';
-    case 'critical':
-      return 'red';
-    default:
-      return 'gray';
-  }
-}
+export function parsePlanCSV(csvText: string): PlanData[] {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) return [];
 
-/**
- * Get status emoji for display
- */
-export function getStatusEmoji(
-  status: 'on_track' | 'over_plan' | 'under_plan' | 'critical'
-): string {
-  switch (status) {
-    case 'on_track':
-      return '🟢';
-    case 'over_plan':
-    case 'under_plan':
-      return '🟡';
-    case 'critical':
-      return '🔴';
-    default:
-      return '⚪';
+  const headers = lines[0].split(/[,;]/).map(h => h.trim().toLowerCase());
+  const planData: PlanData[] = [];
+
+  // Find column indices
+  const accountIdx = headers.findIndex(h => h.includes('konto') || h.includes('account') || h === 'kontonr');
+  const nameIdx = headers.findIndex(h => h.includes('name') || h.includes('bezeichnung'));
+  const amountIdx = headers.findIndex(h => h.includes('betrag') || h.includes('amount') || h.includes('plan') || h.includes('budget'));
+
+  if (accountIdx === -1 || amountIdx === -1) {
+    // Try simple format: just account, amount
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(/[,;]/);
+      if (values.length >= 2) {
+        const account = parseInt(values[0]);
+        const amount = parseFloat(values[values.length - 1].replace(/[^\d.-]/g, ''));
+        if (!isNaN(account) && !isNaN(amount)) {
+          planData.push({
+            account,
+            account_name: values.length > 2 ? values[1].trim() : `Konto ${account}`,
+            amount,
+          });
+        }
+      }
+    }
+    return planData;
   }
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(/[,;]/);
+    const account = parseInt(values[accountIdx]);
+    const amount = parseFloat(values[amountIdx].replace(/[^\d.-]/g, ''));
+
+    if (!isNaN(account) && !isNaN(amount)) {
+      planData.push({
+        account,
+        account_name: nameIdx !== -1 ? values[nameIdx]?.trim() || `Konto ${account}` : `Konto ${account}`,
+        amount,
+      });
+    }
+  }
+
+  return planData;
 }

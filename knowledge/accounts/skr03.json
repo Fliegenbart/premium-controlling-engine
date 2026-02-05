@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "name": "SKR03 Kontenrahmen",
+    "description": "Standardkontenrahmen 03 mit Controlling-Wissen für Labordiagnostik",
+    "version": "1.0",
+    "industry": "Labordiagnostik / Healthcare"
+  },
+  "accounts": {
+    "4000": {
+      "name": "Umsatzerlöse für Waren",
+      "category": "Erlöse",
+      "type": "revenue",
+      "typical_behavior": "Sollte mit Patientenzahlen und Testvolumen korrelieren",
+      "seasonal_pattern": "Leichter Rückgang im Sommer (Urlaubszeit), höher in Q1 (Grippesaison)",
+      "red_flags": [
+        "Starker Rückgang ohne bekannte Ursache",
+        "Ungewöhnlich hohe Gutschriften",
+        "Plötzlicher Anstieg ohne neue Verträge"
+      ],
+      "benchmarks": {
+        "growth_expectation": { "min": -5, "max": 10, "typical": 3 }
+      },
+      "related_accounts": ["4400", "4900"],
+      "keywords": ["Umsatz", "Erlöse", "Verkauf"]
+    },
+    "4400": {
+      "name": "Erlöse aus Laborleistungen",
+      "category": "Erlöse",
+      "type": "revenue",
+      "typical_behavior": "Kerngeschäft - sollte stabil wachsen",
+      "seasonal_pattern": "Q1 und Q4 meist höher, Sommer schwächer",
+      "red_flags": [
+        "Rückgang > 10% ohne Erklärung",
+        "Starke Schwankungen zwischen Monaten",
+        "Abweichung von Testvolumen-Entwicklung"
+      ],
+      "benchmarks": {
+        "percent_of_total_revenue": { "min": 60, "max": 90, "typical": 75 }
+      },
+      "keywords": ["Labor", "Diagnostik", "Analyse", "Test"]
+    },
+    "4900": {
+      "name": "Sonstige betriebliche Erträge",
+      "category": "Erlöse",
+      "type": "revenue",
+      "typical_behavior": "Einmaleffekte, Versicherungserstattungen, Förderungen",
+      "red_flags": [
+        "Große Beträge ohne klare Erklärung im Buchungstext",
+        "Regelmäßige hohe Beträge (sollte unregelmäßig sein)"
+      ],
+      "keywords": ["sonstige", "Erstattung", "Förderung"]
+    },
+    "5000": {
+      "name": "Einkauf Roh-, Hilfs- und Betriebsstoffe",
+      "category": "Materialaufwand",
+      "type": "expense",
+      "typical_behavior": "Sollte proportional zum Umsatz steigen/sinken",
+      "red_flags": [
+        "Material steigt stärker als Umsatz (Effizienz-Problem)",
+        "Neue große Lieferanten ohne Ausschreibung",
+        "Starker Rückgang (mögliche Qualitätsprobleme)"
+      ],
+      "benchmarks": {
+        "percent_of_revenue": { "min": 15, "max": 35, "typical": 25 }
+      },
+      "keywords": ["Material", "Einkauf", "Rohstoffe"]
+    },
+    "5100": {
+      "name": "Einkauf Reagenzien",
+      "category": "Materialaufwand",
+      "type": "expense",
+      "typical_behavior": "Direkt korreliert mit Testvolumen",
+      "seasonal_pattern": "Folgt dem Testvolumen",
+      "red_flags": [
+        "Reagenzienkosten steigen stärker als Testvolumen",
+        "Neue Reagenzienlieferanten ohne Dokumentation",
+        "Verfallsdaten-Abschreibungen"
+      ],
+      "benchmarks": {
+        "percent_of_revenue": { "min": 10, "max": 20, "typical": 15 },
+        "cost_per_test_change": { "min": -5, "max": 5 }
+      },
+      "keywords": ["Reagenz", "Testkit", "Assay", "Chemikalien"]
+    },
+    "5900": {
+      "name": "Fremdleistungen",
+      "category": "Materialaufwand",
+      "type": "expense",
+      "typical_behavior": "Outsourcing von Spezialanalysen",
+      "red_flags": [
+        "Steigende Fremdleistungen bei sinkenden Umsätzen",
+        "Neue Dienstleister ohne Freigabe",
+        "Konzentrierung auf einen Anbieter"
+      ],
+      "benchmarks": {
+        "percent_of_revenue": { "min": 5, "max": 15, "typical": 10 }
+      },
+      "keywords": ["Fremd", "Outsourcing", "externe", "Labor"]
+    },
+    "6000": {
+      "name": "Löhne und Gehälter",
+      "category": "Personalaufwand",
+      "type": "expense",
+      "typical_behavior": "Relativ stabil, Änderungen durch Einstellungen/Kündigungen",
+      "seasonal_pattern": "Höher in Q1 (Boni), niedriger im Sommer (Urlaub)",
+      "red_flags": [
+        "Plötzlicher Anstieg ohne Neueinstellungen",
+        "Starker Rückgang (mögliche Fluktuation)",
+        "Überstunden-Häufung"
+      ],
+      "benchmarks": {
+        "percent_of_revenue": { "min": 25, "max": 45, "typical": 35 }
+      },
+      "keywords": ["Gehalt", "Lohn", "Personal", "Mitarbeiter"]
+    },
+    "6010": {
+      "name": "Gehälter",
+      "category": "Personalaufwand",
+      "type": "expense",
+      "typical_behavior": "Monatlich relativ konstant",
+      "red_flags": [
+        "Sprunghafte Änderungen",
+        "Nachzahlungen ohne Dokumentation"
+      ],
+      "keywords": ["Gehalt", "Angestellte"]
+    },
+    "6020": {
+      "name": "Löhne",
+      "category": "Personalaufwand",
+      "type": "expense",
+      "typical_behavior": "Kann variieren je nach Auslastung",
+      "keywords": ["Lohn", "Arbeiter", "Stundenlohn"]
+    },
+    "6100": {
+      "name": "Soziale Abgaben und Aufwendungen",
+      "category": "Personalaufwand",
+      "type": "expense",
+      "typical_behavior": "Proportional zu Löhnen/Gehältern (~20%)",
+      "red_flags": [
+        "Abweichung vom erwarteten Verhältnis zu Gehältern"
+      ],
+      "benchmarks": {
+        "percent_of_salaries": { "min": 18, "max": 25, "typical": 21 }
+      },
+      "keywords": ["Sozialversicherung", "Rente", "Krankenkasse"]
+    },
+    "6200": {
+      "name": "Abschreibungen",
+      "category": "Abschreibungen",
+      "type": "expense",
+      "typical_behavior": "Relativ konstant, Änderungen bei Investitionen",
+      "red_flags": [
+        "Plötzliche Erhöhung ohne Investitionen",
+        "Sonderabschreibungen prüfen"
+      ],
+      "keywords": ["AfA", "Abschreibung", "Wertverlust"]
+    },
+    "6300": {
+      "name": "Miete und Raumkosten",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Sehr stabil, Änderungen nur bei Umzug/Erweiterung",
+      "red_flags": [
+        "Änderung ohne bekannten Grund",
+        "Neue Mietobjekte ohne Genehmigung"
+      ],
+      "keywords": ["Miete", "Raum", "Gebäude", "Nebenkosten"]
+    },
+    "6400": {
+      "name": "Versicherungen, Beiträge",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Jährlich leicht steigend, meist konstant",
+      "red_flags": [
+        "Starker Anstieg (neue Risiken?)",
+        "Fehlende Pflichtversicherungen"
+      ],
+      "keywords": ["Versicherung", "Beitrag", "Prämie"]
+    },
+    "6500": {
+      "name": "Reparaturen und Instandhaltung",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Variabel, abhängig von Gerätezustand",
+      "red_flags": [
+        "Häufung bei einzelnen Geräten",
+        "Unerwartete Großreparaturen",
+        "Wartungsverträge nicht eingehalten"
+      ],
+      "keywords": ["Reparatur", "Wartung", "Instandhaltung", "Service"]
+    },
+    "6600": {
+      "name": "Werbekosten",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Budgetabhängig, kann schwanken",
+      "red_flags": [
+        "Überschreitung des Budgets ohne Genehmigung"
+      ],
+      "keywords": ["Werbung", "Marketing", "Anzeige"]
+    },
+    "6700": {
+      "name": "Reisekosten",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Abhängig von Konferenzen, Kundenbesuchen",
+      "seasonal_pattern": "Höher bei Konferenzen (Frühjahr/Herbst)",
+      "red_flags": [
+        "Starker Anstieg ohne bekannte Reisen",
+        "Einzelne hohe Buchungen prüfen"
+      ],
+      "keywords": ["Reise", "Flug", "Hotel", "Fahrt", "Spesen"]
+    },
+    "6800": {
+      "name": "Porto und Telefon",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Relativ stabil",
+      "red_flags": [
+        "Unerwarteter Anstieg (neue Systeme?)"
+      ],
+      "keywords": ["Porto", "Telefon", "Kommunikation"]
+    },
+    "6815": {
+      "name": "EDV-Kosten",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Steigend durch Digitalisierung",
+      "red_flags": [
+        "Neue große Softwarelizenzen ohne IT-Freigabe",
+        "Cloud-Kosten explodieren"
+      ],
+      "keywords": ["IT", "Software", "Lizenz", "Cloud", "EDV"]
+    },
+    "6820": {
+      "name": "Rechts- und Beratungskosten",
+      "category": "Sonstige betriebliche Aufwendungen",
+      "type": "expense",
+      "typical_behavior": "Variabel, Projekte und Rechtsstreitigkeiten",
+      "red_flags": [
+        "Hohe Anwaltskosten (Rechtsstreit?)",
+        "Neue Berater ohne Ausschreibung"
+      ],
+      "keywords": ["Rechtsanwalt", "Beratung", "Consulting", "Gutachten"]
+    },
+    "7000": {
+      "name": "Zinsaufwendungen",
+      "category": "Finanzergebnis",
+      "type": "expense",
+      "typical_behavior": "Abhängig von Verschuldung und Zinsniveau",
+      "red_flags": [
+        "Starker Anstieg ohne neue Kredite",
+        "Verzugszinsen"
+      ],
+      "keywords": ["Zins", "Kredit", "Darlehen"]
+    },
+    "7300": {
+      "name": "Steuern vom Einkommen und Ertrag",
+      "category": "Steuern",
+      "type": "expense",
+      "typical_behavior": "Proportional zum Gewinn",
+      "keywords": ["Steuer", "Körperschaftsteuer", "Gewerbesteuer"]
+    }
+  },
+  "categories": {
+    "Erlöse": {
+      "account_range": "4000-4999",
+      "positive_is_good": true,
+      "description": "Einnahmen aus dem Kerngeschäft"
+    },
+    "Materialaufwand": {
+      "account_range": "5000-5999",
+      "positive_is_good": false,
+      "description": "Kosten für Materialien, Reagenzien, Fremdleistungen"
+    },
+    "Personalaufwand": {
+      "account_range": "6000-6199",
+      "positive_is_good": false,
+      "description": "Löhne, Gehälter, Sozialabgaben"
+    },
+    "Abschreibungen": {
+      "account_range": "6200-6299",
+      "positive_is_good": false,
+      "description": "Wertminderung von Anlagevermögen"
+    },
+    "Sonstige betriebliche Aufwendungen": {
+      "account_range": "6300-6999",
+      "positive_is_good": false,
+      "description": "Miete, Versicherungen, IT, Beratung etc."
+    },
+    "Finanzergebnis": {
+      "account_range": "7000-7499",
+      "positive_is_good": false,
+      "description": "Zinsen und ähnliche Aufwendungen"
+    },
+    "Steuern": {
+      "account_range": "7500-7999",
+      "positive_is_good": false,
+      "description": "Ertragsteuern"
+    }
+  },
+  "lab_specific": {
+    "key_kpis": [
+      {
+        "name": "Reagenzienquote",
+        "formula": "Reagenzienkosten / Umsatz",
+        "benchmark": { "min": 10, "max": 20, "typical": 15 },
+        "unit": "percent"
+      },
+      {
+        "name": "Personalquote",
+        "formula": "Personalkosten / Umsatz",
+        "benchmark": { "min": 25, "max": 45, "typical": 35 },
+        "unit": "percent"
+      },
+      {
+        "name": "Fremdleistungsquote",
+        "formula": "Fremdleistungen / Umsatz",
+        "benchmark": { "min": 5, "max": 15, "typical": 10 },
+        "unit": "percent"
+      }
+    ],
+    "cost_drivers": [
+      "Testvolumen",
+      "Personalbestand",
+      "Geräteauslastung",
+      "Reagenzienpreise"
+    ],
+    "seasonal_factors": {
+      "Q1": "Grippesaison - höheres Testvolumen erwartet",
+      "Q2": "Normalbetrieb",
+      "Q3": "Urlaubszeit - niedrigeres Volumen, aber Personal-Rückstellungen",
+      "Q4": "Jahresendgeschäft, Abschlussarbeiten"
+    }
+  }
+}

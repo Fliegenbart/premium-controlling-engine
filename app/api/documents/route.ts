@@ -1,84 +1,78 @@
 /**
- * Documents API - Upload and list documents
- * GET/POST /api/documents
+ * Documents API
+ * GET /api/documents - List all documents
+ * POST /api/documents - Upload and index a new document
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parsePDF } from '@/lib/doc-index/pdf-parser';
-import {
-  addDocument,
-  getAllDocuments,
-  getStats,
-} from '@/lib/doc-index/document-store';
+import { indexDocument, listDocuments } from '@/lib/doc-index';
 
-// GET - List all documents
 export async function GET() {
   try {
-    const documents = getAllDocuments();
-    const stats = getStats();
-
-    return NextResponse.json({
-      success: true,
-      documents: documents.map((d) => ({
-        id: d.id,
-        filename: d.filename,
-        title: d.title,
-        type: d.type,
-        totalPages: d.totalPages,
-        totalSections: d.totalSections,
-        indexedAt: d.indexedAt,
-        sizeBytes: d.sizeBytes,
-      })),
-      stats,
-    });
+    const documents = listDocuments();
+    return NextResponse.json({ documents });
   } catch (error) {
+    console.error('List documents error:', error);
     return NextResponse.json(
-      { error: `Fehler beim Laden: ${(error as Error).message}` },
+      { error: 'Fehler beim Laden der Dokumente' },
       { status: 500 }
     );
   }
 }
 
-// POST - Upload and index document
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
     if (!file) {
-      return NextResponse.json({ error: 'Keine Datei hochgeladen' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Keine Datei hochgeladen' },
+        { status: 400 }
+      );
     }
 
-    const filename = file.name;
-    const buffer = Buffer.from(await file.arrayBuffer());
-
-    let indexedDoc;
-
-    if (filename.toLowerCase().endsWith('.pdf')) {
-      indexedDoc = await parsePDF(buffer, filename);
-    } else {
+    // Check file type
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
       return NextResponse.json(
         { error: 'Nur PDF-Dateien werden unterstützt' },
         { status: 400 }
       );
     }
 
-    addDocument(indexedDoc);
+    // Check file size (max 20MB)
+    if (file.size > 20 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'Datei zu groß (max. 20MB)' },
+        { status: 400 }
+      );
+    }
+
+    // Read file as buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Index the document
+    const document = await indexDocument(buffer, file.name);
 
     return NextResponse.json({
       success: true,
       document: {
-        id: indexedDoc.id,
-        filename: indexedDoc.filename,
-        title: indexedDoc.title,
-        totalPages: indexedDoc.totalPages,
-        totalSections: indexedDoc.totalSections,
+        id: document.id,
+        filename: document.filename,
+        title: document.title,
+        total_pages: document.total_pages,
+        indexed_at: document.indexed_at,
+        sections: document.tree.children.map(c => ({
+          title: c.title,
+          pages: `${c.page_start}-${c.page_end}`,
+        })),
       },
     });
   } catch (error) {
-    console.error('Document upload error:', error);
+    console.error('Index document error:', error);
     return NextResponse.json(
-      { error: `Upload fehlgeschlagen: ${(error as Error).message}` },
+      { error: 'Fehler beim Indexieren des Dokuments: ' + (error as Error).message },
       { status: 500 }
     );
   }

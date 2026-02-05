@@ -5,215 +5,311 @@ import {
   Upload,
   FileSpreadsheet,
   CheckCircle,
-  AlertTriangle,
+  AlertCircle,
   Loader2,
   Sparkles,
   FileText,
+  Database,
   Zap,
+  Info,
+  ChevronDown,
+  ChevronUp,
+  X,
 } from 'lucide-react';
-import { FormatDetectionResult } from '@/lib/parsers';
-import { DataProfile } from '@/lib/types';
+import { magicParse, ParseResult, getParseResultSummary } from '@/lib/magic-upload';
+import { getFormatDisplayName, FileFormat } from '@/lib/magic-upload/format-detector';
+import { Booking } from '@/lib/types';
 
 interface MagicUploadProps {
-  onUploadComplete: (profile: DataProfile, period: 'prev' | 'curr') => void;
+  onBookingsParsed: (bookings: Booking[], period: 'prev' | 'curr', fileName: string) => void;
   period: 'prev' | 'curr';
   label: string;
-  existingProfile?: DataProfile | null;
+  existingFile?: string;
 }
 
-export default function MagicUpload({
-  onUploadComplete,
-  period,
-  label,
-  existingProfile,
-}: MagicUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
-  const [detection, setDetection] = useState<FormatDetectionResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
+const FORMAT_ICONS: Record<FileFormat, string> = {
+  sap_fbl3n: '🔷',
+  sap_fagll03: '🔷',
+  sap_s_alr: '🔷',
+  datev_buchungen: '🟢',
+  datev_kost: '🟢',
+  lexware: '🟡',
+  generic_csv: '📄',
+  unknown: '❓',
+};
 
-  const handleFile = useCallback(
-    async (file: File) => {
-      setIsUploading(true);
-      setError(null);
-      setDetection(null);
+const FORMAT_COLORS: Record<FileFormat, string> = {
+  sap_fbl3n: 'from-blue-600 to-blue-400',
+  sap_fagll03: 'from-blue-600 to-blue-400',
+  sap_s_alr: 'from-blue-600 to-blue-400',
+  datev_buchungen: 'from-green-600 to-green-400',
+  datev_kost: 'from-green-600 to-green-400',
+  lexware: 'from-yellow-600 to-yellow-400',
+  generic_csv: 'from-gray-600 to-gray-400',
+  unknown: 'from-red-600 to-red-400',
+};
 
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('period', period);
+export function MagicUpload({ onBookingsParsed, period, label, existingFile }: MagicUploadProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState<ParseResult | null>(null);
+  const [fileName, setFileName] = useState<string>(existingFile || '');
+  const [showDetails, setShowDetails] = useState(false);
 
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+  const processFile = useCallback(async (file: File) => {
+    setIsProcessing(true);
+    setFileName(file.name);
+    setResult(null);
 
-        const data = await response.json();
+    try {
+      const content = await file.text();
+      const parseResult = magicParse(content);
 
-        if (data.success) {
-          setDetection(data.detection);
-          onUploadComplete(data.profile, period);
-        } else {
-          setError(data.error || 'Upload fehlgeschlagen');
-        }
-      } catch (err) {
-        setError('Verbindungsfehler beim Upload');
-      } finally {
-        setIsUploading(false);
+      setResult(parseResult);
+
+      if (parseResult.success) {
+        onBookingsParsed(parseResult.bookings, period, file.name);
       }
-    },
-    [period, onUploadComplete]
-  );
+    } catch (error) {
+      setResult({
+        success: false,
+        bookings: [],
+        detection: {
+          format: 'unknown',
+          confidence: 0,
+          detectedColumns: [],
+          mappedColumns: {},
+          encoding: 'utf-8',
+          delimiter: ';',
+          decimalSeparator: ',',
+          dateFormat: 'DD.MM.YYYY',
+          sampleRows: [],
+          warnings: [(error as Error).message],
+        },
+        stats: { totalRows: 0, parsedRows: 0, skippedRows: 0, totalAmount: 0 },
+        errors: ['Fehler beim Lesen der Datei: ' + (error as Error).message],
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [onBookingsParsed, period]);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
-    },
-    [handleFile]
-  );
-
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver(true);
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.csv') || file.name.endsWith('.txt'))) {
+      processFile(file);
+    }
+  }, [processFile]);
+
+  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  }, [processFile]);
+
+  const clearFile = () => {
+    setResult(null);
+    setFileName('');
   };
 
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('de-DE', {
+      style: 'currency',
+      currency: 'EUR',
+      maximumFractionDigits: 0,
+    }).format(value);
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return 'text-green-400';
-    if (confidence >= 0.6) return 'text-yellow-400';
-    return 'text-orange-400';
-  };
-
-  const getConfidenceBg = (confidence: number) => {
-    if (confidence >= 0.8) return 'bg-green-500/20 border-green-500/30';
-    if (confidence >= 0.6) return 'bg-yellow-500/20 border-yellow-500/30';
-    return 'bg-orange-500/20 border-orange-500/30';
-  };
-
-  // Already uploaded state
-  if (existingProfile) {
-    return (
-      <div className="relative border-2 border-green-500/50 bg-green-500/5 rounded-xl p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 text-green-400" />
+  return (
+    <div className="space-y-3">
+      {/* Upload Zone */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={handleDrop}
+        className={`relative border-2 border-dashed rounded-xl p-6 transition-all ${
+          isDragging
+            ? 'border-pink-500 bg-pink-500/10'
+            : result?.success
+            ? 'border-green-500/50 bg-green-500/5'
+            : result && !result.success
+            ? 'border-red-500/50 bg-red-500/5'
+            : 'border-white/10 hover:border-white/30 bg-white/5'
+        }`}
+      >
+        {isProcessing ? (
+          <div className="flex flex-col items-center gap-3 py-4">
+            <div className="relative">
+              <Loader2 className="w-10 h-10 text-pink-400 animate-spin" />
+              <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
+            </div>
+            <div className="text-center">
+              <p className="text-white font-medium">Analysiere Datei...</p>
+              <p className="text-gray-500 text-sm">Format wird automatisch erkannt</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <h3 className="text-white font-semibold">{label}</h3>
-            <p className="text-green-400 text-sm mb-3">
-              {existingProfile.rowCount.toLocaleString('de-DE')} Buchungen geladen
-            </p>
-
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="bg-white/5 rounded-lg p-3">
-                <p className="text-gray-500 text-xs">Zeitraum</p>
-                <p className="text-white">
-                  {existingProfile.dateRange.min} – {existingProfile.dateRange.max}
-                </p>
+        ) : result ? (
+          <div className="space-y-3">
+            {/* Success/Error Header */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                {result.success ? (
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${FORMAT_COLORS[result.detection.format]} flex items-center justify-center`}>
+                    <span className="text-lg">{FORMAT_ICONS[result.detection.format]}</span>
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 text-red-400" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-white font-medium flex items-center gap-2">
+                    {fileName}
+                    {result.success && <CheckCircle className="w-4 h-4 text-green-400" />}
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {getFormatDisplayName(result.detection.format)}
+                    {result.detection.confidence > 0 && (
+                      <span className="ml-2 text-gray-500">
+                        ({result.detection.confidence.toFixed(0)}% Konfidenz)
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
-              <div className="bg-white/5 rounded-lg p-3">
-                <p className="text-gray-500 text-xs">Summe</p>
-                <p className="text-white">
-                  {new Intl.NumberFormat('de-DE', {
-                    style: 'currency',
-                    currency: 'EUR',
-                    maximumFractionDigits: 0,
-                  }).format(existingProfile.totals.all)}
-                </p>
-              </div>
-              <div className="bg-white/5 rounded-lg p-3">
-                <p className="text-gray-500 text-xs">Konten</p>
-                <p className="text-white">{existingProfile.uniqueAccounts}</p>
-              </div>
-              <div className="bg-white/5 rounded-lg p-3">
-                <p className="text-gray-500 text-xs">Qualität</p>
-                <p
-                  className={
-                    existingProfile.warnings.length === 0 ? 'text-green-400' : 'text-yellow-400'
-                  }
-                >
-                  {existingProfile.warnings.length === 0
-                    ? '✓ Gut'
-                    : `${existingProfile.warnings.length} Hinweise`}
-                </p>
-              </div>
+              <button
+                onClick={clearFile}
+                className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
             </div>
 
-            {detection && (
-              <div className={`mt-3 p-2 rounded-lg border ${getConfidenceBg(detection.confidence)}`}>
-                <div className="flex items-center gap-2 text-sm">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span className="text-white">{detection.formatLabel}</span>
-                  <span className={`ml-auto ${getConfidenceColor(detection.confidence)}`}>
-                    {(detection.confidence * 100).toFixed(0)}% Konfidenz
-                  </span>
+            {/* Stats */}
+            {result.success && (
+              <div className="grid grid-cols-3 gap-2 py-2">
+                <div className="bg-white/5 rounded-lg px-3 py-2 text-center">
+                  <p className="text-lg font-bold text-white">{result.stats.parsedRows}</p>
+                  <p className="text-xs text-gray-500">Buchungen</p>
+                </div>
+                <div className="bg-white/5 rounded-lg px-3 py-2 text-center">
+                  <p className="text-lg font-bold text-white">{formatCurrency(result.stats.totalAmount)}</p>
+                  <p className="text-xs text-gray-500">Summe</p>
+                </div>
+                <div className="bg-white/5 rounded-lg px-3 py-2 text-center">
+                  <p className="text-lg font-bold text-gray-400">{result.stats.skippedRows}</p>
+                  <p className="text-xs text-gray-500">Übersprungen</p>
+                </div>
+              </div>
+            )}
+
+            {/* Errors */}
+            {result.errors.length > 0 && (
+              <div className="space-y-1">
+                {result.errors.slice(0, 3).map((error, i) => (
+                  <p key={i} className="text-xs text-red-400 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" /> {error}
+                  </p>
+                ))}
+                {result.errors.length > 3 && (
+                  <p className="text-xs text-gray-500">
+                    + {result.errors.length - 3} weitere Fehler
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Details Toggle */}
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              Erkannte Spalten anzeigen
+            </button>
+
+            {/* Column Details */}
+            {showDetails && (
+              <div className="bg-white/5 rounded-lg p-3 text-xs">
+                <p className="text-gray-400 mb-2">Spalten-Mapping:</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {Object.entries(result.detection.mappedColumns).map(([field, index]) => (
+                    <div key={field} className="flex items-center gap-1">
+                      <span className="text-gray-500">{field}:</span>
+                      <span className="text-white">{result.detection.detectedColumns[index as number] || '-'}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
-        </div>
+        ) : (
+          <label className="cursor-pointer block">
+            <input
+              type="file"
+              accept=".csv,.txt"
+              onChange={handleFileInput}
+              className="hidden"
+            />
+            <div className="flex flex-col items-center gap-3 py-2">
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
+                  <Upload className="w-7 h-7 text-pink-400" />
+                </div>
+                <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1" />
+              </div>
+              <div className="text-center">
+                <p className="text-white font-medium">{label}</p>
+                <p className="text-gray-500 text-sm">
+                  SAP, DATEV, CSV – wird automatisch erkannt
+                </p>
+              </div>
+            </div>
+          </label>
+        )}
       </div>
-    );
-  }
 
-  // Upload state
-  return (
-    <div
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-      className={`relative border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer ${
-        isDragOver
-          ? 'border-blue-500 bg-blue-500/10'
-          : 'border-white/20 hover:border-blue-500/50 bg-white/5'
-      }`}
-    >
-      {isUploading ? (
-        <div className="flex flex-col items-center">
-          <div className="relative mb-4">
-            <Loader2 className="w-12 h-12 text-blue-400 animate-spin" />
-            <Sparkles className="w-5 h-5 text-purple-400 absolute -top-1 -right-1 animate-pulse" />
-          </div>
-          <p className="text-white font-medium">Magic Upload analysiert...</p>
-          <p className="text-gray-500 text-sm">Format-Erkennung & Import in DuckDB</p>
+      {/* Format Badges */}
+      {!result && (
+        <div className="flex items-center justify-center gap-2 text-xs">
+          <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded">SAP</span>
+          <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded">DATEV</span>
+          <span className="px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded">Lexware</span>
+          <span className="px-2 py-1 bg-gray-500/10 text-gray-400 rounded">CSV</span>
         </div>
-      ) : error ? (
-        <div className="flex flex-col items-center">
-          <AlertTriangle className="w-12 h-12 text-red-400 mb-4" />
-          <p className="text-red-400 font-medium">{error}</p>
-          <button
-            onClick={() => setError(null)}
-            className="mt-3 text-sm text-gray-400 hover:text-white"
-          >
-            Erneut versuchen
-          </button>
-        </div>
-      ) : (
-        <label className="flex flex-col items-center cursor-pointer">
-          <input
-            type="file"
-            accept=".csv,.xlsx,.xls,.txt"
-            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            className="hidden"
-          />
-          <div className="relative mb-4">
-            <Upload className="w-12 h-12 text-gray-500" />
-            <Zap className="w-5 h-5 text-yellow-400 absolute -top-1 -right-1" />
-          </div>
-          <p className="text-white font-semibold mb-1">{label}</p>
-          <p className="text-gray-500 text-sm text-center">
-            CSV, XLSX, SAP, DATEV, Lexware
-            <br />
-            <span className="text-xs text-purple-400">✨ Automatische Format-Erkennung</span>
-          </p>
-        </label>
       )}
+    </div>
+  );
+}
+
+/**
+ * Combined Magic Upload for VJ and Current Period
+ */
+interface MagicUploadPairProps {
+  onPrevParsed: (bookings: Booking[], fileName: string) => void;
+  onCurrParsed: (bookings: Booking[], fileName: string) => void;
+}
+
+export function MagicUploadPair({ onPrevParsed, onCurrParsed }: MagicUploadPairProps) {
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      <div>
+        <MagicUpload
+          period="prev"
+          label="Vorjahr hochladen"
+          onBookingsParsed={(bookings, _, fileName) => onPrevParsed(bookings, fileName)}
+        />
+      </div>
+      <div>
+        <MagicUpload
+          period="curr"
+          label="Aktuell hochladen"
+          onBookingsParsed={(bookings, _, fileName) => onCurrParsed(bookings, fileName)}
+        />
+      </div>
     </div>
   );
 }

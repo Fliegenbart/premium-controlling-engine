@@ -1,85 +1,15 @@
-/**
- * Premium Controlling Engine - Type Definitions
- * 
- * Core types for the DuckDB-based controlling system
- */
-
-// ============================================
-// DATA LAYER TYPES
-// ============================================
-
 export interface Booking {
   posting_date: string;
   amount: number;
   account: number;
   account_name: string;
-  cost_center?: string;
-  profit_center?: string;
-  vendor?: string;
-  customer?: string;
+  cost_center: string;
+  profit_center: string;
+  vendor: string | null;
+  customer: string | null;
   document_no: string;
   text: string;
-}
-
-export interface DataProfile {
-  rowCount: number;
-  uniqueAccounts: number;
-  uniqueCostCenters: number;
-  uniqueDocuments: number;
-  dateRange: {
-    min: string;
-    max: string;
-  };
-  totals: {
-    all: number;
-    credits: number;
-    debits: number;
-    balanced: boolean;
-  };
-  quality: {
-    nullAmounts: number;
-    nullDates: number;
-    nullAccounts: number;
-    duplicateDocuments: number;
-    outlierCount: number;
-  };
-  warnings: string[];
-}
-
-export interface TimeSeriesPoint {
-  period: string;
-  value: number;
-  transactionCount: number;
-  uniqueAccounts: number;
-}
-
-// ============================================
-// ANALYSIS TYPES
-// ============================================
-
-export interface VarianceResult {
-  dimension: string;
-  key: string;
-  label: string;
-  amountPrev: number;
-  amountCurr: number;
-  deltaAbs: number;
-  deltaPct: number;
-  bookingsPrev: number;
-  bookingsCurr: number;
-}
-
-export interface VarianceDriver {
-  dimension: string;
-  key: string;
-  contribution: number;
-  contributionPct: number;
-}
-
-export interface DecomposedVariance {
-  totalVariance: number;
-  drivers: VarianceDriver[];
-  coverage: number; // % of variance explained by top drivers
+  entity?: string; // Für Multi-Entity Support
 }
 
 export interface AccountDeviation {
@@ -89,27 +19,19 @@ export interface AccountDeviation {
   amount_curr: number;
   delta_abs: number;
   delta_pct: number;
-  bookings_count_prev: number;
-  bookings_count_curr: number;
   comment: string;
   top_bookings?: TopBooking[];
-  top_bookings_curr?: TopBooking[];
-  top_bookings_prev?: TopBooking[];
-  new_bookings?: TopBooking[];
-  missing_bookings?: TopBooking[];
-  drivers?: VarianceDriver[];
+  // Enhanced evidence tracking
+  top_bookings_prev?: TopBooking[];  // Top 10 Buchungen Vorjahr
+  top_bookings_curr?: TopBooking[];  // Top 10 Buchungen Aktuell
+  new_bookings?: TopBooking[];       // Buchungen die es im VJ nicht gab
+  missing_bookings?: TopBooking[];   // Buchungen die es im AJ nicht mehr gibt
+  bookings_count_prev?: number;      // Anzahl Buchungen Vorjahr
+  bookings_count_curr?: number;      // Anzahl Buchungen Aktuell
+  // Anomaly detection fields
   anomalyHint?: string;
   anomalyType?: 'seasonal' | 'outlier' | 'trend_break' | 'unusual_single';
   anomalySeverity?: 'info' | 'warning' | 'critical';
-}
-
-export interface TopBooking {
-  date: string;
-  amount: number;
-  document_no: string;
-  text: string;
-  vendor?: string;
-  customer?: string;
 }
 
 export interface CostCenterDeviation {
@@ -118,22 +40,44 @@ export interface CostCenterDeviation {
   amount_curr: number;
   delta_abs: number;
   delta_pct: number;
+  top_accounts: {
+    account: number;
+    account_name: string;
+    delta_abs: number;
+  }[];
 }
 
-// ============================================
-// ANALYSIS RESULT TYPES
-// ============================================
+export interface DetailDeviation {
+  account: number;
+  account_name: string;
+  cost_center: string;
+  amount_prev: number;
+  amount_curr: number;
+  delta_abs: number;
+  delta_pct: number;
+  comment: string;
+}
+
+export interface TopBooking {
+  date: string;
+  amount: number;
+  text: string;
+  vendor: string | null;
+  customer: string | null;
+  document_no: string;
+}
 
 export interface AnalysisResult {
   meta: {
     period_prev: string;
     period_curr: string;
-    bookings_prev: number;
-    bookings_curr: number;
     total_prev: number;
     total_curr: number;
-    analyzed_at: string;
-    engine_version: string;
+    bookings_prev: number;
+    bookings_curr: number;
+    wesentlichkeit_abs: number;
+    wesentlichkeit_pct: number;
+    entity?: string;
   };
   summary: {
     total_delta: number;
@@ -144,10 +88,173 @@ export interface AnalysisResult {
   };
   by_account: AccountDeviation[];
   by_cost_center: CostCenterDeviation[];
-  data_quality: {
-    prev: DataProfile;
-    curr: DataProfile;
+  by_detail: DetailDeviation[];
+}
+
+export interface AnalysisConfig {
+  wesentlichkeit_abs: number;
+  wesentlichkeit_pct: number;
+  period_prev_name: string;
+  period_curr_name: string;
+  use_ai_comments: boolean;
+  api_key?: string;
+}
+
+// Multi-Entity Types
+export interface EntityFile {
+  name: string;
+  prevFile: File | null;
+  currFile: File | null;
+}
+
+export interface EntityResult {
+  entity: string;
+  result: AnalysisResult;
+  status: 'success' | 'error';
+  error?: string;
+}
+
+export interface MultiEntityAnalysis {
+  meta: {
+    period_prev: string;
+    period_curr: string;
+    total_entities: number;
+    analyzed_at: string;
   };
+  entities: EntityResult[];
+  consolidated: AnalysisResult | null;
+  benchmarks: BenchmarkResult[];
+}
+
+export interface BenchmarkResult {
+  metric: string;
+  unit: string;
+  values: {
+    entity: string;
+    value: number;
+    vs_average: number;
+    rank: number;
+  }[];
+  average: number;
+  best: string;
+  worst: string;
+}
+
+// Chat Types
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  isLoading?: boolean;
+}
+
+// Management Summary
+export interface ManagementSummary {
+  text: string;
+  generatedByAI: boolean;
+  generatedAt: string;
+}
+
+// Labor/Healthcare KPIs
+export interface LabKPIs {
+  // Revenue metrics
+  revenue_prev: number;
+  revenue_curr: number;
+  revenue_delta: number;
+  revenue_delta_pct: number;
+  // Cost metrics
+  total_costs_prev: number;
+  total_costs_curr: number;
+  // Personnel
+  personnel_costs_prev: number;
+  personnel_costs_curr: number;
+  personnel_ratio_prev: number;  // Personalkosten / Umsatz
+  personnel_ratio_curr: number;
+  // Reagents/Materials
+  reagent_costs_prev: number;
+  reagent_costs_curr: number;
+  reagent_ratio_prev: number;    // Reagenzienkosten / Umsatz
+  reagent_ratio_curr: number;
+  // Optional: Cost per test (if test count provided)
+  test_count_prev?: number;
+  test_count_curr?: number;
+  cost_per_test_prev?: number;
+  cost_per_test_curr?: number;
+}
+
+// Saved Analysis for persistence
+export interface SavedAnalysis {
+  id: string;
+  name: string;
+  entity: string;
+  period_prev: string;
+  period_curr: string;
+  created_at: string;
+  result: AnalysisResult;
+  kpis?: LabKPIs;
+  workflow_status: 'draft' | 'review' | 'approved';
+  approved_by?: string;
+  approved_at?: string;
+}
+
+// Extended Anomaly Types
+export interface Anomaly {
+  id: string;
+  type: 'outlier' | 'frequency' | 'new_account' | 'missing_account' | 'timing' | 'single_booking';
+  severity: 'low' | 'medium' | 'high';
+  account?: number;
+  account_name?: string;
+  description: string;
+  affected_amount: number;
+  affected_bookings: TopBooking[];
+  suggested_action: string;
+}
+
+// ============================================
+// PLAN vs. IST vs. VJ - Triple Comparison
+// ============================================
+
+export interface TripleAccountDeviation {
+  account: number;
+  account_name: string;
+  // Three-way values
+  amount_vj: number;      // Vorjahr (Previous Year)
+  amount_plan: number;    // Plan/Budget
+  amount_ist: number;     // Ist (Actual)
+  // Deltas vs Plan
+  delta_plan_abs: number;
+  delta_plan_pct: number;
+  // Deltas vs VJ
+  delta_vj_abs: number;
+  delta_vj_pct: number;
+  // Plan vs VJ (shows if plan was ambitious)
+  plan_vs_vj_abs: number;
+  plan_vs_vj_pct: number;
+  // Status indicators
+  status: 'on_track' | 'over_plan' | 'under_plan' | 'critical';
+  comment: string;
+  // Evidence
+  top_bookings_ist?: TopBooking[];
+  bookings_count_ist?: number;
+}
+
+export interface TripleCostCenterDeviation {
+  cost_center: string;
+  amount_vj: number;
+  amount_plan: number;
+  amount_ist: number;
+  delta_plan_abs: number;
+  delta_plan_pct: number;
+  delta_vj_abs: number;
+  delta_vj_pct: number;
+  status: 'on_track' | 'over_plan' | 'under_plan' | 'critical';
+  top_accounts: {
+    account: number;
+    account_name: string;
+    delta_plan_abs: number;
+    delta_vj_abs: number;
+  }[];
 }
 
 export interface TripleAnalysisResult {
@@ -158,213 +265,157 @@ export interface TripleAnalysisResult {
     total_vj: number;
     total_plan: number;
     total_ist: number;
-    analyzed_at: string;
+    bookings_ist: number;
+    wesentlichkeit_abs: number;
+    wesentlichkeit_pct: number;
+    entity?: string;
   };
   summary: {
+    // Totals
     total_delta_plan: number;
     total_delta_vj: number;
-    plan_achievement_pct: number;
-  };
-  traffic_light: {
-    green: number;
-    yellow: number;
-    red: number;
+    // Revenue
+    erloese_vj: number;
+    erloese_plan: number;
+    erloese_ist: number;
+    erloese_delta_plan: number;
+    erloese_delta_vj: number;
+    // Expenses
+    aufwendungen_vj: number;
+    aufwendungen_plan: number;
+    aufwendungen_ist: number;
+    aufwendungen_delta_plan: number;
+    aufwendungen_delta_vj: number;
+    // Plan achievement
+    plan_achievement_pct: number; // Ist / Plan * 100
   };
   by_account: TripleAccountDeviation[];
-}
-
-export interface TripleAccountDeviation {
-  account: number;
-  account_name: string;
-  amount_vj: number;
-  amount_plan: number;
-  amount_ist: number;
-  delta_plan_abs: number;
-  delta_plan_pct: number;
-  delta_vj_abs: number;
-  delta_vj_pct: number;
-  plan_vs_vj_abs: number;
-  plan_vs_vj_pct: number;
-  status: 'on_track' | 'over_plan' | 'under_plan' | 'critical';
-  comment: string;
-  bookings_count_ist?: number;
-  top_bookings_ist?: TopBooking[];
-}
-
-// ============================================
-// AGENT / TOOL TYPES
-// ============================================
-
-export interface ToolCall {
-  tool: string;
-  input: Record<string, unknown>;
-  output?: unknown;
-  executionTimeMs?: number;
-  error?: string;
-}
-
-export interface AnalysisPlan {
-  query: string;
-  intent: 'variance' | 'drill_down' | 'forecast' | 'anomaly' | 'general';
-  steps: PlanStep[];
-  estimatedCalls: number;
-}
-
-export interface PlanStep {
-  step: number;
-  action: string;
-  tool: string;
-  rationale: string;
-  dependsOn?: number[];
-}
-
-export interface AgentResponse {
-  answer: string;
-  confidence: number;
-  sources: Source[];
-  toolCalls: ToolCall[];
-  plan?: AnalysisPlan;
-}
-
-export interface Source {
-  type: 'query' | 'document' | 'calculation';
-  reference: string;
-  excerpt?: string;
-}
-
-// ============================================
-// KNOWLEDGE LAYER TYPES
-// ============================================
-
-export interface AccountKnowledge {
-  account: number;
-  account_name: string;
-  category: 'revenue' | 'expense' | 'asset' | 'liability';
-  typical_behavior: string;
-  seasonality?: string;
-  benchmarks?: {
-    revenueRatio?: { min: number; max: number };
-    absoluteThreshold?: number;
+  by_cost_center: TripleCostCenterDeviation[];
+  // Traffic light summary
+  traffic_light: {
+    green: number;   // On track
+    yellow: number;  // Slight deviation
+    red: number;     // Critical
   };
-  related_accounts?: number[];
 }
 
-export interface PolicyDocument {
-  id: string;
-  title: string;
-  type: 'guideline' | 'definition' | 'process';
-  sections: PolicySection[];
-  indexed_at: string;
+export interface TripleAnalysisConfig {
+  wesentlichkeit_abs: number;
+  wesentlichkeit_pct: number;
+  period_vj_name: string;
+  period_plan_name: string;
+  period_ist_name: string;
+  // Thresholds for traffic lights
+  threshold_yellow_pct: number; // e.g., 5%
+  threshold_red_pct: number;    // e.g., 10%
 }
 
-export interface PolicySection {
-  id: string;
-  title: string;
-  content: string;
-  page?: number;
-  parent_id?: string;
-}
-
-// ============================================
-// UI / STATE TYPES
-// ============================================
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
-  isLoading?: boolean;
-  toolCalls?: ToolCall[];
-  sources?: Source[];
-}
-
-export interface SavedAnalysis {
-  id: string;
-  name: string;
-  entity: string;
-  period_prev: string;
-  period_curr: string;
-  created_at: string;
-  workflow_status: 'draft' | 'review' | 'approved';
-  result: AnalysisResult;
-  kpis?: LabKPIs;
-}
-
-export interface LabKPIs {
-  revenue_prev: number;
-  revenue_curr: number;
-  revenue_delta: number;
-  personnel_costs_prev: number;
-  personnel_costs_curr: number;
-  personnel_ratio_prev: number;
-  personnel_ratio_curr: number;
-  reagent_costs_prev: number;
-  reagent_costs_curr: number;
-  reagent_ratio_prev: number;
-  reagent_ratio_curr: number;
-  total_costs_prev: number;
-  total_costs_curr: number;
-  cost_per_test_prev?: number;
-  cost_per_test_curr?: number;
-  test_count_prev?: number;
-  test_count_curr?: number;
+// Plan data can be either from CSV or manual entry
+export interface PlanData {
+  account: number;
+  account_name: string;
+  amount: number;
+  cost_center?: string;
 }
 
 // ============================================
-// API TYPES
+// Enterprise Feature Types
 // ============================================
+
+export interface DataProfile {
+  rowCount: number;
+  totalAmount: number;
+  dateRange: { from: string; to: string };
+  accountCount: number;
+  costCenterCount: number;
+  columns: string[];
+}
 
 export interface UploadResponse {
   success: boolean;
   tableName: string;
   profile: DataProfile;
   rowCount: number;
-}
-
-export interface AnalyzeRequest {
-  tablePrev: string;
-  tableCurr: string;
-  options?: {
-    wesentlichkeit_abs?: number;
-    wesentlichkeit_pct?: number;
-    include_drivers?: boolean;
-    max_accounts?: number;
+  detection: {
+    format: string;
+    confidence: number;
   };
 }
 
 export interface SQLQueryRequest {
   sql: string;
-  explain?: boolean;
+  format?: 'json' | 'csv';
 }
 
 export interface SQLQueryResponse {
-  success: boolean;
   columns: string[];
   rows: Record<string, unknown>[];
   rowCount: number;
-  executionTimeMs: number;
-  error?: string;
+  executionTime: number;
 }
 
-// ============================================
-// EVALUATION TYPES
-// ============================================
+export interface VarianceResult {
+  account: number;
+  account_name: string;
+  amount_prev: number;
+  amount_curr: number;
+  variance: number;
+  variance_pct: number;
+}
 
-export interface EvaluationResult {
-  sqlCorrectness: {
-    syntaxValid: boolean;
-    executionSuccess: boolean;
-    resultMatches?: boolean;
-  };
-  groundedness: {
-    totalClaims: number;
-    supportedClaims: number;
-    unsupportedClaims: number;
-    score: number;
-  };
-  driverQuality?: {
-    varianceCovered: number;
-    topDriversStable: boolean;
-  };
+export interface VarianceDriver {
+  account: number;
+  account_name: string;
+  contribution: number;
+  contribution_pct: number;
+}
+
+export interface TimeSeriesPoint {
+  period: string;
+  value: number;
+}
+
+// Agent Types
+export interface AgentResponse {
+  type: 'thinking' | 'tool_call' | 'result' | 'error';
+  content: string;
+  tool?: string;
+  toolInput?: Record<string, unknown>;
+  toolResult?: unknown;
+  sources?: Source[];
+  timestamp: string;
+}
+
+export interface Source {
+  type: 'booking' | 'account' | 'document' | 'calculation';
+  reference: string;
+  description: string;
+  value?: number;
+}
+
+export interface ToolCall {
+  name: string;
+  input: Record<string, unknown>;
+  output?: unknown;
+}
+
+export interface AnalysisPlan {
+  goal: string;
+  steps: PlanStep[];
+  reasoning: string;
+}
+
+export interface PlanStep {
+  action: string;
+  tool: string;
+  params: Record<string, unknown>;
+  expectedOutput: string;
+}
+
+export interface AccountKnowledge {
+  account: number;
+  name: string;
+  category: string;
+  typical_range?: { min: number; max: number };
+  notes?: string;
 }

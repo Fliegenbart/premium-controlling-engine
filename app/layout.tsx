@@ -5,11 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Premium Controlling Engine',
-  description: 'Enterprise Controlling Engine mit DuckDB, AI Tool-Calling und Evidence-Based Reporting',
-  icons: {
-    icon: '/favicon.ico',
-  },
+  title: 'Controlling Abweichungsanalyse',
+  description: 'Automatische Analyse und Kommentierung von Buchungsdaten',
 };
 
 export default function RootLayout({
