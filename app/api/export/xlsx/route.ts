@@ -23,11 +23,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unbekannter Export-Typ' }, { status: 400 });
     }
 
-    const response = new NextResponse(buffer);
-    response.headers.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    response.headers.set('Content-Disposition', `attachment; filename="${filename || 'export.xlsx'}"`);
-
-    return response;
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="${filename || 'export.xlsx'}"`,
+      },
+    });
   } catch (error) {
     console.error('Excel export error:', error);
     return NextResponse.json(
