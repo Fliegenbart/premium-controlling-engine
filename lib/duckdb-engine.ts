@@ -452,6 +452,19 @@ export async function getConnection(): Promise<duckdb.Database> {
 }
 
 /**
+ * Export table to Parquet file
+ */
+export async function exportToParquet(tableName: string, filePath: string): Promise<void> {
+  const database = await getDatabase();
+  return new Promise((resolve, reject) => {
+    database.run(`COPY ${tableName} TO '${filePath}' (FORMAT PARQUET)`, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+}
+
+/**
  * Close database
  */
 export async function closeDatabase(): Promise<void> {

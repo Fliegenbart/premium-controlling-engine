@@ -23,11 +23,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unbekannter Export-Typ' }, { status: 400 });
     }
 
-    const response = new NextResponse(buffer);
-    response.headers.set('Content-Type', 'application/pdf');
-    response.headers.set('Content-Disposition', `attachment; filename="${filename || 'report.pdf'}"`);
-
-    return response;
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${filename || 'report.pdf'}"`,
+      },
+    });
   } catch (error) {
     console.error('PDF export error:', error);
     return NextResponse.json(
