@@ -2,19 +2,20 @@
 # Multi-stage build for minimal image size
 
 # ============================================
-# Stage 1: Dependencies
+# Stage 1: Dependencies (ALL deps for build)
 # ============================================
 FROM node:20-alpine AS deps
 WORKDIR /app
 
 # Install build dependencies for native modules
-RUN apk add --no-cache python3 make g++ 
+RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (including devDependencies for build)
+# tailwindcss, autoprefixer, postcss are needed during next build
+RUN npm ci
 
 # ============================================
 # Stage 2: Builder
