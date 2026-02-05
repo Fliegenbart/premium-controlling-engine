@@ -376,7 +376,9 @@ export async function parseXLSX(buffer: Buffer): Promise<Booking[]> {
   // Dynamic import for ExcelJS (large package)
   const ExcelJS = await import('exceljs');
   const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(buffer);
+  // ExcelJS types expect a different Buffer shape across @types/node versions.
+  // Runtime accepts Node Buffer; cast to avoid type mismatch.
+  await workbook.xlsx.load(buffer as unknown as any);
   
   const worksheet = workbook.worksheets[0];
   if (!worksheet) {

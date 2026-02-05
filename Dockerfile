@@ -4,11 +4,13 @@
 # ============================================
 # Stage 1: Dependencies (ALL deps for build)
 # ============================================
-FROM node:20-alpine AS deps
+FROM node:20-bookworm-slim AS deps
 WORKDIR /app
 
 # Install build dependencies for native modules
-RUN apk add --no-cache python3 make g++
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package.json package-lock.json* ./
@@ -20,7 +22,7 @@ RUN npm ci
 # ============================================
 # Stage 2: Builder
 # ============================================
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 
 # Copy dependencies from deps stage
@@ -36,15 +38,17 @@ RUN npm run build
 # ============================================
 # Stage 3: Production Runner
 # ============================================
-FROM node:20-alpine AS runner
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
 
 # Security: Run as non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs \
+    && useradd --system --uid 1001 --gid nodejs nextjs
 
 # Install runtime dependencies only
-RUN apk add --no-cache curl
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment
 ENV NODE_ENV=production

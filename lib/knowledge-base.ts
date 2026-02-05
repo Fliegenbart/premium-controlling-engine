@@ -422,7 +422,7 @@ function extractSeasonalMonths(seasonality: string): number[] {
     months.push(12, 1, 2);
   }
   
-  return [...new Set(months)];
+  return Array.from(new Set(months));
 }
 
 function formatCurrency(value: number): string {

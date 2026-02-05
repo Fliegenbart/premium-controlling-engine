@@ -25,6 +25,18 @@ const DEFAULT_OPTIONS: TripleAnalysisOptions = {
   maxAccounts: 50,
 };
 
+async function fetchAllRows(
+  conn: Awaited<ReturnType<typeof getConnection>>,
+  sql: string
+): Promise<Record<string, unknown>[]> {
+  return new Promise((resolve, reject) => {
+    conn.all(sql, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows as Record<string, unknown>[]);
+    });
+  });
+}
+
 /**
  * Run triple analysis: Plan vs. Ist vs. Vorjahr
  */
@@ -39,7 +51,7 @@ export async function analyzeTriple(
   const conn = await getConnection();
 
   // Get period metadata
-  const metaResult = await conn.run(`
+  const metaRows = await fetchAllRows(conn, `
     WITH vj AS (
       SELECT
         MIN(posting_date) as min_date,
@@ -71,10 +83,10 @@ export async function analyzeTriple(
     FROM vj, plan, ist
   `);
 
-  const meta = (await metaResult.fetchAllRows())[0] as Record<string, unknown>;
+  const meta = (metaRows[0] ?? {}) as Record<string, unknown>;
 
   // Account-level triple variance
-  const varianceResult = await conn.run(`
+  const varianceRows = await fetchAllRows(conn, `
     WITH vj AS (
       SELECT account, account_name, SUM(amount) as amount, COUNT(*) as cnt
       FROM ${tableVJ}
@@ -126,8 +138,6 @@ export async function analyzeTriple(
     ORDER BY ABS(COALESCE(ist.amount, 0) - COALESCE(plan.amount, 0)) DESC
     LIMIT ${opts.maxAccounts}
   `);
-
-  const varianceRows = (await varianceResult.fetchAllRows()) as Record<string, unknown>[];
 
   // Build account deviations with status
   const byAccount: TripleAccountDeviation[] = [];
@@ -205,14 +215,13 @@ export async function analyzeTriple(
 
     // Get top bookings if requested
     if (opts.includeTopBookings && deviation.bookings_count_ist! > 0) {
-      const topResult = await conn.run(`
+      const topRows = await fetchAllRows(conn, `
         SELECT posting_date, amount, document_no, text, vendor, customer
         FROM ${tableIst}
         WHERE account = ${account}
         ORDER BY ABS(amount) DESC
         LIMIT 5
       `);
-      const topRows = (await topResult.fetchAllRows()) as Record<string, unknown>[];
       deviation.top_bookings_ist = topRows.map((r) => ({
         date: String(r.posting_date),
         amount: Number(r.amount),
