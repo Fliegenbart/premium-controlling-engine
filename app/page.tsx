@@ -31,6 +31,14 @@ import {
   Zap,
   Save,
   Target,
+  Search,
+  GitCompare,
+  Activity,
+  FolderOpen,
+  Wallet,
+  Grid3x3,
+  Menu,
+  type LucideIcon,
 } from 'lucide-react';
 import {
   BarChart,
@@ -153,6 +161,9 @@ export default function Home() {
 
   // KPIs state
   const [labKPIs, setLabKPIs] = useState<LabKPIs | null>(null);
+
+  // Sidebar state (mobile)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Magic Upload state
   const [useMagicUpload, setUseMagicUpload] = useState(true);
@@ -374,27 +385,100 @@ export default function Home() {
     return <LandingPage onStartApp={() => setShowApp(true)} />;
   }
 
-  // Mode config for tabs
-  const modeTabs: { key: AnalysisMode; label: string }[] = [
-    { key: 'liquidity', label: 'Liquidität' },
-    { key: 'closing', label: 'Abschluss' },
-    { key: 'contribution', label: 'DB-Rechnung' },
-    { key: 'cashflow', label: 'Cashflow' },
-    { key: 'bwa', label: 'BWA' },
-    { key: 'bab', label: 'BAB' },
-    { key: 'single', label: 'Einzelanalyse' },
-    { key: 'triple', label: 'Plan vs Ist' },
-    { key: 'multi', label: 'Konzern' },
-    { key: 'docs', label: 'Dokumente' },
-    { key: 'trends', label: 'Trends' },
-    { key: 'errors', label: 'Fehler' },
-    { key: 'scenario', label: 'Szenario' },
-    { key: 'forecast', label: 'Forecast' },
+  // Mode config for sidebar navigation
+  interface ModeTab {
+    key: AnalysisMode;
+    label: string;
+    desc: string;
+    icon: LucideIcon;
+    color: string;
+    group: 'controlling' | 'analyse' | 'ki';
+  }
+
+  const modeTabs: ModeTab[] = [
+    // ── Controlling ──
+    { key: 'liquidity',    label: 'Liquidität',     desc: '13-Wochen Cashflow-Prognose',     icon: TrendingUp,   color: '#3b82f6', group: 'controlling' },
+    { key: 'closing',      label: 'Abschluss',      desc: 'Monatsabschluss mit 12 Checks',   icon: CheckCircle,  color: '#22c55e', group: 'controlling' },
+    { key: 'contribution', label: 'DB-Rechnung',    desc: 'Mehrstufige DB I → DB V',         icon: BarChart3,    color: '#14b8a6', group: 'controlling' },
+    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#06b6d4', group: 'controlling' },
+    { key: 'bwa',          label: 'BWA',            desc: 'DATEV-BWA mit KI-Analyse',        icon: FileText,     color: '#f97316', group: 'controlling' },
+    { key: 'bab',          label: 'BAB',            desc: 'Kostenstellen & GK-Zuschläge',    icon: Grid3x3,      color: '#f43f5e', group: 'controlling' },
+    // ── Analyse ──
+    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#6366f1', group: 'analyse' },
+    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#ec4899', group: 'analyse' },
+    { key: 'multi',        label: 'Konzern',        desc: 'Multi-Entity Konsolidierung',     icon: Building2,    color: '#6366f1', group: 'analyse' },
+    // ── KI-Tools ──
+    { key: 'errors',       label: 'Fehler-Scan',    desc: 'KI-Buchungsfehler-Erkennung',     icon: AlertCircle,  color: '#f43f5e', group: 'ki' },
+    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#8b5cf6', group: 'ki' },
+    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#06b6d4', group: 'ki' },
+    { key: 'trends',       label: 'Trends',         desc: 'Multi-Perioden Trendanalyse',     icon: Activity,     color: '#10b981', group: 'ki' },
+    { key: 'docs',         label: 'Dokumente',      desc: 'KI-Reports & Dokumenten-Archiv',  icon: FolderOpen,   color: '#f59e0b', group: 'ki' },
   ];
+
+  const sidebarGroups = [
+    { key: 'controlling' as const, label: 'Controlling' },
+    { key: 'analyse' as const, label: 'Analyse' },
+    { key: 'ki' as const, label: 'KI-Tools' },
+  ];
+
+  // Shared sidebar content renderer
+  const renderSidebarNav = (onSelect?: () => void) => (
+    <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-thin">
+      {sidebarGroups.map((group, gi) => (
+        <div key={group.key}>
+          {gi > 0 && <div className="my-3 mx-2 h-px bg-white/[0.06]" />}
+          <p className="text-[10px] uppercase tracking-[0.12em] text-gray-600 font-semibold px-3 mb-2">{group.label}</p>
+          <div className="space-y-0.5">
+            {modeTabs.filter(t => t.group === group.key).map((tab) => {
+              const Icon = tab.icon;
+              const isActive = mode === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => { setMode(tab.key); onSelect?.(); }}
+                  className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left transition-all group/item relative ${
+                    isActive ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebarActive"
+                      className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full"
+                      style={{ backgroundColor: tab.color }}
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                      isActive ? '' : 'bg-white/[0.04]'
+                    }`}
+                    style={isActive ? { backgroundColor: `${tab.color}18` } : undefined}
+                  >
+                    <Icon className="w-4 h-4 transition-colors" style={{ color: isActive ? tab.color : '#6b7280' }} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-sm font-medium leading-tight transition-colors ${
+                      isActive ? 'text-white' : 'text-gray-400 group-hover/item:text-gray-200'
+                    }`}>
+                      {tab.label}
+                    </p>
+                    <p className="text-[11px] text-gray-600 leading-tight mt-0.5 truncate">{tab.desc}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+
+  // Get active tab info for header
+  const activeTab_meta = modeTabs.find(t => t.key === mode);
 
   // Main App
   return (
-    <main className="min-h-screen bg-[#080b16] mesh-gradient noise-overlay relative">
+    <main className="min-h-screen bg-[#080b16] mesh-gradient noise-overlay relative flex">
       {/* Animated Background */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <Particles
@@ -417,118 +501,162 @@ export default function Home() {
         />
       )}
 
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="relative bg-[#080b16]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-50"
-      >
-        {/* Animated gradient accent line */}
-        <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-        <div className="max-w-7xl mx-auto px-6 py-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowApp(false)}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
-              >
-                <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center overflow-hidden shadow-lg shadow-indigo-500/25">
-                  <BarChart3 className="w-5 h-5 text-white relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-semibold text-white tracking-[-0.02em]">Premium Controlling</h1>
-                </div>
-              </button>
-
-              {/* Mode Toggle — pill tabs with gradient active state */}
-              <div className="hidden md:flex bg-white/[0.03] rounded-xl p-1 ml-6 border border-white/[0.06] gap-0.5">
-                {modeTabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setMode(tab.key)}
-                    className="relative px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all"
-                  >
-                    {mode === tab.key && (
-                      <motion.div
-                        layoutId="activeMode"
-                        className="absolute inset-0 bg-gradient-to-r from-indigo-500/90 to-cyan-500/90 rounded-lg shadow-lg shadow-indigo-500/20"
-                        transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
-                      />
-                    )}
-                    <span className={`relative z-10 ${mode === tab.key ? 'text-white font-semibold' : 'text-gray-500 hover:text-gray-300'}`}>
-                      {tab.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
+      {/* ═══ Desktop Sidebar ═══ */}
+      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-[#0a0e1a]/90 backdrop-blur-2xl border-r border-white/[0.06]">
+        {/* Sidebar Header / Logo */}
+        <div className="px-4 py-4 border-b border-white/[0.06]">
+          <button
+            onClick={() => setShowApp(false)}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+          >
+            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center overflow-hidden shadow-lg shadow-indigo-500/25">
+              <BarChart3 className="w-5 h-5 text-white relative z-10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-
-            <div className="flex items-center gap-3">
-              {/* Workflow Status */}
-              {hasValidData && (
-                <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg p-1 border border-white/[0.05]">
-                  {(['draft', 'review', 'approved'] as WorkflowStatus[]).map(status => (
-                    <button
-                      key={status}
-                      onClick={() => setWorkflowStatus(status)}
-                      className="relative px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
-                    >
-                      {workflowStatus === status && (
-                        <motion.div
-                          layoutId="activeWorkflow"
-                          className={`absolute inset-0 rounded-md ${
-                            status === 'draft' ? 'bg-yellow-500/15 border border-yellow-500/20'
-                            : status === 'review' ? 'bg-blue-500/15 border border-blue-500/20'
-                            : 'bg-green-500/15 border border-green-500/20'
-                          }`}
-                          transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
-                        />
-                      )}
-                      <span className={`relative z-10 flex items-center gap-1.5 ${
-                        workflowStatus === status
-                          ? status === 'draft' ? 'text-yellow-400'
-                          : status === 'review' ? 'text-blue-400'
-                          : 'text-green-400'
-                          : 'text-gray-500 hover:text-gray-300'
-                      }`}>
-                        {status === 'draft' && <Clock className="w-3 h-3" />}
-                        {status === 'review' && <Eye className="w-3 h-3" />}
-                        {status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
-                        {status === 'draft' ? 'Entwurf' : status === 'review' ? 'Prüfung' : 'Freigabe'}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
+            <div>
+              <h1 className="text-[15px] font-semibold text-white tracking-[-0.02em]">Premium Controlling</h1>
+              <p className="text-[10px] text-gray-600 tracking-wide">Engine v2.0</p>
             </div>
+          </button>
+        </div>
+
+        {/* Sidebar Navigation */}
+        {renderSidebarNav()}
+
+        {/* Sidebar Footer */}
+        <div className="px-4 py-3 border-t border-white/[0.06]">
+          <div className="flex items-center gap-2 text-[11px] text-gray-600">
+            <div className="w-2 h-2 rounded-full bg-green-500/60 animate-pulse" />
+            <span>14 Module aktiv</span>
           </div>
         </div>
-      </motion.div>
+      </aside>
 
-      {/* Mobile Mode Selector */}
-      <div className="md:hidden sticky top-[52px] z-40 bg-[#080b16]/90 backdrop-blur-xl border-b border-white/[0.06] px-4 py-2 overflow-x-auto">
-        <div className="flex gap-1.5 min-w-max">
-          {modeTabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setMode(tab.key)}
-              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
-                mode === tab.key
-                  ? 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/20'
-                  : 'bg-white/[0.04] text-gray-500 border border-white/[0.06]'
-              }`}
+      {/* ═══ Mobile Sidebar Overlay ═══ */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+            {/* Sidebar Panel */}
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-[#0a0e1a] border-r border-white/[0.06] flex flex-col md:hidden"
             >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+              {/* Mobile Sidebar Header */}
+              <div className="px-4 py-4 border-b border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+                    <BarChart3 className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-semibold text-white">Navigation</span>
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+              {/* Mobile Sidebar Nav */}
+              {renderSidebarNav(() => setSidebarOpen(false))}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ═══ Main Content Area ═══ */}
+      <div className="flex-1 min-h-screen overflow-y-auto relative">
+        {/* Header — simplified (no tabs) */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="relative bg-[#080b16]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-30"
+        >
+          <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+          <div className="px-6 py-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* Mobile hamburger */}
+                <button
+                  onClick={() => setSidebarOpen(true)}
+                  className="md:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+
+                {/* Active mode indicator in header */}
+                {activeTab_meta && (
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: `${activeTab_meta.color}18` }}
+                    >
+                      <activeTab_meta.icon className="w-4 h-4" style={{ color: activeTab_meta.color }} />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-semibold text-white tracking-tight leading-none">{activeTab_meta.label}</h2>
+                      <p className="text-[11px] text-gray-500 mt-0.5">{activeTab_meta.desc}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* Workflow Status */}
+                {hasValidData && (
+                  <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg p-1 border border-white/[0.05]">
+                    {(['draft', 'review', 'approved'] as WorkflowStatus[]).map(status => (
+                      <button
+                        key={status}
+                        onClick={() => setWorkflowStatus(status)}
+                        className="relative px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
+                      >
+                        {workflowStatus === status && (
+                          <motion.div
+                            layoutId="activeWorkflow"
+                            className={`absolute inset-0 rounded-md ${
+                              status === 'draft' ? 'bg-yellow-500/15 border border-yellow-500/20'
+                              : status === 'review' ? 'bg-blue-500/15 border border-blue-500/20'
+                              : 'bg-green-500/15 border border-green-500/20'
+                            }`}
+                            transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                          />
+                        )}
+                        <span className={`relative z-10 flex items-center gap-1.5 ${
+                          workflowStatus === status
+                            ? status === 'draft' ? 'text-yellow-400'
+                            : status === 'review' ? 'text-blue-400'
+                            : 'text-green-400'
+                            : 'text-gray-500 hover:text-gray-300'
+                        }`}>
+                          {status === 'draft' && <Clock className="w-3 h-3" />}
+                          {status === 'review' && <Eye className="w-3 h-3" />}
+                          {status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
+                          {status === 'draft' ? 'Entwurf' : status === 'review' ? 'Prüfung' : 'Freigabe'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+      <div className="px-6 py-6 max-w-[1400px] relative z-10">
         <AnimatePresence mode="wait">
         {/* Documents Section */}
         {mode === 'docs' && (
@@ -540,23 +668,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-amber-500/[0.08] via-orange-500/[0.04] to-transparent border border-amber-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/25">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Dokumenten-Center</h2>
-                  <p className="text-sm text-gray-400">KI-Reports, Analysen & Archiv</p>
-                </div>
-              </div>
-            </motion.div>
             <DocumentsPanel />
           </motion.div>
         )}
@@ -642,23 +753,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-rose-500/[0.08] via-pink-500/[0.04] to-transparent border border-rose-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg shadow-rose-500/25">
-                  <AlertCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Buchungsfehler-Erkennung</h2>
-                  <p className="text-sm text-gray-400">Duplikate, Rundläufer, Wochenend-Buchungen & mehr</p>
-                </div>
-              </div>
-            </motion.div>
             <BookingErrorPanel
               errors={errorDetectionResult}
               isLoading={isDetectingErrors}
@@ -677,23 +771,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-purple-500/[0.08] via-violet-500/[0.04] to-transparent border border-purple-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
-                  <Target className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Szenario-Simulation</h2>
-                  <p className="text-sm text-gray-400">What-if Analyse in Echtzeit</p>
-                </div>
-              </div>
-            </motion.div>
             <ScenarioSimulator analysisResult={currentResult ?? null} />
           </motion.div>
         )}
@@ -708,24 +785,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            {/* Section Hero */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-blue-500/[0.08] via-cyan-500/[0.04] to-transparent border border-blue-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">13-Wochen Liquiditätsplanung</h2>
-                  <p className="text-sm text-gray-400">Cashflow-Prognose mit KI-Mustererkennung</p>
-                </div>
-              </div>
-            </motion.div>
             <LiquidityDashboard bookings={currBookings} />
           </motion.div>
         )}
@@ -740,24 +799,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            {/* Section Hero */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-green-500/[0.08] via-emerald-500/[0.04] to-transparent border border-green-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-green-500/25">
-                  <CheckCircle className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Monatsabschluss-Workflow</h2>
-                  <p className="text-sm text-gray-400">12 automatische Prüfungen mit Freigabe</p>
-                </div>
-              </div>
-            </motion.div>
             <MonthlyClosingDashboard bookings={currBookings} prevBookings={prevBookings} />
           </motion.div>
         )}
@@ -772,24 +813,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            {/* Section Hero */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-teal-500/[0.08] via-emerald-500/[0.04] to-transparent border border-teal-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/25">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Mehrstufige Deckungsbeitragsrechnung</h2>
-                  <p className="text-sm text-gray-400">DB I → DB V mit Wasserfall & Kostenstellen-Vergleich</p>
-                </div>
-              </div>
-            </motion.div>
             <ContributionDashboard bookings={currBookings} />
           </motion.div>
         )}
@@ -804,24 +827,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            {/* Section Hero */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-blue-500/[0.04] to-transparent border border-cyan-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Kapitalflussrechnung (DRS 21)</h2>
-                  <p className="text-sm text-gray-400">Operativ • Investition • Finanzierung mit Free Cashflow</p>
-                </div>
-              </div>
-            </motion.div>
             <CashflowDashboard bookings={currBookings} />
           </motion.div>
         )}
@@ -836,23 +841,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-orange-500/[0.08] via-amber-500/[0.04] to-transparent border border-orange-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/25">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Betriebswirtschaftliche Auswertung</h2>
-                  <p className="text-sm text-gray-400">BWA nach DATEV-Standard mit Margen-Analyse & KI-Insights</p>
-                </div>
-              </div>
-            </motion.div>
             <BWADashboard bookings={currBookings} prevBookings={prevBookings} />
           </motion.div>
         )}
@@ -867,23 +855,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-rose-500/[0.08] via-pink-500/[0.04] to-transparent border border-rose-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg shadow-rose-500/25">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Betriebsabrechnungsbogen</h2>
-                  <p className="text-sm text-gray-400">Kostenstellenrechnung mit Gemeinkostenzuschlägen & Heatmap</p>
-                </div>
-              </div>
-            </motion.div>
             <BABDashboard bookings={currBookings} />
           </motion.div>
         )}
@@ -898,23 +869,6 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-blue-500/[0.04] to-transparent border border-cyan-500/[0.1] overflow-hidden"
-            >
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-white tracking-tight">Rollierender Forecast</h2>
-                  <p className="text-sm text-gray-400">Automatische Prognose basierend auf historischen Daten</p>
-                </div>
-              </div>
-            </motion.div>
             <RollingForecastDashboard
               currentBookings={currBookings.length > 0 ? currBookings : null}
               historicalBookings={prevBookings.length > 0 ? prevBookings : null}
@@ -1565,6 +1519,7 @@ export default function Home() {
       <ChatInterface
         analysisResult={currentResult ?? null}
       />
+      </div>{/* end Main Content Area */}
     </main>
   );
 }
