@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Upload,
   FileText,
@@ -366,9 +367,30 @@ export default function Home() {
     return <LandingPage onStartApp={() => setShowApp(true)} />;
   }
 
+  // Mode config for tabs
+  const modeTabs: { key: AnalysisMode; label: string }[] = [
+    { key: 'single', label: 'Einzelanalyse' },
+    { key: 'triple', label: 'Plan vs Ist' },
+    { key: 'multi', label: 'Konzern' },
+    { key: 'docs', label: 'Dokumente' },
+    { key: 'trends', label: 'Trends' },
+    { key: 'errors', label: 'Fehler' },
+    { key: 'scenario', label: 'Szenario' },
+    { key: 'forecast', label: 'Forecast' },
+  ];
+
   // Main App
   return (
-    <main className="min-h-screen bg-[#0a0a0f]">
+    <main className="min-h-screen bg-[#0a0a0f] relative">
+      {/* Subtle Particles Background */}
+      <Particles
+        className="fixed inset-0 z-0 pointer-events-none"
+        quantity={30}
+        color="#3b82f6"
+        staticity={80}
+        size={0.3}
+      />
+
       {/* Evidence Modal */}
       {showEvidenceModal && selectedDeviation && (
         <EvidenceModal
@@ -378,8 +400,13 @@ export default function Home() {
       )}
 
       {/* Header */}
-      <div className="relative bg-[#12121a]/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+        className="relative bg-[#12121a]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-50"
+      >
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -387,105 +414,72 @@ export default function Home() {
                 onClick={() => setShowApp(false)}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
               >
-                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden">
+                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden shadow-lg shadow-blue-500/20">
                   <BarChart3 className="w-6 h-6 text-white relative z-10" />
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">Premium Controlling</h1>
-                  <p className="text-xs text-gray-500">für den Mittelstand</p>
+                  <h1 className="text-xl font-bold text-white tracking-tight">Premium Controlling</h1>
+                  <p className="text-[10px] text-gray-500 tracking-wide uppercase">für den Mittelstand</p>
                 </div>
               </button>
 
-              {/* Mode Toggle */}
-              <div className="hidden md:flex bg-white/5 rounded-lg p-1 ml-8 border border-white/5">
-                <button
-                  onClick={() => setMode('single')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'single' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Einzelanalyse
-                </button>
-                <button
-                  onClick={() => setMode('triple')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'triple' ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Plan vs Ist
-                </button>
-                <button
-                  onClick={() => setMode('multi')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'multi' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Konzern
-                </button>
-                <button
-                  onClick={() => setMode('docs')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'docs' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  📄 Dokumente
-                </button>
-                <button
-                  onClick={() => setMode('trends')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'trends' ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  📈 Trends
-                </button>
-                <button
-                  onClick={() => setMode('errors')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'errors' ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  🔍 Fehler
-                </button>
-                <button
-                  onClick={() => setMode('scenario')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'scenario' ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  🔮 Szenario
-                </button>
-                <button
-                  onClick={() => setMode('forecast')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    mode === 'forecast' ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  📊 Forecast
-                </button>
+              {/* Mode Toggle with animated indicator */}
+              <div className="hidden md:flex bg-white/[0.03] rounded-xl p-1 ml-8 border border-white/[0.06]">
+                {modeTabs.map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setMode(tab.key)}
+                    className="relative px-3.5 py-2 rounded-lg text-xs font-medium transition-colors"
+                  >
+                    {mode === tab.key && (
+                      <motion.div
+                        layoutId="activeMode"
+                        className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-cyan-600/90 rounded-lg shadow-lg shadow-blue-500/20"
+                        transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                      />
+                    )}
+                    <span className={`relative z-10 ${mode === tab.key ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}>
+                      {tab.label}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* Workflow Status */}
               {hasValidData && (
-                <div className="flex items-center gap-2 bg-white/5 rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-white/[0.03] rounded-lg p-1 border border-white/[0.06]">
                   {(['draft', 'review', 'approved'] as WorkflowStatus[]).map(status => (
                     <button
                       key={status}
                       onClick={() => setWorkflowStatus(status)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${
-                        workflowStatus === status
-                          ? status === 'draft' ? 'bg-yellow-500/20 text-yellow-400'
-                          : status === 'review' ? 'bg-blue-500/20 text-blue-400'
-                          : 'bg-green-500/20 text-green-400'
-                          : 'text-gray-500 hover:text-gray-300'
-                      }`}
+                      className="relative px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5"
                     >
-                      {status === 'draft' && <Clock className="w-3 h-3" />}
-                      {status === 'review' && <Eye className="w-3 h-3" />}
-                      {status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
-                      {status === 'draft' ? 'Entwurf' : status === 'review' ? 'Prüfung' : 'Freigabe'}
+                      {workflowStatus === status && (
+                        <motion.div
+                          layoutId="activeWorkflow"
+                          className={`absolute inset-0 rounded-md ${
+                            status === 'draft' ? 'bg-yellow-500/15 border border-yellow-500/20'
+                            : status === 'review' ? 'bg-blue-500/15 border border-blue-500/20'
+                            : 'bg-green-500/15 border border-green-500/20'
+                          }`}
+                          transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                        />
+                      )}
+                      <span className={`relative z-10 flex items-center gap-1.5 ${
+                        workflowStatus === status
+                          ? status === 'draft' ? 'text-yellow-400'
+                          : status === 'review' ? 'text-blue-400'
+                          : 'text-green-400'
+                          : 'text-gray-500 hover:text-gray-300'
+                      }`}>
+                        {status === 'draft' && <Clock className="w-3 h-3" />}
+                        {status === 'review' && <Eye className="w-3 h-3" />}
+                        {status === 'approved' && <CheckCircle2 className="w-3 h-3" />}
+                        {status === 'draft' ? 'Entwurf' : status === 'review' ? 'Prüfung' : 'Freigabe'}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -494,24 +488,39 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        <AnimatePresence mode="wait">
         {/* Documents Section */}
         {mode === 'docs' && (
-          <div className="mb-8">
+          <motion.div
+            key="docs"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
             <DocumentsPanel />
-          </div>
+          </motion.div>
         )}
 
         {/* Trends Section */}
         {mode === 'trends' && (
-          <div className="mb-8">
-            <div className="bg-[#12121a] rounded-2xl border border-white/10 p-8 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4">
+          <motion.div
+            key="trends"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
+            <div className="bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-8 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/20">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Multi-Perioden Trendanalyse</h2>
+              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Multi-Perioden Trendanalyse</h2>
               <p className="text-gray-400 mb-6 max-w-lg mx-auto">
                 Laden Sie Buchungsdaten aus mehreren Jahren hoch, um CAGR, Volatilität, Forecasts und Anomalien über 3-5 Perioden zu analysieren.
               </p>
@@ -519,40 +528,68 @@ export default function Home() {
                 Nutzen Sie die Einzelanalyse, um zunächst Daten zu laden. Die Trend-Engine analysiert dann automatisch Ihre historischen Perioden.
               </p>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Error Detection Section */}
         {mode === 'errors' && (
-          <div className="mb-8">
+          <motion.div
+            key="errors"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
             <BookingErrorPanel
               errors={errorDetectionResult}
               isLoading={isDetectingErrors}
               onRefresh={refreshErrorDetection}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Scenario Simulation Section */}
         {mode === 'scenario' && (
-          <div className="mb-8">
+          <motion.div
+            key="scenario"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
             <ScenarioSimulator analysisResult={currentResult ?? null} />
-          </div>
+          </motion.div>
         )}
 
         {/* Rolling Forecast Section */}
         {mode === 'forecast' && (
-          <div className="mb-8">
+          <motion.div
+            key="forecast"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
             <RollingForecastDashboard
               currentBookings={currBookings.length > 0 ? currBookings : null}
               historicalBookings={prevBookings.length > 0 ? prevBookings : null}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Triple Upload Section */}
         {mode === 'triple' && (
-          <div className="bg-[#12121a] rounded-2xl border border-white/10 p-6 mb-8">
+          <motion.div
+            key="triple-upload"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 mb-8"
+          >
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-pink-400" />
               Plan vs. Ist vs. Vorjahr
@@ -563,13 +600,20 @@ export default function Home() {
             <TripleUpload
               onAnalysisComplete={(result) => setTripleResult(result)}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Upload Section */}
         {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && (
+        <motion.div
+          key="upload"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
         <BlurFade delay={0.05} inView>
-        <div className="relative bg-[#12121a] rounded-2xl border border-white/10 p-6 mb-8 overflow-hidden">
+        <div className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 mb-8 overflow-hidden">
           <BorderBeam size={150} duration={20} colorFrom="#ec4899" colorTo="#8b5cf6" />
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -783,26 +827,33 @@ export default function Home() {
           </div>
         </div>
         </BlurFade>
+        </motion.div>
         )}
 
         {/* Triple Comparison Results */}
         {mode === 'triple' && tripleResult && (
-          <div className="mb-8">
+          <motion.div
+            key="triple-results"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Plan</p>
                 <p className="text-xl font-bold text-blue-400">{formatCurrency(tripleResult.meta.total_plan)}</p>
-              </div>
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+              </motion.div>
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Ist</p>
                 <p className="text-xl font-bold text-white">{formatCurrency(tripleResult.meta.total_ist)}</p>
-              </div>
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+              </motion.div>
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
                 <p className="text-xl font-bold text-gray-400">{formatCurrency(tripleResult.meta.total_vj)}</p>
-              </div>
-              <div className={`rounded-xl border p-4 ${
+              </motion.div>
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.25 }} className={`rounded-xl border p-4 ${
                 tripleResult.summary.total_delta_plan > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
                 <p className="text-sm text-gray-500 mb-1">Δ Plan</p>
@@ -812,11 +863,11 @@ export default function Home() {
                   {tripleResult.summary.total_delta_plan > 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
                   {formatCurrency(tripleResult.summary.total_delta_plan)}
                 </p>
-              </div>
+              </motion.div>
             </div>
 
             {/* Triple Comparison Table */}
-            <div className="bg-[#12121a] rounded-2xl border border-white/10 p-6">
+            <div className="bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6">
               <TripleComparisonTable
                 result={tripleResult}
                 onShowEvidence={(deviation: TripleAccountDeviation) => {
@@ -838,7 +889,7 @@ export default function Home() {
                 }}
               />
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Saved Analyses List */}
@@ -862,10 +913,17 @@ export default function Home() {
           onDelete={deleteSavedAnalysis}
           onRefresh={refreshSavedAnalyses}
         />
+        </AnimatePresence>
 
         {/* Natural Language Query */}
         {mode !== 'triple' && mode !== 'docs' && mode !== 'trends' && hasValidData && (
-          <NLQueryBar />
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.15 }}
+          >
+            <NLQueryBar />
+          </motion.div>
         )}
 
         {/* Results (for single and multi mode) */}
@@ -884,52 +942,52 @@ export default function Home() {
             {/* KPI Cards with NumberTicker */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <BlurFade delay={0.05} inView>
-              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-4 overflow-hidden group hover:border-white/20 transition-colors">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={80} duration={12} colorFrom="#3b82f6" colorTo="#8b5cf6" />
-                <p className="text-sm text-gray-500 mb-1">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
+                <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={mode === 'multi' ? (konzernResult?.entities.length ?? 0) : currentResult.meta.bookings_prev} />
                 </p>
-              </div>
+              </motion.div>
               </BlurFade>
               <BlurFade delay={0.1} inView>
-              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-4 overflow-hidden group hover:border-white/20 transition-colors">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={80} duration={12} delay={3} colorFrom="#3b82f6" colorTo="#06b6d4" />
-                <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Vorjahr</p>
+                <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_prev)} prefix="" suffix=" €" />
                 </p>
-              </div>
+              </motion.div>
               </BlurFade>
               <BlurFade delay={0.15} inView>
-              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-4 overflow-hidden group hover:border-white/20 transition-colors">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={80} duration={12} delay={6} colorFrom="#06b6d4" colorTo="#22c55e" />
-                <p className="text-sm text-gray-500 mb-1">Aktuell</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Aktuell</p>
+                <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_curr)} prefix="" suffix=" €" />
                 </p>
-              </div>
+              </motion.div>
               </BlurFade>
               <BlurFade delay={0.2} inView>
-              <div className={`relative rounded-xl border p-4 overflow-hidden ${
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className={`relative rounded-xl border p-5 overflow-hidden ${
                 currentResult.summary.total_delta > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
                 <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#06b6d4'} />
-                <p className="text-sm text-gray-500 mb-1">Abweichung</p>
-                <p className={`text-2xl font-bold flex items-center gap-2 ${
+                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Abweichung</p>
+                <p className={`text-2xl font-bold flex items-center gap-2 tracking-tight ${
                   currentResult.summary.total_delta > 0 ? 'text-red-400' : 'text-green-400'
                 }`}>
                   {currentResult.summary.total_delta > 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
                   <NumberTicker value={Math.round(Math.abs(currentResult.summary.total_delta))} prefix={currentResult.summary.total_delta > 0 ? '+' : '-'} suffix=" €" />
                 </p>
-              </div>
+              </motion.div>
               </BlurFade>
             </div>
 
             {/* Charts */}
             <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-6 overflow-hidden hover:border-white/20 transition-colors">
+              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={100} duration={15} colorFrom="#3b82f6" colorTo="#06b6d4" />
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-400" />
@@ -948,9 +1006,9 @@ export default function Home() {
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
+              </motion.div>
 
-              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-6 overflow-hidden hover:border-white/20 transition-colors">
+              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={100} duration={15} delay={7} colorFrom="#8b5cf6" colorTo="#ec4899" />
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                   <PieChart className="w-5 h-5 text-purple-400" />
@@ -970,15 +1028,15 @@ export default function Home() {
                     <Legend formatter={v => <span style={{ color: '#9ca3af' }}>{v}</span>} />
                   </RechartsPie>
                 </ResponsiveContainer>
-              </div>
+              </motion.div>
             </div>
             </BlurFade>
 
             {/* Tabs */}
             <BlurFade delay={0.3} inView>
-            <div className="relative bg-[#12121a] rounded-2xl border border-white/10 overflow-hidden">
+            <div className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] overflow-hidden">
               <BorderBeam size={200} duration={25} colorFrom="#3b82f6" colorTo="#22c55e" />
-              <div className="flex border-b border-white/10">
+              <div className="flex border-b border-white/[0.06]">
                 {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
                   <button
                     key={tab}
@@ -988,7 +1046,11 @@ export default function Home() {
                     }`}
                   >
                     {activeTab === tab && (
-                      <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500" />
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500"
+                        transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                      />
                     )}
                     {tab === 'overview' && 'Übersicht'}
                     {tab === 'accounts' && 'Konten'}
