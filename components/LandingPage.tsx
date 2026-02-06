@@ -18,6 +18,9 @@ import {
   AlignJustify,
   XIcon,
   Sparkles,
+  ClipboardCheck,
+  CheckCircle,
+  Clock,
 } from 'lucide-react';
 import TextShimmer from '@/components/magicui/text-shimmer';
 import { BorderBeam } from '@/components/magicui/border-beam';
@@ -640,7 +643,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             Was kein anderes Tool kann.
           </h2>
           <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-            Vier KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
+            Fünf KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
           </p>
         </div>
 
@@ -1100,6 +1103,75 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   <span key={m}>{m}</span>
                 ))}
               </div>
+            </div>
+          </motion.div>
+
+          {/* ── Tile 5: Monatsabschluss-Workflow ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col md:col-span-2"
+          >
+            <BorderBeam size={180} duration={14} delay={12} colorFrom="#22c55e" colorTo="#10b981" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                <ClipboardCheck className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Monatsabschluss-Workflow</h3>
+                <p className="text-xs text-gray-500">Geführter Abschluss</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              12 automatische Prüfungen — von Kontenabstimmung bis Storno-Check. Mit Fortschrittsanzeige, Findings und digitaler Freigabe.
+            </p>
+            {/* Mini Demo: Animated checklist */}
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              <div className="flex items-center gap-3 mb-3">
+                {/* Progress ring mini */}
+                <svg viewBox="0 0 36 36" className="w-10 h-10">
+                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+                  <motion.circle
+                    cx="18" cy="18" r="15.5" fill="none" stroke="#22c55e" strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray="97.4"
+                    initial={{ strokeDashoffset: 97.4 }}
+                    whileInView={{ strokeDashoffset: 14.6 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 2, delay: 0.5, ease: 'easeOut' }}
+                    transform="rotate(-90 18 18)"
+                  />
+                  <text x="18" y="20" textAnchor="middle" fill="white" fontSize="8" fontWeight="600">85%</text>
+                </svg>
+                <div>
+                  <p className="text-xs text-white font-medium">10 von 12 bestanden</p>
+                  <p className="text-[10px] text-gray-500">2 Warnungen</p>
+                </div>
+              </div>
+              {[
+                { name: 'Kontenabstimmung', status: 'passed', delay: 0.4 },
+                { name: 'Rückstellungen', status: 'passed', delay: 0.7 },
+                { name: 'Buchungsfehler-Scan', status: 'warning', delay: 1.0 },
+                { name: 'Storno-Check', status: 'passed', delay: 1.3 },
+                { name: 'Manuelle Freigabe', status: 'pending', delay: 1.6 },
+              ].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: item.delay }}
+                  className="flex items-center gap-2.5 py-1.5"
+                >
+                  {item.status === 'passed' && <CheckCircle className="w-4 h-4 text-green-400" />}
+                  {item.status === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400" />}
+                  {item.status === 'pending' && <Clock className="w-4 h-4 text-gray-500" />}
+                  <span className={`text-xs ${item.status === 'pending' ? 'text-gray-500' : 'text-gray-300'}`}>{item.name}</span>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         </div>

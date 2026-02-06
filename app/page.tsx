@@ -64,6 +64,7 @@ import BookingErrorPanel from '@/components/BookingErrorPanel';
 import { ScenarioSimulator } from '@/components/ScenarioSimulator';
 import RollingForecastDashboard from '@/components/RollingForecastDashboard';
 import { LiquidityDashboard } from '@/components/LiquidityDashboard';
+import { MonthlyClosingDashboard } from '@/components/MonthlyClosingDashboard';
 import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
@@ -102,7 +103,7 @@ interface KonzernResult {
 }
 
 type WorkflowStatus = 'draft' | 'review' | 'approved';
-type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast' | 'liquidity';
+type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast' | 'liquidity' | 'closing';
 
 // Beispiel-Gesellschaften für Konzernanalyse (vom Nutzer anpassbar)
 const EXAMPLE_ENTITIES = [
@@ -371,6 +372,7 @@ export default function Home() {
   // Mode config for tabs
   const modeTabs: { key: AnalysisMode; label: string }[] = [
     { key: 'liquidity', label: 'Liquidität' },
+    { key: 'closing', label: 'Abschluss' },
     { key: 'single', label: 'Einzelanalyse' },
     { key: 'triple', label: 'Plan vs Ist' },
     { key: 'multi', label: 'Konzern' },
@@ -576,6 +578,20 @@ export default function Home() {
             className="mb-8"
           >
             <LiquidityDashboard bookings={currBookings} />
+          </motion.div>
+        )}
+
+        {/* Monatsabschluss-Workflow Section */}
+        {mode === 'closing' && (
+          <motion.div
+            key="closing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
+            <MonthlyClosingDashboard bookings={currBookings} prevBookings={prevBookings} />
           </motion.div>
         )}
 
