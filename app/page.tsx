@@ -58,6 +58,11 @@ import { MagicUpload } from '@/components/MagicUpload';
 import { DocumentsPanel } from '@/components/DocumentsPanel';
 import { NLQueryBar } from '@/components/NLQueryBar';
 import { RootCausePanel } from '@/components/RootCausePanel';
+import AIReportButton from '@/components/AIReportButton';
+import BookingErrorPanel from '@/components/BookingErrorPanel';
+import { ScenarioSimulator } from '@/components/ScenarioSimulator';
+import RollingForecastDashboard from '@/components/RollingForecastDashboard';
+import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
 
 
 interface EntityUpload {
@@ -86,7 +91,7 @@ interface KonzernResult {
 }
 
 type WorkflowStatus = 'draft' | 'review' | 'approved';
-type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends';
+type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast';
 
 const PREMIUM_ENTITIES = [
   'Ganzimmun Diagnostics',
@@ -164,6 +169,10 @@ export default function Home() {
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [rootCauseDeviation, setRootCauseDeviation] = useState<AccountDeviation | null>(null);
 
+  // Booking error detection state
+  const [errorDetectionResult, setErrorDetectionResult] = useState<ErrorDetectionResult | null>(null);
+  const [isDetectingErrors, setIsDetectingErrors] = useState(false);
+
   // Saved analyses management
   const { analyses: savedAnalyses, saveAnalysis, deleteAnalysis: deleteSavedAnalysis, refresh: refreshSavedAnalyses } = useSavedAnalyses();
 
@@ -216,6 +225,26 @@ export default function Home() {
       updateEntity(entity.id, { status: 'error', error: 'Analyse fehlgeschlagen' });
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  // Error detection refresh handler
+  const refreshErrorDetection = async () => {
+    setIsDetectingErrors(true);
+    try {
+      const response = await fetch('/api/detect-errors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setErrorDetectionResult(result);
+      }
+    } catch (error) {
+      console.error('Error detection failed:', error);
+    } finally {
+      setIsDetectingErrors(false);
     }
   };
 
@@ -668,6 +697,30 @@ export default function Home() {
                 >
                   📈 Trends
                 </button>
+                <button
+                  onClick={() => setMode('errors')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    mode === 'errors' ? 'bg-gradient-to-r from-red-600 to-orange-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  🔍 Fehler
+                </button>
+                <button
+                  onClick={() => setMode('scenario')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    mode === 'scenario' ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  🔮 Szenario
+                </button>
+                <button
+                  onClick={() => setMode('forecast')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    mode === 'forecast' ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  📊 Forecast
+                </button>
               </div>
             </div>
 
@@ -727,6 +780,34 @@ export default function Home() {
           </div>
         )}
 
+        {/* Error Detection Section */}
+        {mode === 'errors' && (
+          <div className="mb-8">
+            <BookingErrorPanel
+              errors={errorDetectionResult}
+              isLoading={isDetectingErrors}
+              onRefresh={refreshErrorDetection}
+            />
+          </div>
+        )}
+
+        {/* Scenario Simulation Section */}
+        {mode === 'scenario' && (
+          <div className="mb-8">
+            <ScenarioSimulator analysisResult={currentResult ?? null} />
+          </div>
+        )}
+
+        {/* Rolling Forecast Section */}
+        {mode === 'forecast' && (
+          <div className="mb-8">
+            <RollingForecastDashboard
+              currentBookings={currBookings.length > 0 ? currBookings : null}
+              historicalBookings={prevBookings.length > 0 ? prevBookings : null}
+            />
+          </div>
+        )}
+
         {/* Triple Upload Section */}
         {mode === 'triple' && (
           <div className="bg-[#12121a] rounded-2xl border border-white/10 p-6 mb-8">
@@ -744,7 +825,7 @@ export default function Home() {
         )}
 
         {/* Upload Section */}
-        {mode !== 'triple' && mode !== 'docs' && (
+        {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && (
         <div className="bg-[#12121a] rounded-2xl border border-white/10 p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -934,6 +1015,7 @@ export default function Home() {
                   <FileSpreadsheet className="w-5 h-5 text-green-400" />
                   Excel
                 </button>
+                <AIReportButton analysisResult={currentResult ?? null} />
                 <button
                   onClick={() => {
                     if (currentResult) {
