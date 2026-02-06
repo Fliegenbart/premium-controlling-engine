@@ -380,7 +380,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           className="mb-12 text-lg tracking-tight text-gray-300 md:text-xl text-balance"
         >
           DATEV, SAP, BMD, Lexware — egal welches System, wir analysieren es.
-          <br className="hidden md:block" /> KI-Abweichungskommentare, Evidence Links & 100% on-premise.
+          <br className="hidden md:block" /> 13-Wochen Liquiditätsplanung, KI-Abweichungskommentare & 100% on-premise.
         </motion.p>
 
         {/* CTA Button */}
@@ -643,6 +643,115 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             Vier KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
           </p>
         </div>
+
+        {/* ── NEW: 13-Wochen Liquiditätsplanung Banner ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="relative bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent rounded-2xl border border-blue-500/20 p-8 mb-8 overflow-hidden"
+        >
+          {/* Background glow */}
+          <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative flex flex-col md:flex-row items-start gap-8">
+            {/* Left: Content */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-2xl font-semibold text-white tracking-tight">13-Wochen Liquiditätsplanung</h3>
+                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed max-w-xl">
+                Automatische Cashflow-Prognose aus Ihren Buchungsdaten. Wiederkehrende Zahlungen werden erkannt,
+                Engpässe vorhergesagt und Konfidenzintervalle berechnet — Woche für Woche, 13 Wochen voraus.
+              </p>
+              <div className="flex flex-wrap gap-3 mt-4">
+                {['Wiederkehrende Muster', 'Konfidenzintervalle', 'Alerts bei Engpass', 'KI-Empfehlungen'].map((tag) => (
+                  <span key={tag} className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Mini Chart Animation */}
+            <div className="w-full md:w-72 h-36 relative">
+              {/* Animated line chart preview */}
+              <svg viewBox="0 0 280 120" className="w-full h-full" preserveAspectRatio="none">
+                {/* Grid lines */}
+                {[0, 30, 60, 90].map((y) => (
+                  <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.05)" />
+                ))}
+                {/* Threshold line */}
+                <line x1="0" y1="75" x2="280" y2="75" stroke="#ef4444" strokeWidth="1" strokeDasharray="6 4" opacity="0.5" />
+                <text x="4" y="72" fill="#ef4444" fontSize="8" opacity="0.6">Schwelle</text>
+
+                {/* Confidence band */}
+                <motion.path
+                  d="M0,20 L22,22 L44,25 L66,30 L88,28 L110,35 L132,45 L154,50 L176,55 L198,48 L220,42 L242,38 L264,35 L264,75 L242,68 L220,72 L198,78 L176,85 L154,80 L132,75 L110,65 L88,58 L66,60 L44,55 L22,52 L0,50 Z"
+                  fill="rgba(59,130,246,0.08)"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.2, delay: 0.3 }}
+                />
+
+                {/* Main balance line */}
+                <motion.path
+                  d="M0,35 L22,37 L44,40 L66,45 L88,43 L110,50 L132,60 L154,65 L176,70 L198,63 L220,57 L242,53 L264,50"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  whileInView={{ pathLength: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
+                />
+
+                {/* Pulsing dot at lowest point */}
+                <motion.circle
+                  cx="176"
+                  cy="70"
+                  r="4"
+                  fill="#ef4444"
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: [0, 1, 0.6, 1], scale: [0, 1.5, 1, 1.2] }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 2, delay: 1.2, repeat: Infinity, repeatDelay: 2 }}
+                />
+                <text x="160" y="90" fill="#ef4444" fontSize="7" fontWeight="600" opacity="0.8">KW 9: Min</text>
+
+                {/* Inflow bars */}
+                {[0, 44, 88, 132, 176, 220].map((x, i) => (
+                  <motion.rect
+                    key={`in-${i}`}
+                    x={x + 4}
+                    y={105}
+                    width="14"
+                    height={[12, 10, 14, 8, 15, 11][i]}
+                    rx="2"
+                    fill="#10b981"
+                    opacity="0.3"
+                    initial={{ scaleY: 0 }}
+                    whileInView={{ scaleY: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
+                    style={{ transformOrigin: `${x + 11}px 117px` }}
+                  />
+                ))}
+              </svg>
+              {/* Labels */}
+              <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1">
+                {['KW 1', 'KW 4', 'KW 7', 'KW 10', 'KW 13'].map((kw) => (
+                  <span key={kw} className="text-[8px] text-gray-600">{kw}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
         {/* ── NEW: KI-Abweichungskommentare Banner ── */}
         <motion.div
