@@ -676,25 +676,27 @@ export default function Home() {
       )}
 
       {/* Header */}
-      <div className="bg-[#12121a] border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="relative bg-[#12121a]/95 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+        <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowApp(false)}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-white" />
+                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden">
+                  <BarChart3 className="w-6 h-6 text-white relative z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-white">Premium Controlling</h1>
-                  <p className="text-xs text-gray-500">Automatisierte Abweichungsanalyse</p>
+                  <p className="text-xs text-gray-500">für den Mittelstand</p>
                 </div>
               </button>
 
               {/* Mode Toggle */}
-              <div className="hidden md:flex bg-white/5 rounded-lg p-1 ml-8">
+              <div className="hidden md:flex bg-white/5 rounded-lg p-1 ml-8 border border-white/5">
                 <button
                   onClick={() => setMode('single')}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
@@ -864,7 +866,9 @@ export default function Home() {
 
         {/* Upload Section */}
         {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && (
-        <div className="bg-[#12121a] rounded-2xl border border-white/10 p-6 mb-8">
+        <BlurFade delay={0.05} inView>
+        <div className="relative bg-[#12121a] rounded-2xl border border-white/10 p-6 mb-8 overflow-hidden">
+          <BorderBeam size={150} duration={20} colorFrom="#ec4899" colorTo="#8b5cf6" />
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
               {useMagicUpload ? (
@@ -1013,7 +1017,7 @@ export default function Home() {
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
+            <ShimmerButton
               onClick={() => {
                 if (mode === 'single' && useMagicUpload) {
                   analyzeMagic();
@@ -1026,31 +1030,35 @@ export default function Home() {
                   ? prevBookings.length === 0 || currBookings.length === 0
                   : entities.every(e => !e.prevFile || !e.currFile)
               )}
-              className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 disabled:from-gray-700 disabled:to-gray-700 text-white py-3 px-6 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+              shimmerColor="#06b6d4"
+              shimmerSize="0.08em"
+              background="linear-gradient(135deg, #2563eb 0%, #0891b2 100%)"
+              borderRadius="12px"
+              className="flex-1 min-w-[200px] py-3 px-6 font-medium disabled:opacity-40"
             >
               {isAnalyzing ? (
-                <><Loader2 className="w-5 h-5 animate-spin" /> Analysiere...</>
+                <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Analysiere...</span>
               ) : (
-                <><Sparkles className="w-5 h-5" /> Analysieren</>
+                <span className="flex items-center gap-2"><Sparkles className="w-5 h-5" /> Analysieren</span>
               )}
-            </button>
+            </ShimmerButton>
 
             {hasValidData && (
               <>
                 <button
                   onClick={() => downloadReport('word')}
                   disabled={isGeneratingReport}
-                  className="bg-white/10 hover:bg-white/20 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2"
+                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/30 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
-                  <FileText className="w-5 h-5 text-blue-400" />
+                  <FileText className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
                   Word
                 </button>
                 <button
                   onClick={() => downloadReport('excel')}
                   disabled={isGeneratingReport}
-                  className="bg-white/10 hover:bg-white/20 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2"
+                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-green-500/30 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
-                  <FileSpreadsheet className="w-5 h-5 text-green-400" />
+                  <FileSpreadsheet className="w-5 h-5 text-green-400 group-hover:scale-110 transition-transform" />
                   Excel
                 </button>
                 <AIReportButton analysisResult={currentResult ?? null} />
@@ -1063,15 +1071,16 @@ export default function Home() {
                       }
                     }
                   }}
-                  className="bg-white/10 hover:bg-white/20 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2"
+                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-yellow-500/30 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
-                  <Save className="w-5 h-5 text-yellow-400" />
+                  <Save className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
                   Speichern
                 </button>
               </>
             )}
           </div>
         </div>
+        </BlurFade>
         )}
 
         {/* Triple Comparison Results */}
@@ -1218,7 +1227,8 @@ export default function Home() {
             {/* Charts */}
             <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-6">
+              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-6 overflow-hidden hover:border-white/20 transition-colors">
+                <BorderBeam size={100} duration={15} colorFrom="#3b82f6" colorTo="#06b6d4" />
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-400" />
                   {mode === 'multi' ? 'Gesellschaften' : 'Top Abweichungen'}
@@ -1238,9 +1248,10 @@ export default function Home() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-6">
+              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-6 overflow-hidden hover:border-white/20 transition-colors">
+                <BorderBeam size={100} duration={15} delay={7} colorFrom="#8b5cf6" colorTo="#ec4899" />
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <PieChart className="w-5 h-5 text-blue-400" />
+                  <PieChart className="w-5 h-5 text-purple-400" />
                   Verteilung
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
@@ -1262,16 +1273,21 @@ export default function Home() {
             </BlurFade>
 
             {/* Tabs */}
-            <div className="bg-[#12121a] rounded-2xl border border-white/10 overflow-hidden">
+            <BlurFade delay={0.3} inView>
+            <div className="relative bg-[#12121a] rounded-2xl border border-white/10 overflow-hidden">
+              <BorderBeam size={200} duration={25} colorFrom="#3b82f6" colorTo="#22c55e" />
               <div className="flex border-b border-white/10">
                 {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
-                      activeTab === tab ? 'bg-white/5 text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-white'
+                    className={`flex-1 py-3.5 px-4 text-sm font-medium transition-all relative ${
+                      activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'
                     }`}
                   >
+                    {activeTab === tab && (
+                      <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500" />
+                    )}
                     {tab === 'overview' && 'Übersicht'}
                     {tab === 'accounts' && 'Konten'}
                     {tab === 'costcenters' && 'Kostenstellen'}
@@ -1287,12 +1303,16 @@ export default function Home() {
               <div className="p-6">
                 {activeTab === 'overview' && (
                   <div className="space-y-3">
-                    <h4 className="text-white font-medium mb-4">Signifikante Abweichungen</h4>
+                    <h4 className="text-white font-medium mb-4 flex items-center gap-2">
+                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500" />
+                      Signifikante Abweichungen
+                    </h4>
                     {currentResult.by_account?.slice(0, 10).map((dev, idx) => (
-                      <div key={idx} className="space-y-2">
+                      <BlurFade key={idx} delay={0.03 * idx} inView>
+                      <div className="space-y-2">
                         <button
                           onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
-                          className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-colors text-left"
+                          className="w-full flex items-center justify-between bg-white/[0.03] hover:bg-white/[0.08] border border-transparent hover:border-white/10 rounded-xl p-4 transition-all text-left group"
                         >
                           <div>
                             <div className="flex items-center gap-2">
@@ -1338,6 +1358,7 @@ export default function Home() {
                           />
                         )}
                       </div>
+                      </BlurFade>
                     ))}
                   </div>
                 )}
@@ -1346,31 +1367,31 @@ export default function Home() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="text-left text-gray-500 text-sm">
-                          <th className="pb-3">Konto</th>
-                          <th className="pb-3">Bezeichnung</th>
-                          <th className="pb-3 text-right">Vorjahr</th>
-                          <th className="pb-3 text-right">Aktuell</th>
-                          <th className="pb-3 text-right">Abweichung</th>
-                          <th className="pb-3"></th>
+                        <tr className="text-left text-xs uppercase tracking-wider text-gray-500">
+                          <th className="pb-4 font-semibold">Konto</th>
+                          <th className="pb-4 font-semibold">Bezeichnung</th>
+                          <th className="pb-4 text-right font-semibold">Vorjahr</th>
+                          <th className="pb-4 text-right font-semibold">Aktuell</th>
+                          <th className="pb-4 text-right font-semibold">Abweichung</th>
+                          <th className="pb-4 w-10"></th>
                         </tr>
                       </thead>
                       <tbody className="text-sm">
                         {currentResult.by_account?.slice(0, 15).map((acc, idx) => (
-                          <tr key={idx} className="border-t border-white/5 hover:bg-white/5">
-                            <td className="py-3 text-gray-400">{acc.account}</td>
-                            <td className="py-3 text-white">{acc.account_name}</td>
-                            <td className="py-3 text-right text-gray-400">{formatCurrency(acc.amount_prev)}</td>
-                            <td className="py-3 text-right text-gray-400">{formatCurrency(acc.amount_curr)}</td>
-                            <td className={`py-3 text-right font-medium ${acc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                          <tr key={idx} className={`border-t border-white/5 hover:bg-white/[0.06] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.02]' : ''}`}>
+                            <td className="py-3.5 text-gray-500 font-mono text-xs">{acc.account}</td>
+                            <td className="py-3.5 text-white">{acc.account_name}</td>
+                            <td className="py-3.5 text-right text-gray-400 tabular-nums">{formatCurrency(acc.amount_prev)}</td>
+                            <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(acc.amount_curr)}</td>
+                            <td className={`py-3.5 text-right font-semibold tabular-nums ${acc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
                               {formatCurrency(acc.delta_abs)}
                             </td>
-                            <td className="py-3 text-right">
+                            <td className="py-3.5 text-right">
                               <button
                                 onClick={() => { setSelectedDeviation(acc); setShowEvidenceModal(true); }}
-                                className="p-1 hover:bg-white/10 rounded"
+                                className="p-1.5 hover:bg-blue-500/20 rounded-lg transition-colors group"
                               >
-                                <Link2 className="w-4 h-4 text-blue-400" />
+                                <Link2 className="w-4 h-4 text-blue-400 group-hover:text-blue-300" />
                               </button>
                             </td>
                           </tr>
@@ -1384,20 +1405,20 @@ export default function Home() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="text-left text-gray-500 text-sm">
-                          <th className="pb-3">Kostenstelle</th>
-                          <th className="pb-3 text-right">Vorjahr</th>
-                          <th className="pb-3 text-right">Aktuell</th>
-                          <th className="pb-3 text-right">Abweichung</th>
+                        <tr className="text-left text-xs uppercase tracking-wider text-gray-500">
+                          <th className="pb-4 font-semibold">Kostenstelle</th>
+                          <th className="pb-4 text-right font-semibold">Vorjahr</th>
+                          <th className="pb-4 text-right font-semibold">Aktuell</th>
+                          <th className="pb-4 text-right font-semibold">Abweichung</th>
                         </tr>
                       </thead>
                       <tbody className="text-sm">
                         {currentResult.by_cost_center?.slice(0, 15).map((cc, idx) => (
-                          <tr key={idx} className="border-t border-white/5 hover:bg-white/5">
-                            <td className="py-3 text-white">{cc.cost_center || '(keine)'}</td>
-                            <td className="py-3 text-right text-gray-400">{formatCurrency(cc.amount_prev)}</td>
-                            <td className="py-3 text-right text-gray-400">{formatCurrency(cc.amount_curr)}</td>
-                            <td className={`py-3 text-right font-medium ${cc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                          <tr key={idx} className={`border-t border-white/5 hover:bg-white/[0.06] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.02]' : ''}`}>
+                            <td className="py-3.5 text-white font-medium">{cc.cost_center || '(keine)'}</td>
+                            <td className="py-3.5 text-right text-gray-400 tabular-nums">{formatCurrency(cc.amount_prev)}</td>
+                            <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(cc.amount_curr)}</td>
+                            <td className={`py-3.5 text-right font-semibold tabular-nums ${cc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
                               {formatCurrency(cc.delta_abs)}
                             </td>
                           </tr>
@@ -1408,17 +1429,28 @@ export default function Home() {
                 )}
 
                 {activeTab === 'evidence' && (
-                  <div className="text-center py-12">
-                    <Link2 className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                    <h4 className="text-white font-semibold mb-2">Evidence Trail</h4>
-                    <p className="text-gray-500 max-w-md mx-auto">
+                  <div className="text-center py-16">
+                    <div className="relative w-20 h-20 mx-auto mb-6">
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 animate-pulse" />
+                      <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <Link2 className="w-10 h-10 text-blue-400" />
+                      </div>
+                    </div>
+                    <h4 className="text-white font-semibold text-lg mb-3">Evidence Trail</h4>
+                    <p className="text-gray-400 max-w-md mx-auto leading-relaxed">
                       Klicke auf eine Abweichung in der Übersicht oder Konten-Tabelle,
-                      um die verknüpften Buchungen zu sehen.
+                      um die verknüpften Buchungen bis auf Belegebene nachzuverfolgen.
                     </p>
+                    <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-500">
+                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500/60" /> Prüfungssicher</div>
+                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-blue-500/60" /> Revisionsfest</div>
+                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-purple-500/60" /> Belegverknüpft</div>
+                    </div>
                   </div>
                 )}
               </div>
             </div>
+            </BlurFade>
           </>
         )}
       </div>
