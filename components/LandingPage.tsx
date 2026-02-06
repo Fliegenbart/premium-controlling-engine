@@ -17,6 +17,7 @@ import {
   ChevronRight,
   AlignJustify,
   XIcon,
+  Sparkles,
 } from 'lucide-react';
 import TextShimmer from '@/components/magicui/text-shimmer';
 import { BorderBeam } from '@/components/magicui/border-beam';
@@ -378,8 +379,8 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           transition={{ duration: 0.8, delay: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
           className="mb-12 text-lg tracking-tight text-gray-300 md:text-xl text-balance"
         >
-          Automatische Abweichungsanalyse mit KI-Kommentaren – komplett on-premise.
-          <br className="hidden md:block" /> Jede Aussage mit Evidence Link zur Buchung.
+          DATEV, SAP, BMD, Lexware — egal welches System, wir analysieren es.
+          <br className="hidden md:block" /> KI-Abweichungskommentare, Evidence Links & 100% on-premise.
         </motion.p>
 
         {/* CTA Button */}
@@ -567,20 +568,146 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
         </div>
       </section>
 
+      {/* ═══════════ INTEGRATIONEN / DATENVIELFALT ═══════════ */}
+      <section id="integrations" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="text-center mb-14"
+        >
+          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-[0.08em] mb-3">Integrationen</h4>
+          <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
+            Ihre Daten. Jedes Format.
+          </h2>
+          <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
+            Egal ob DATEV, SAP, BMD oder einfaches CSV — unser Magic-Upload erkennt das Format automatisch und startet die Analyse sofort.
+          </p>
+        </motion.div>
+
+        {/* Integration Logos Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {[
+            { name: 'DATEV', sub: 'Kanzlei-Rechnungswesen', color: 'from-green-500/20 to-emerald-500/20', border: 'border-green-500/20', text: 'text-green-400' },
+            { name: 'SAP', sub: 'FI / CO Export', color: 'from-blue-500/20 to-sky-500/20', border: 'border-blue-500/20', text: 'text-blue-400' },
+            { name: 'BMD', sub: 'NTCS Export', color: 'from-purple-500/20 to-violet-500/20', border: 'border-purple-500/20', text: 'text-purple-400' },
+            { name: 'Addison', sub: 'Wolters Kluwer', color: 'from-orange-500/20 to-amber-500/20', border: 'border-orange-500/20', text: 'text-orange-400' },
+            { name: 'Lexware', sub: 'buchhaltung', color: 'from-cyan-500/20 to-teal-500/20', border: 'border-cyan-500/20', text: 'text-cyan-400' },
+            { name: 'Agenda', sub: 'Finanzbuchhaltung', color: 'from-pink-500/20 to-rose-500/20', border: 'border-pink-500/20', text: 'text-pink-400' },
+            { name: 'CSV', sub: 'Universalformat', color: 'from-gray-400/20 to-gray-500/20', border: 'border-gray-400/20', text: 'text-gray-300' },
+            { name: 'Excel', sub: '.xlsx / .xls', color: 'from-emerald-500/20 to-green-500/20', border: 'border-emerald-500/20', text: 'text-emerald-400' },
+          ].map((integration, idx) => (
+            <motion.div
+              key={integration.name}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: idx * 0.06, ease: [0.21, 0.47, 0.32, 0.98] }}
+              whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}
+              className={`relative bg-gradient-to-br ${integration.color} rounded-xl border ${integration.border} p-5 text-center backdrop-blur-xl group cursor-default`}
+            >
+              <div className={`text-2xl font-bold ${integration.text} tracking-tight mb-1`}>{integration.name}</div>
+              <div className="text-[11px] text-gray-500 tracking-wide">{integration.sub}</div>
+              <div className="absolute inset-0 rounded-xl bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Auto-detect badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="mt-10 text-center"
+        >
+          <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-full px-5 py-2.5">
+            <Zap className="w-4 h-4 text-yellow-400" />
+            <span className="text-sm text-gray-300">Magic Upload — Format wird <strong className="text-white">automatisch erkannt</strong></span>
+          </div>
+        </motion.div>
+      </section>
+
       {/* ═══════════ SPHERE MASK ═══════════ */}
       <SphereMask />
 
       {/* ═══════════ 4 KILLER FEATURE TILES ═══════════ */}
       <section id="features" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-xl font-semibold tracking-tight text-white mb-2">Features</h2>
-          <p className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
-            Vier Killer-Features.
-          </p>
+          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-[0.08em] mb-3">KI-Features</h4>
+          <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
+            Was kein anderes Tool kann.
+          </h2>
           <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-            Jedes einzelne löst ein echtes Problem im Controlling-Alltag.
+            Vier KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
           </p>
         </div>
+
+        {/* ── NEW: KI-Abweichungskommentare Banner ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+          whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
+          className="relative rounded-2xl border border-white/[0.06] p-8 md:p-10 overflow-hidden bg-gradient-to-br from-white/[0.04] to-white/[0.01] backdrop-blur-xl shadow-glow-md mb-6"
+        >
+          <BorderBeam size={250} duration={18} colorFrom="#f59e0b" colorTo="#ef4444" />
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-2xl font-semibold text-white tracking-tight">KI-Abweichungskommentare</h3>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+              </div>
+              <p className="text-gray-300 leading-relaxed max-w-2xl">
+                Statt nur &quot;Personalkosten +12%&quot; sagt die KI: &quot;Anstieg durch 3 Neueinstellungen IT (März-April) + Tariferhöhung 3.2%.
+                Größte Einzelbuchung: Entwickler-Team 45.200€.&quot; — <strong className="text-white">Jede Abweichung automatisch erklärt.</strong>
+              </p>
+            </div>
+            {/* Mini demo */}
+            <div className="hidden lg:block flex-shrink-0 w-72">
+              <div className="bg-white/[0.03] rounded-xl border border-white/[0.06] p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-1 h-4 rounded-full bg-gradient-to-b from-amber-400 to-red-400" />
+                  <span className="text-xs text-gray-400">KI-Analyse</span>
+                </div>
+                {[
+                  { label: 'Neueinstellungen IT', w: '75%', color: 'bg-red-400/60' },
+                  { label: 'Tariferhöhung', w: '40%', color: 'bg-red-400/40' },
+                  { label: 'Wegfall Zeitarbeit', w: '25%', color: 'bg-green-400/50' },
+                ].map((factor, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.15 }}
+                    className="mb-2"
+                  >
+                    <div className="text-[10px] text-gray-500 mb-0.5">{factor.label}</div>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: factor.w }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: 0.5 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+                      className={`h-1.5 rounded-full ${factor.color}`}
+                    />
+                  </motion.div>
+                ))}
+                <div className="flex items-center gap-1.5 mt-3 text-[10px] text-amber-400/80">
+                  <Sparkles className="w-3 h-3" />
+                  <span>85% Konfidenz — Strukturelle Änderung</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* ── Tile 1: KI-Monatsberichte ── */}

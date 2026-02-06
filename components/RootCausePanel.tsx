@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, GitBranch, TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronUp, Sparkles, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Loader2, GitBranch, TrendingUp, TrendingDown, AlertTriangle, ChevronDown, ChevronUp, Sparkles, ThumbsUp, ThumbsDown, Zap, BarChart3, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AccountDeviation, Booking } from '@/lib/types';
 
 interface BookingCluster {
@@ -46,6 +47,36 @@ const clusterTypeLabels: Record<string, { label: string; color: string; icon: st
   one_time: { label: 'Einmaleffekt', color: 'bg-red-500/20 text-red-400', icon: '⚡' },
 };
 
+interface ExplanationResponse {
+  summary: string;
+  factors: Array<{
+    label: string;
+    impact: number;
+    type: 'increase' | 'decrease';
+  }>;
+  topBookings: Array<{
+    description: string;
+    amount: number;
+    date: string;
+  }>;
+  pattern: 'seasonal' | 'structural' | 'one-time' | 'trend';
+  confidence: number;
+}
+
+const patternIcons: Record<string, React.ReactNode> = {
+  seasonal: <Calendar className="w-4 h-4" />,
+  structural: <BarChart3 className="w-4 h-4" />,
+  'one-time': <Zap className="w-4 h-4" />,
+  trend: <TrendingUp className="w-4 h-4" />,
+};
+
+const patternLabels: Record<string, string> = {
+  seasonal: 'Saisonales Muster',
+  structural: 'Strukturelle Änderung',
+  'one-time': 'Einmaleffekt',
+  trend: 'Trend',
+};
+
 interface RootCausePanelProps {
   deviation: AccountDeviation;
   prevBookings: Booking[];
@@ -56,10 +87,12 @@ interface RootCausePanelProps {
 
 export function RootCausePanel({ deviation, prevBookings, currBookings, onClose, onFeedback }: RootCausePanelProps) {
   const [rootCause, setRootCause] = useState<RootCause | null>(null);
+  const [explanation, setExplanation] = useState<ExplanationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedCluster, setExpandedCluster] = useState<number | null>(null);
   const [showDrivers, setShowDrivers] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(true);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
 
   useEffect(() => {
@@ -68,20 +101,37 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
       setError(null);
 
       try {
-        const response = await fetch('/api/root-cause', {
+        // First try the new explain-deviation API for AI auto-comments
+        const explanationResponse = await fetch('/api/explain-deviation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            deviation,
+            prevBookings,
+            currBookings,
+          }),
+        });
+
+        if (explanationResponse.ok) {
+          const explanationData = await explanationResponse.json();
+          setExplanation(explanationData);
+        }
+
+        // Also run traditional root cause analysis for detailed clusters
+        const rcResponse = await fetch('/api/root-cause', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             account: deviation.account,
             prevBookings,
             currBookings,
-            includeLLMNarrative: true,
+            includeLLMNarrative: false,
           }),
         });
 
-        const data = await response.json();
-        if (response.ok) {
-          setRootCause(data);
+        const data = await rcResponse.json();
+        if (rcResponse.ok) {
+          setRootCause(data.result || data);
         } else {
           setError(data.error || 'Analyse fehlgeschlagen');
         }
@@ -93,7 +143,7 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
     };
 
     analyze();
-  }, [deviation.account, prevBookings, currBookings]);
+  }, [deviation, prevBookings, currBookings]);
 
   const handleFeedback = async (positive: boolean) => {
     setFeedbackGiven(true);
@@ -118,15 +168,38 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-xl border border-purple-500/20 p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6"
+      >
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
           <div>
             <h4 className="text-white font-medium">Ursachenanalyse läuft...</h4>
-            <p className="text-gray-500 text-sm mt-1">Buchungen werden geclustert und Treiber identifiziert</p>
+            <p className="text-gray-500 text-sm mt-1">Buchungen werden analysiert und KI-Kommentare generiert</p>
           </div>
         </div>
-      </div>
+
+        {/* Loading skeleton */}
+        <div className="mt-4 space-y-3">
+          <motion.div
+            className="h-4 bg-white/10 rounded-full"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+          <motion.div
+            className="h-4 bg-white/10 rounded-full w-5/6"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.1 }}
+          />
+          <motion.div
+            className="h-4 bg-white/10 rounded-full w-4/6"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+          />
+        </div>
+      </motion.div>
     );
   }
 
@@ -141,21 +214,28 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
     );
   }
 
-  if (!rootCause) return null;
+  if (!explanation && !rootCause) return null;
 
   return (
-    <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-xl border border-purple-500/20 overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] overflow-hidden shadow-xl"
+    >
       {/* Header */}
-      <div className="p-4 border-b border-white/10 flex items-center justify-between">
+      <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <GitBranch className="w-5 h-5 text-purple-400" />
+          <Sparkles className="w-5 h-5 text-yellow-400" />
           <div>
-            <h4 className="text-white font-medium">Ursachenanalyse</h4>
-            <p className="text-gray-500 text-xs mt-0.5">
-              Konto {rootCause.account} • {rootCause.clusters.length} Cluster identifiziert •{' '}
-              <span className={rootCause.confidence > 0.7 ? 'text-green-400' : 'text-yellow-400'}>
-                {Math.round(rootCause.confidence * 100)}% Konfidenz
-              </span>
+            <h4 className="text-white font-semibold">KI-Abweichungskommentare</h4>
+            <p className="text-gray-400 text-xs mt-0.5">
+              Konto {deviation.account} • {deviation.account_name}
+              {explanation && (
+                <>
+                  {' '}• <span className={explanation.confidence > 0.75 ? 'text-green-400' : explanation.confidence > 0.5 ? 'text-yellow-400' : 'text-orange-400'}>{Math.round(explanation.confidence * 100)}% Konfidenz</span>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -167,9 +247,137 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
         </button>
       </div>
 
-      {/* AI Narrative */}
-      {rootCause.narrative && (
-        <div className="p-4 border-b border-white/10 bg-white/5">
+      {/* New Explanation Section */}
+      {explanation && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          transition={{ duration: 0.4 }}
+          className="border-b border-white/[0.06] bg-gradient-to-br from-yellow-500/5 to-orange-500/5 overflow-hidden"
+        >
+          <div className="p-4 space-y-4">
+            {/* Summary with gradient accent */}
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="relative"
+            >
+              <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-400 via-orange-400 to-transparent rounded-r-full" />
+              <p className="text-gray-100 text-sm leading-relaxed pl-3">{explanation.summary}</p>
+            </motion.div>
+
+            {/* Factor Bars */}
+            {explanation.factors.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="space-y-2"
+              >
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Hauptfaktoren</p>
+                {explanation.factors.map((factor, idx) => {
+                  const maxImpact = Math.max(...explanation.factors.map((f) => Math.abs(f.impact)));
+                  const percentage = maxImpact > 0 ? (Math.abs(factor.impact) / maxImpact) * 100 : 0;
+                  const isIncrease = factor.type === 'increase';
+
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.25 + idx * 0.05 }}
+                      className="space-y-1"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-300">{factor.label}</span>
+                        <span className={`text-xs font-semibold ${isIncrease ? 'text-red-400' : 'text-green-400'}`}>
+                          {isIncrease ? '+' : '-'}{Math.abs(factor.impact).toLocaleString('de-DE')} EUR
+                        </span>
+                      </div>
+                      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 0.5, delay: 0.35 + idx * 0.05, ease: 'easeOut' }}
+                          className={`h-full rounded-full ${isIncrease ? 'bg-gradient-to-r from-red-500 to-red-400' : 'bg-gradient-to-r from-green-500 to-green-400'}`}
+                        />
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+
+            {/* Top Bookings */}
+            {explanation.topBookings.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.35 }}
+                className="space-y-2 pt-2 border-t border-white/10"
+              >
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Größte Buchungen</p>
+                <div className="space-y-1">
+                  {explanation.topBookings.map((booking, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.4 + idx * 0.05 }}
+                      className="flex items-center justify-between p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-300 truncate">{booking.description}</p>
+                        <p className="text-xs text-gray-500">{booking.date}</p>
+                      </div>
+                      <span className={`text-xs font-semibold ml-2 shrink-0 ${booking.amount > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                        {Math.abs(booking.amount).toLocaleString('de-DE')} EUR
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Pattern Badge and Confidence */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.45 }}
+              className="flex items-center justify-between pt-2 border-t border-white/10"
+            >
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/20 border border-blue-500/30">
+                  {patternIcons[explanation.pattern]}
+                  <span className="text-xs text-blue-300 font-medium">{patternLabels[explanation.pattern]}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Vertrauen:</span>
+                <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${explanation.confidence * 100}%` }}
+                    transition={{ duration: 0.6, delay: 0.55, ease: 'easeOut' }}
+                    className={`h-full rounded-full ${
+                      explanation.confidence > 0.75
+                        ? 'bg-green-500'
+                        : explanation.confidence > 0.5
+                          ? 'bg-yellow-500'
+                          : 'bg-orange-500'
+                    }`}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* AI Narrative from traditional analysis */}
+      {rootCause?.narrative && (
+        <div className="p-4 border-b border-white/[0.06] bg-white/5">
           <div className="flex items-start gap-3">
             <Sparkles className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
             <div className="flex-1">
@@ -200,8 +408,9 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
       )}
 
       {/* Clusters */}
-      <div className="p-4 space-y-2">
-        {rootCause.clusters.map((cluster, idx) => {
+      {rootCause && rootCause.clusters && rootCause.clusters.length > 0 && (
+        <div className="p-4 space-y-2">
+          {rootCause.clusters.map((cluster, idx) => {
           const typeInfo = clusterTypeLabels[cluster.type] || { label: cluster.type, color: 'bg-gray-500/20 text-gray-400', icon: '📌' };
           const isExpanded = expandedCluster === idx;
 
@@ -260,11 +469,13 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
               )}
             </div>
           );
-        })}
-      </div>
+          })}
+        </div>
+      )}
 
       {/* Drivers Toggle */}
-      <div className="border-t border-white/10">
+      {rootCause && rootCause.drivers && rootCause.drivers.length > 0 && (
+      <div className="border-t border-white/[0.06]">
         <button
           onClick={() => setShowDrivers(!showDrivers)}
           className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
@@ -295,6 +506,7 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
           </div>
         )}
       </div>
-    </div>
+      )}
+    </motion.div>
   );
 }
