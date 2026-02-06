@@ -726,7 +726,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             Was kein anderes Tool kann.
           </h2>
           <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-            Fünf KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
+            Sechs KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
           </p>
         </div>
 
@@ -1189,16 +1189,129 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             </div>
           </motion.div>
 
-          {/* ── Tile 5: Monatsabschluss-Workflow ── */}
+          {/* ── Tile 5: Deckungsbeitragsrechnung ── */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col md:col-span-2"
+            className="relative rounded-2xl border border-teal-500/[0.12] p-8 overflow-hidden group hover:border-teal-500/30 transition-colors bg-gradient-to-br from-teal-500/[0.06] to-emerald-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={12} colorFrom="#22c55e" colorTo="#10b981" />
+            <BorderBeam size={180} duration={14} delay={11} colorFrom="#14b8a6" colorTo="#10b981" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Deckungsbeitragsrechnung</h3>
+                <p className="text-xs text-gray-500">DB I → DB V</p>
+              </div>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-500/30 text-teal-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Mehrstufige Deckungsbeitragsrechnung nach SKR03/04. Von Rohertrag (DB I) bis Unternehmensergebnis (DB V) — mit Wasserfall-Chart und Kostenstellen-Vergleich.
+            </p>
+            {/* Mini Demo: Animated Waterfall Chart */}
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><span className="w-3 h-1.5 bg-emerald-400 rounded inline-block" /> Erlöse/DB</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-1.5 bg-red-400/60 rounded inline-block" /> Kosten</span>
+              </div>
+              <svg viewBox="0 0 280 100" className="w-full h-auto" fill="none">
+                {/* Grid lines */}
+                {[25, 50, 75].map((y) => (
+                  <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.04)" />
+                ))}
+                {/* Waterfall bars — animated */}
+                {[
+                  { x: 10, y: 10, h: 70, color: '#10b981', label: 'Umsatz', delay: 0.4 },
+                  { x: 50, y: 10, h: 20, color: '#ef4444', label: '-Material', delay: 0.6 },
+                  { x: 90, y: 30, h: 50, color: '#0ea5e9', label: 'DB I', delay: 0.8 },
+                  { x: 130, y: 30, h: 15, color: '#ef4444', label: '-Personal', delay: 1.0 },
+                  { x: 170, y: 45, h: 35, color: '#3b82f6', label: 'DB II', delay: 1.2 },
+                  { x: 210, y: 45, h: 10, color: '#ef4444', label: '-GK', delay: 1.4 },
+                  { x: 250, y: 55, h: 25, color: '#8b5cf6', label: 'DB V', delay: 1.6 },
+                ].map((bar, i) => (
+                  <g key={i}>
+                    <motion.rect
+                      x={bar.x}
+                      y={bar.y}
+                      width="30"
+                      height={bar.h}
+                      rx="3"
+                      fill={bar.color}
+                      opacity={bar.color === '#ef4444' ? 0.5 : 0.7}
+                      initial={{ scaleY: 0 }}
+                      whileInView={{ scaleY: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: bar.delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+                      style={{ transformOrigin: `${bar.x + 15}px ${bar.y + bar.h}px` }}
+                    />
+                    <motion.text
+                      x={bar.x + 15}
+                      y={95}
+                      textAnchor="middle"
+                      fill="rgba(255,255,255,0.4)"
+                      fontSize="7"
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: bar.delay + 0.3 }}
+                    >
+                      {bar.label}
+                    </motion.text>
+                  </g>
+                ))}
+                {/* Connector lines */}
+                {[
+                  { x1: 40, y1: 10, x2: 50, y2: 10 },
+                  { x1: 80, y1: 30, x2: 90, y2: 30 },
+                  { x1: 120, y1: 30, x2: 130, y2: 30 },
+                  { x1: 160, y1: 45, x2: 170, y2: 45 },
+                  { x1: 200, y1: 45, x2: 210, y2: 45 },
+                  { x1: 240, y1: 55, x2: 250, y2: 55 },
+                ].map((line, i) => (
+                  <motion.line
+                    key={`conn-${i}`}
+                    x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2}
+                    stroke="rgba(255,255,255,0.15)"
+                    strokeWidth="1"
+                    strokeDasharray="3 2"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.6 + i * 0.2 }}
+                  />
+                ))}
+              </svg>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {['DB I-V', 'Wasserfall', 'Kostenstellen', 'KI-Analyse'].map((tag, i) => (
+                  <motion.span
+                    key={tag}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 2.0 + i * 0.1 }}
+                    className="px-1.5 py-0.5 rounded text-[8px] bg-teal-500/10 text-teal-400/70 border border-teal-500/10"
+                  >
+                    {tag}
+                  </motion.span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── Tile 6: Monatsabschluss-Workflow ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.75, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={14} colorFrom="#22c55e" colorTo="#10b981" />
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
                 <ClipboardCheck className="w-6 h-6 text-white" />

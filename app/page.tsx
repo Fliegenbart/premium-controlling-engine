@@ -66,6 +66,7 @@ import { ScenarioSimulator } from '@/components/ScenarioSimulator';
 import RollingForecastDashboard from '@/components/RollingForecastDashboard';
 import { LiquidityDashboard } from '@/components/LiquidityDashboard';
 import { MonthlyClosingDashboard } from '@/components/MonthlyClosingDashboard';
+import { ContributionDashboard } from '@/components/ContributionDashboard';
 import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
@@ -104,7 +105,7 @@ interface KonzernResult {
 }
 
 type WorkflowStatus = 'draft' | 'review' | 'approved';
-type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast' | 'liquidity' | 'closing';
+type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast' | 'liquidity' | 'closing' | 'contribution';
 
 // Beispiel-Gesellschaften für Konzernanalyse (vom Nutzer anpassbar)
 const EXAMPLE_ENTITIES = [
@@ -374,6 +375,7 @@ export default function Home() {
   const modeTabs: { key: AnalysisMode; label: string }[] = [
     { key: 'liquidity', label: 'Liquidität' },
     { key: 'closing', label: 'Abschluss' },
+    { key: 'contribution', label: 'DB-Rechnung' },
     { key: 'single', label: 'Einzelanalyse' },
     { key: 'triple', label: 'Plan vs Ist' },
     { key: 'multi', label: 'Konzern' },
@@ -754,6 +756,38 @@ export default function Home() {
           </motion.div>
         )}
 
+        {/* Deckungsbeitragsrechnung Section */}
+        {mode === 'contribution' && (
+          <motion.div
+            key="contribution"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
+            {/* Section Hero */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-teal-500/[0.08] via-emerald-500/[0.04] to-transparent border border-teal-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/25">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Mehrstufige Deckungsbeitragsrechnung</h2>
+                  <p className="text-sm text-gray-400">DB I → DB V mit Wasserfall & Kostenstellen-Vergleich</p>
+                </div>
+              </div>
+            </motion.div>
+            <ContributionDashboard bookings={currBookings} />
+          </motion.div>
+        )}
+
         {/* Rolling Forecast Section */}
         {mode === 'forecast' && (
           <motion.div
@@ -812,7 +846,7 @@ export default function Home() {
         )}
 
         {/* Upload Section */}
-        {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && (
+        {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && mode !== 'contribution' && (
         <motion.div
           key="upload"
           initial={{ opacity: 0, y: 20 }}
