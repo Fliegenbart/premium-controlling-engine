@@ -1,30 +1,40 @@
 /**
- * Document Query API - Ask questions about documents
+ * Document Query API - Search documents
  * POST /api/documents/query
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { searchDocument } from '@/lib/doc-index/tree-reasoner';
 import { searchAllDocuments } from '@/lib/doc-index/document-store';
+
+interface SearchResultItem {
+  documentId: string;
+  documentTitle: string;
+  node: { title?: string };
+  excerpt: string;
+  relevanceScore: number;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { question, useOllama = true, ollamaModel, anthropicApiKey } = body;
+    const { question, limit = 10 } = body;
 
     if (!question) {
       return NextResponse.json({ error: 'Frage fehlt' }, { status: 400 });
     }
 
-    const result = await searchDocument(question, {
-      useOllama,
-      ollamaModel,
-      anthropicApiKey,
-    });
+    const results = searchAllDocuments(question);
 
     return NextResponse.json({
       success: true,
-      ...result,
+      query: question,
+      results: results.slice(0, limit).map((r: SearchResultItem) => ({
+        documentId: r.documentId,
+        documentTitle: r.documentTitle,
+        nodeTitle: r.node?.title || '',
+        excerpt: r.excerpt,
+        relevance: r.relevanceScore,
+      })),
     });
   } catch (error) {
     console.error('Query error:', error);
@@ -49,7 +59,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     success: true,
     query: q,
-    results: results.slice(0, 10).map((r: { documentId: string; documentTitle: string; node: { title?: string }; excerpt: string; relevanceScore: number }) => ({
+    results: results.slice(0, 10).map((r: SearchResultItem) => ({
       documentId: r.documentId,
       documentTitle: r.documentTitle,
       nodeTitle: r.node?.title || '',
