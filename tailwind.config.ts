@@ -35,6 +35,9 @@ const config: Config = {
         "marquee": "marquee var(--duration) infinite linear",
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
         "mesh-pulse": "mesh-pulse 8s ease-in-out infinite",
+        "float-orb": "float-orb 20s ease-in-out infinite",
+        "float-orb-2": "float-orb-2 25s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 4s ease-in-out infinite",
       },
       keyframes: {
         "gradient": {
@@ -124,6 +127,21 @@ const config: Config = {
         "mesh-pulse": {
           "0%, 100%": { opacity: "0.6" },
           "50%": { opacity: "1" },
+        },
+        "float-orb": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "25%": { transform: "translate(30px, -40px) scale(1.1)" },
+          "50%": { transform: "translate(-20px, 20px) scale(0.95)" },
+          "75%": { transform: "translate(40px, 10px) scale(1.05)" },
+        },
+        "float-orb-2": {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(-40px, 30px) scale(1.08)" },
+          "66%": { transform: "translate(20px, -30px) scale(0.92)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.1), 0 0 40px rgba(99, 102, 241, 0.05)" },
+          "50%": { boxShadow: "0 0 30px rgba(99, 102, 241, 0.2), 0 0 60px rgba(99, 102, 241, 0.1)" },
         },
       },
     },

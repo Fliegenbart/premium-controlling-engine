@@ -30,6 +30,7 @@ import {
   ArrowRight,
   Zap,
   Save,
+  Target,
 } from 'lucide-react';
 import {
   BarChart,
@@ -385,15 +386,20 @@ export default function Home() {
 
   // Main App
   return (
-    <main className="min-h-screen bg-[#0f1117] mesh-gradient noise-overlay relative">
-      {/* Subtle Particles Background */}
-      <Particles
-        className="fixed inset-0 z-0 pointer-events-none"
-        quantity={12}
-        color="#4b5563"
-        staticity={80}
-        size={0.3}
-      />
+    <main className="min-h-screen bg-[#080b16] mesh-gradient noise-overlay relative">
+      {/* Animated Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <Particles
+          className="absolute inset-0"
+          quantity={18}
+          color="#6366f1"
+          staticity={60}
+          size={0.4}
+        />
+        <div className="absolute top-[5%] left-[10%] w-[600px] h-[600px] rounded-full bg-indigo-500/[0.05] blur-[150px] animate-float-orb" />
+        <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] rounded-full bg-cyan-500/[0.04] blur-[120px] animate-float-orb-2" />
+        <div className="absolute top-[40%] right-[25%] w-[350px] h-[350px] rounded-full bg-purple-500/[0.035] blur-[100px] animate-float-orb" style={{ animationDelay: '-10s' }} />
+      </div>
 
       {/* Evidence Modal */}
       {showEvidenceModal && selectedDeviation && (
@@ -408,42 +414,43 @@ export default function Home() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="relative bg-[#0f1117]/60 backdrop-blur-2xl border-b border-white/[0.04] sticky top-0 z-50"
+        className="relative bg-[#080b16]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-50"
       >
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
-        <div className="max-w-7xl mx-auto px-6 py-3">
+        {/* Animated gradient accent line */}
+        <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        <div className="max-w-7xl mx-auto px-6 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowApp(false)}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
               >
-                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden shadow-lg shadow-blue-500/20">
-                  <BarChart3 className="w-6 h-6 text-white relative z-10" />
+                <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center overflow-hidden shadow-lg shadow-indigo-500/25">
+                  <BarChart3 className="w-5 h-5 text-white relative z-10" />
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-semibold text-white tracking-[-0.02em]">Premium Controlling</h1>
-                  <p className="text-[10px] text-gray-500 tracking-wide uppercase">für den Mittelstand</p>
+                  <h1 className="text-lg font-semibold text-white tracking-[-0.02em]">Premium Controlling</h1>
                 </div>
               </button>
 
-              {/* Mode Toggle with animated indicator */}
-              <div className="hidden md:flex bg-white/[0.04] rounded-xl p-1 ml-8 border border-white/[0.05]">
+              {/* Mode Toggle — pill tabs with gradient active state */}
+              <div className="hidden md:flex bg-white/[0.03] rounded-xl p-1 ml-6 border border-white/[0.06] gap-0.5">
                 {modeTabs.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setMode(tab.key)}
-                    className="relative px-3.5 py-2 rounded-lg text-xs font-medium transition-colors"
+                    className="relative px-3 py-1.5 rounded-lg text-[11px] font-medium transition-all"
                   >
                     {mode === tab.key && (
                       <motion.div
                         layoutId="activeMode"
-                        className="absolute inset-0 bg-gradient-to-r from-blue-500/80 to-cyan-500/80 rounded-lg shadow-glow-blue"
+                        className="absolute inset-0 bg-gradient-to-r from-indigo-500/90 to-cyan-500/90 rounded-lg shadow-lg shadow-indigo-500/20"
                         transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                       />
                     )}
-                    <span className={`relative z-10 ${mode === tab.key ? 'text-white' : 'text-gray-500 hover:text-gray-300'}`}>
+                    <span className={`relative z-10 ${mode === tab.key ? 'text-white font-semibold' : 'text-gray-500 hover:text-gray-300'}`}>
                       {tab.label}
                     </span>
                   </button>
@@ -494,6 +501,25 @@ export default function Home() {
         </div>
       </motion.div>
 
+      {/* Mobile Mode Selector */}
+      <div className="md:hidden sticky top-[52px] z-40 bg-[#080b16]/90 backdrop-blur-xl border-b border-white/[0.06] px-4 py-2 overflow-x-auto">
+        <div className="flex gap-1.5 min-w-max">
+          {modeTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setMode(tab.key)}
+              className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
+                mode === tab.key
+                  ? 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg shadow-indigo-500/20'
+                  : 'bg-white/[0.04] text-gray-500 border border-white/[0.06]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
         <AnimatePresence mode="wait">
         {/* Documents Section */}
@@ -503,9 +529,26 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-amber-500/[0.08] via-orange-500/[0.04] to-transparent border border-amber-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/25">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Dokumenten-Center</h2>
+                  <p className="text-sm text-gray-400">KI-Reports, Analysen & Archiv</p>
+                </div>
+              </div>
+            </motion.div>
             <DocumentsPanel />
           </motion.div>
         )}
@@ -517,20 +560,66 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-8 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/20">
-                <TrendingUp className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-semibold text-white mb-2 tracking-tight">Multi-Perioden Trendanalyse</h2>
-              <p className="text-gray-300 mb-6 max-w-lg mx-auto">
+            <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-10 text-center overflow-hidden">
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-gradient-to-b from-emerald-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
+                className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/25"
+              >
+                <TrendingUp className="w-10 h-10 text-white" />
+              </motion.div>
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-2xl font-semibold text-white mb-3 tracking-tight"
+              >Multi-Perioden Trendanalyse</motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-gray-300 mb-6 max-w-lg mx-auto"
+              >
                 Laden Sie Buchungsdaten aus mehreren Jahren hoch, um CAGR, Volatilität, Forecasts und Anomalien über 3-5 Perioden zu analysieren.
-              </p>
-              <p className="text-gray-500 text-sm">
-                Nutzen Sie die Einzelanalyse, um zunächst Daten zu laden. Die Trend-Engine analysiert dann automatisch Ihre historischen Perioden.
-              </p>
+              </motion.p>
+              {/* Animated mini chart placeholder */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="max-w-md mx-auto"
+              >
+                <svg viewBox="0 0 300 60" className="w-full h-auto opacity-30">
+                  <motion.path
+                    d="M0,50 L30,45 L60,48 L90,35 L120,38 L150,25 L180,28 L210,15 L240,18 L270,10 L300,5"
+                    fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 2, delay: 0.6, ease: 'easeOut' }}
+                  />
+                  {[0, 60, 120, 180, 240, 300].map((x, i) => (
+                    <motion.circle
+                      key={i} cx={x} cy={[50, 48, 35, 25, 15, 5][i]} r="3" fill="#10b981"
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 0.5, scale: 1 }}
+                      transition={{ delay: 0.8 + i * 0.15 }}
+                    />
+                  ))}
+                </svg>
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                className="text-gray-500 text-sm mt-4"
+              >
+                Nutzen Sie die Einzelanalyse, um zunächst Daten zu laden.
+              </motion.p>
             </div>
           </motion.div>
         )}
@@ -542,9 +631,26 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-rose-500/[0.08] via-pink-500/[0.04] to-transparent border border-rose-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg shadow-rose-500/25">
+                  <AlertCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Buchungsfehler-Erkennung</h2>
+                  <p className="text-sm text-gray-400">Duplikate, Rundläufer, Wochenend-Buchungen & mehr</p>
+                </div>
+              </div>
+            </motion.div>
             <BookingErrorPanel
               errors={errorDetectionResult}
               isLoading={isDetectingErrors}
@@ -560,9 +666,26 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-purple-500/[0.08] via-violet-500/[0.04] to-transparent border border-purple-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-purple-500/25">
+                  <Target className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Szenario-Simulation</h2>
+                  <p className="text-sm text-gray-400">What-if Analyse in Echtzeit</p>
+                </div>
+              </div>
+            </motion.div>
             <ScenarioSimulator analysisResult={currentResult ?? null} />
           </motion.div>
         )}
@@ -574,9 +697,27 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
+            {/* Section Hero */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-blue-500/[0.08] via-cyan-500/[0.04] to-transparent border border-blue-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">13-Wochen Liquiditätsplanung</h2>
+                  <p className="text-sm text-gray-400">Cashflow-Prognose mit KI-Mustererkennung</p>
+                </div>
+              </div>
+            </motion.div>
             <LiquidityDashboard bookings={currBookings} />
           </motion.div>
         )}
@@ -588,9 +729,27 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
+            {/* Section Hero */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-green-500/[0.08] via-emerald-500/[0.04] to-transparent border border-green-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-green-500/25">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Monatsabschluss-Workflow</h2>
+                  <p className="text-sm text-gray-400">12 automatische Prüfungen mit Freigabe</p>
+                </div>
+              </div>
+            </motion.div>
             <MonthlyClosingDashboard bookings={currBookings} prevBookings={prevBookings} />
           </motion.div>
         )}
@@ -602,9 +761,26 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-blue-500/[0.04] to-transparent border border-cyan-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Rollierender Forecast</h2>
+                  <p className="text-sm text-gray-400">Automatische Prognose basierend auf historischen Daten</p>
+                </div>
+              </div>
+            </motion.div>
             <RollingForecastDashboard
               currentBookings={currBookings.length > 0 ? currBookings : null}
               historicalBookings={prevBookings.length > 0 ? prevBookings : null}

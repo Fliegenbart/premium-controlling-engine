@@ -248,7 +248,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#0f1117] mesh-gradient noise-overlay text-white overflow-hidden relative">
+    <main className="min-h-screen bg-[#080b16] mesh-gradient noise-overlay text-white overflow-hidden relative">
       {/* ─── Global Particles ─── */}
       <Particles
         className="absolute inset-0 -z-10"
@@ -258,12 +258,19 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
         color="#6b7280"
       />
 
+      {/* ─── Animated Gradient Orbs ─── */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] rounded-full bg-indigo-500/[0.07] blur-[120px] animate-float-orb" />
+        <div className="absolute top-[60%] right-[10%] w-[400px] h-[400px] rounded-full bg-cyan-500/[0.06] blur-[100px] animate-float-orb-2" />
+        <div className="absolute top-[30%] right-[30%] w-[300px] h-[300px] rounded-full bg-purple-500/[0.05] blur-[80px] animate-float-orb" style={{ animationDelay: '-7s' }} />
+      </div>
+
       {/* ═══════════ HEADER ═══════════ */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/[0.04] backdrop-blur-2xl bg-[#0f1117]/60"
+        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/[0.04] backdrop-blur-2xl bg-[#080b16]/60"
       >
         <div className="max-w-7xl mx-auto flex h-[3.5rem] w-full items-center justify-between">
           {/* Logo */}
@@ -309,7 +316,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#0f1117]/95 backdrop-blur-[12px]"
+            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#080b16]/95 backdrop-blur-[12px]"
           >
             <div className="max-w-7xl mx-auto flex h-[3.5rem] items-center justify-between px-4">
               <span className="text-md font-semibold">Premium Controlling</span>
@@ -400,147 +407,223 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           <ArrowRight className="ml-1 size-4" />
         </motion.button>
 
-        {/* Hero Image / Dashboard Mockup */}
+        {/* Hero Image — Bento Grid Tool Preview */}
         <motion.div
           ref={heroRef}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative mt-[8rem] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,#0f1117_30%,transparent)]"
+          transition={{ duration: 1.2, delay: 1.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="relative mt-[8rem] [perspective:2000px]"
         >
           <div
-            className={`rounded-xl border border-white/10 bg-white/[0.01] before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
+            className={`relative rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] to-white/[0.01] backdrop-blur-xl p-1 before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
               heroInView ? 'before:animate-image-glow' : ''
             }`}
           >
             <BorderBeam
-              size={200}
+              size={250}
               duration={12}
               delay={11}
               colorFrom="var(--color-one)"
               colorTo="var(--color-two)"
             />
 
-            {/* Dashboard Preview — realistic mockup */}
-            <div className="relative w-full rounded-[inherit] border border-white/[0.06] overflow-hidden select-none pointer-events-none">
-              <div className="bg-[#12141d] p-3 sm:p-5 md:p-6">
-                {/* Mock Header Bar */}
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                      <BarChart3 className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-xs font-semibold text-white/80">Premium Controlling</span>
-                    <div className="hidden sm:flex ml-4 gap-1">
-                      {['Einzelanalyse', 'Konzern', 'Fehler', 'Forecast'].map((tab, i) => (
-                        <span key={tab} className={`px-2 py-0.5 rounded text-[9px] font-medium ${i === 0 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>{tab}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded text-[9px] bg-yellow-500/20 text-yellow-400">Entwurf</span>
-                    <span className="px-2 py-0.5 rounded text-[9px] bg-blue-500/20 text-blue-400">Prüfung</span>
-                    <span className="px-2 py-0.5 rounded text-[9px] bg-green-500/20 text-green-400">Freigabe</span>
-                  </div>
-                </div>
+            {/* Bento Grid */}
+            <div className="grid grid-cols-6 grid-rows-3 gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl bg-[#0c0f1a]/80">
 
-                {/* KPI Row */}
-                <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-4">
-                  {[
-                    { label: 'Buchungen VJ', value: '4.218', color: 'text-white' },
-                    { label: 'Vorjahr', value: '2.847.392 €', color: 'text-white' },
-                    { label: 'Aktuell', value: '3.124.508 €', color: 'text-white' },
-                    { label: 'Abweichung', value: '+277.116 €', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
-                  ].map((kpi, i) => (
-                    <div key={i} className={`rounded-lg border p-2 sm:p-3 ${kpi.bg || 'bg-white/[0.02] border-white/5'}`}>
-                      <div className="text-[8px] sm:text-[10px] text-gray-500 mb-0.5">{kpi.label}</div>
-                      <div className={`text-[11px] sm:text-sm font-bold font-mono ${kpi.color}`}>{kpi.value}</div>
+              {/* ── Top-Left: Liquiditäts-Chart (3 cols, 2 rows) ── */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.6, delay: 1.5 }}
+                className="col-span-4 row-span-2 rounded-xl bg-gradient-to-br from-blue-500/[0.08] to-cyan-500/[0.04] border border-blue-500/[0.12] p-3 sm:p-4 overflow-hidden relative"
+              >
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                      <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400" />
                     </div>
+                    <span className="text-[10px] sm:text-xs font-semibold text-white/80">13-Wochen Liquiditätsplanung</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 rounded text-[8px] bg-blue-500/20 text-blue-400 font-medium">LIVE</span>
+                </div>
+                {/* Animated Area Chart */}
+                <svg viewBox="0 0 400 140" className="w-full h-auto" preserveAspectRatio="none">
+                  {/* Grid */}
+                  {[35, 70, 105].map(y => (
+                    <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="rgba(255,255,255,0.04)" />
+                  ))}
+                  {/* Confidence band */}
+                  <motion.path
+                    d="M0,30 C40,28 80,35 120,45 C160,55 200,50 240,65 C280,75 320,72 360,68 L400,65 L400,120 L360,108 L320,112 L280,115 L240,105 L200,90 L160,95 L120,85 L80,75 L40,68 L0,70 Z"
+                    fill="url(#heroConfBand)"
+                    initial={{ opacity: 0 }}
+                    animate={heroInView ? { opacity: 0.4 } : {}}
+                    transition={{ duration: 1.5, delay: 2 }}
+                  />
+                  {/* Inflow bars */}
+                  {[20, 70, 120, 170, 220, 270, 320, 370].map((x, i) => (
+                    <motion.rect
+                      key={`bar-${i}`}
+                      x={x}
+                      y={125 - [18, 14, 20, 12, 22, 16, 18, 14][i]}
+                      width="22"
+                      height={[18, 14, 20, 12, 22, 16, 18, 14][i]}
+                      rx="3"
+                      fill={i < 4 ? 'rgba(34,197,94,0.25)' : 'rgba(34,197,94,0.12)'}
+                      initial={{ scaleY: 0 }}
+                      animate={heroInView ? { scaleY: 1 } : {}}
+                      transition={{ duration: 0.5, delay: 1.8 + i * 0.08 }}
+                      style={{ transformOrigin: `${x + 11}px 125px` }}
+                    />
+                  ))}
+                  {/* Main balance line */}
+                  <motion.path
+                    d="M0,50 C40,48 80,55 120,65 C160,72 200,68 240,82 C280,90 320,88 360,85 L400,82"
+                    fill="none"
+                    stroke="url(#heroLineGrad)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={heroInView ? { pathLength: 1, opacity: 1 } : {}}
+                    transition={{ duration: 2, delay: 1.8, ease: 'easeOut' }}
+                  />
+                  {/* Threshold line */}
+                  <line x1="0" y1="95" x2="400" y2="95" stroke="#ef4444" strokeWidth="1" strokeDasharray="8 6" opacity="0.4" />
+                  <text x="6" y="92" fill="#ef4444" fontSize="8" opacity="0.5">Schwelle</text>
+                  {/* Pulsing alert dot */}
+                  <motion.circle
+                    cx="280"
+                    cy="90"
+                    r="5"
+                    fill="#ef4444"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={heroInView ? { opacity: [0, 1, 0.5, 1], scale: [0, 1.6, 1, 1.3] } : {}}
+                    transition={{ duration: 2.5, delay: 3.2, repeat: Infinity, repeatDelay: 3 }}
+                  />
+                  <defs>
+                    <linearGradient id="heroConfBand" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stopColor="#3b82f6" stopOpacity="0.15" />
+                      <stop offset="1" stopColor="#3b82f6" stopOpacity="0" />
+                    </linearGradient>
+                    <linearGradient id="heroLineGrad" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stopColor="#3b82f6" />
+                      <stop offset="0.5" stopColor="#06b6d4" />
+                      <stop offset="1" stopColor="#3b82f6" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div className="flex justify-between mt-1 px-1">
+                  {['KW 1', 'KW 3', 'KW 5', 'KW 7', 'KW 9', 'KW 11', 'KW 13'].map(kw => (
+                    <span key={kw} className="text-[7px] sm:text-[8px] text-gray-600">{kw}</span>
                   ))}
                 </div>
+              </motion.div>
 
-                {/* Charts Row */}
-                <div className="grid grid-cols-5 gap-2 sm:gap-3 mb-4">
-                  {/* Bar Chart */}
-                  <div className="col-span-3 rounded-lg border border-white/5 bg-white/[0.02] p-2 sm:p-3">
-                    <div className="text-[9px] text-gray-500 mb-2 flex items-center gap-1">
-                      <BarChart3 className="w-2.5 h-2.5 text-blue-400" />
-                      Top Abweichungen
+              {/* ── Top-Right: KPI Cards Stack (2 cols, 2 rows) ── */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ duration: 0.6, delay: 1.7 }}
+                className="col-span-2 row-span-2 flex flex-col gap-1.5 sm:gap-2"
+              >
+                {[
+                  { label: 'Kontostand', value: '847.293 €', color: 'text-white', icon: '💰', bg: 'from-white/[0.04] to-white/[0.02]', border: 'border-white/[0.06]' },
+                  { label: 'Burn Rate', value: '-42.100 €/W', color: 'text-red-400', icon: '🔥', bg: 'from-red-500/[0.06] to-red-500/[0.02]', border: 'border-red-500/[0.1]' },
+                  { label: 'Reichweite', value: '18 Wochen', color: 'text-emerald-400', icon: '📊', bg: 'from-emerald-500/[0.06] to-emerald-500/[0.02]', border: 'border-emerald-500/[0.1]' },
+                  { label: 'Prüfungen', value: '10/12 ✓', color: 'text-green-400', icon: '✅', bg: 'from-green-500/[0.06] to-green-500/[0.02]', border: 'border-green-500/[0.1]' },
+                ].map((kpi, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={heroInView ? { opacity: 1, x: 0 } : {}}
+                    transition={{ duration: 0.5, delay: 2.0 + i * 0.15 }}
+                    className={`flex-1 rounded-lg bg-gradient-to-br ${kpi.bg} border ${kpi.border} p-2 sm:p-2.5 flex items-center gap-2`}
+                  >
+                    <span className="text-sm sm:text-base">{kpi.icon}</span>
+                    <div className="min-w-0">
+                      <div className="text-[7px] sm:text-[9px] text-gray-500 truncate">{kpi.label}</div>
+                      <div className={`text-[10px] sm:text-xs font-bold font-mono ${kpi.color} truncate`}>{kpi.value}</div>
                     </div>
-                    <div className="flex items-end gap-1 h-16 sm:h-20">
-                      {[
-                        { h: '75%', c: 'from-red-500 to-red-400', label: 'Personal' },
-                        { h: '55%', c: 'from-red-500/80 to-red-400/80', label: 'Material' },
-                        { h: '40%', c: 'from-green-500 to-green-400', label: 'Miete' },
-                        { h: '60%', c: 'from-red-500/70 to-red-400/70', label: 'IT' },
-                        { h: '30%', c: 'from-green-500/80 to-green-400/80', label: 'Reise' },
-                        { h: '45%', c: 'from-red-500/60 to-red-400/60', label: 'Beratg.' },
-                        { h: '20%', c: 'from-green-500/60 to-green-400/60', label: 'Versich.' },
-                      ].map((bar, i) => (
-                        <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                          <div className={`w-full rounded-t bg-gradient-to-t ${bar.c}`} style={{ height: bar.h }} />
-                          <span className="text-[6px] text-gray-600 truncate w-full text-center">{bar.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  </motion.div>
+                ))}
+              </motion.div>
 
-                  {/* Pie / Donut */}
-                  <div className="col-span-2 rounded-lg border border-white/5 bg-white/[0.02] p-2 sm:p-3 flex flex-col items-center justify-center">
-                    <div className="text-[9px] text-gray-500 mb-2 self-start flex items-center gap-1">
-                      <Target className="w-2.5 h-2.5 text-purple-400" />
-                      Verteilung
-                    </div>
-                    <svg viewBox="0 0 80 80" className="w-14 h-14 sm:w-16 sm:h-16">
-                      <circle cx="40" cy="40" r="30" fill="none" stroke="#ef4444" strokeWidth="10" strokeDasharray="120 69" strokeDashoffset="0" className="opacity-80" />
-                      <circle cx="40" cy="40" r="30" fill="none" stroke="#22c55e" strokeWidth="10" strokeDasharray="69 120" strokeDashoffset="-120" className="opacity-80" />
-                      <text x="40" y="42" textAnchor="middle" className="fill-white text-[10px] font-bold">63/37</text>
-                    </svg>
-                    <div className="flex gap-2 mt-1">
-                      <span className="flex items-center gap-0.5 text-[7px] text-gray-500"><span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />Steig.</span>
-                      <span className="flex items-center gap-0.5 text-[7px] text-gray-500"><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Senk.</span>
-                    </div>
-                  </div>
+              {/* ── Bottom-Left: KI-Kommentar (3 cols, 1 row) ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={heroInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 2.2 }}
+                className="col-span-3 rounded-xl bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.03] border border-amber-500/[0.12] p-3 overflow-hidden"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-amber-400/80">KI-Abweichungskommentar</span>
                 </div>
-
-                {/* Deviation Table */}
-                <div className="rounded-lg border border-white/5 bg-white/[0.02] overflow-hidden">
-                  <div className="px-3 py-1.5 border-b border-white/5 text-[9px] text-gray-500 flex items-center gap-1">
-                    <span className="w-1 h-3 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 inline-block" />
-                    Signifikante Abweichungen
-                  </div>
-                  <table className="w-full text-[8px] sm:text-[10px]">
-                    <thead>
-                      <tr className="text-gray-600 border-b border-white/5">
-                        <th className="text-left py-1 px-2 sm:px-3 font-medium">Konto</th>
-                        <th className="text-left py-1 px-1 font-medium hidden sm:table-cell">Bezeichnung</th>
-                        <th className="text-right py-1 px-1 font-medium hidden sm:table-cell">Vorjahr</th>
-                        <th className="text-right py-1 px-1 font-medium hidden sm:table-cell">Aktuell</th>
-                        <th className="text-right py-1 px-2 sm:px-3 font-medium">Abweichung</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        { konto: '4120', name: 'Gehälter', vj: '845.200', akt: '923.400', delta: '+78.200 €', neg: true },
-                        { konto: '4960', name: 'Reisekosten', vj: '124.800', akt: '98.300', delta: '-26.500 €', neg: false },
-                        { konto: '6300', name: 'Sonst. Aufwand', vj: '67.400', akt: '112.900', delta: '+45.500 €', neg: true },
-                        { konto: '4830', name: 'Abschreibungen', vj: '234.100', akt: '241.800', delta: '+7.700 €', neg: true },
-                        { konto: '6800', name: 'IT-Kosten', vj: '189.500', akt: '156.200', delta: '-33.300 €', neg: false },
-                      ].map((row, i) => (
-                        <tr key={i} className={`border-b border-white/[0.03] ${i % 2 === 0 ? 'bg-white/[0.01]' : ''}`}>
-                          <td className="py-1 px-2 sm:px-3 text-gray-500 font-mono">{row.konto}</td>
-                          <td className="py-1 px-1 text-white/70 hidden sm:table-cell">{row.name}</td>
-                          <td className="py-1 px-1 text-right text-gray-500 font-mono hidden sm:table-cell">{row.vj}</td>
-                          <td className="py-1 px-1 text-right text-gray-400 font-mono hidden sm:table-cell">{row.akt}</td>
-                          <td className={`py-1 px-2 sm:px-3 text-right font-mono font-semibold ${row.neg ? 'text-red-400' : 'text-green-400'}`}>{row.delta}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <motion.p
+                  className="text-[8px] sm:text-[10px] text-gray-400 leading-relaxed"
+                  initial={{ opacity: 0 }}
+                  animate={heroInView ? { opacity: 1 } : {}}
+                  transition={{ duration: 1, delay: 2.8 }}
+                >
+                  &quot;Personalkosten +12,3% durch 3 Neueinstellungen IT (Mär-Apr) + Tariferhöhung 3,2%.
+                  Größter Einzelposten: Dev-Team 45.200€.&quot;
+                </motion.p>
+                <div className="flex gap-2 mt-1.5">
+                  {['Strukturell', '85% Konfidenz'].map((tag, i) => (
+                    <motion.span
+                      key={tag}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={heroInView ? { opacity: 1, scale: 1 } : {}}
+                      transition={{ delay: 3.2 + i * 0.15 }}
+                      className="px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] bg-amber-500/10 text-amber-400/70 border border-amber-500/10"
+                    >
+                      {tag}
+                    </motion.span>
+                  ))}
                 </div>
-              </div>
+              </motion.div>
+
+              {/* ── Bottom-Right: Fehler-Scanner (3 cols, 1 row) ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={heroInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 2.4 }}
+                className="col-span-3 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06] p-3 overflow-hidden"
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400" />
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-white/70">Buchungsfehler-Scan</span>
+                  </div>
+                  <span className="text-[8px] text-green-400">2 gefunden</span>
+                </div>
+                <div className="space-y-1">
+                  {[
+                    { text: '4711 Personalkosten — Duplikat', ok: false },
+                    { text: '6800 IT-Kosten — Sa/So', ok: false },
+                    { text: '3842 Buchungen geprüft', ok: true },
+                  ].map((row, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={heroInView ? { opacity: 1, x: 0 } : {}}
+                      transition={{ duration: 0.3, delay: 2.8 + i * 0.12 }}
+                      className={`flex items-center gap-1.5 text-[8px] sm:text-[9px] px-2 py-1 rounded ${
+                        row.ok ? 'text-green-400/70' : 'text-rose-400/80 bg-rose-500/[0.06]'
+                      }`}
+                    >
+                      {row.ok ? <CheckCircle2 className="w-2.5 h-2.5" /> : <AlertTriangle className="w-2.5 h-2.5" />}
+                      <span>{row.text}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             </div>
           </div>
+
+          {/* Fade overlay at bottom */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#080b16] to-transparent pointer-events-none" />
         </motion.div>
       </section>
 
@@ -1199,7 +1282,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               interval === 'year' ? 'bg-white' : 'bg-white/20'
             }`}
           >
-            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#0f1117] transition-transform ${
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#080b16] transition-transform ${
               interval === 'year' ? 'translate-x-6' : 'translate-x-0.5'
             }`} />
           </button>
@@ -1307,7 +1390,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
 
             {/* Center CTA Overlay */}
             <div className="absolute z-10">
-              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#0f1117]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
+              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#080b16]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
                 <BarChart3 className="mx-auto size-16 text-white lg:size-24" />
               </div>
               <div className="z-10 mt-4 flex flex-col items-center text-center text-white">
@@ -1325,15 +1408,15 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
                 </button>
               </div>
-              <div className="absolute inset-0 -z-10 rounded-full bg-[#0f1117] opacity-40 blur-xl" />
+              <div className="absolute inset-0 -z-10 rounded-full bg-[#080b16] opacity-40 blur-xl" />
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#0f1117] to-70%" />
+            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#080b16] to-70%" />
           </div>
         </div>
       </section>
 
       {/* ═══════════ FOOTER ═══════════ */}
-      <footer id="contact" className="bg-[#0c0e14]">
+      <footer id="contact" className="bg-[#06080f]">
         <div className="mx-auto w-full max-w-screen-xl xl:pb-2">
           <div className="md:flex md:justify-between px-8 p-4 py-16 sm:pb-16 gap-4">
             <div className="mb-12 flex-col flex gap-4">
