@@ -478,19 +478,19 @@ export default function Home() {
 
   // Main App
   return (
-    <main className="min-h-screen bg-[#080b16] mesh-gradient noise-overlay relative flex">
+    <main className="min-h-screen bg-[#0c1222] mesh-gradient noise-overlay relative flex">
       {/* Animated Background */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <Particles
           className="absolute inset-0"
-          quantity={18}
-          color="#6366f1"
+          quantity={28}
+          color="#818cf8"
           staticity={60}
-          size={0.4}
+          size={0.5}
         />
-        <div className="absolute top-[5%] left-[10%] w-[600px] h-[600px] rounded-full bg-indigo-500/[0.05] blur-[150px] animate-float-orb" />
-        <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] rounded-full bg-cyan-500/[0.04] blur-[120px] animate-float-orb-2" />
-        <div className="absolute top-[40%] right-[25%] w-[350px] h-[350px] rounded-full bg-purple-500/[0.035] blur-[100px] animate-float-orb" style={{ animationDelay: '-10s' }} />
+        <div className="absolute top-[5%] left-[10%] w-[600px] h-[600px] rounded-full bg-indigo-500/[0.12] blur-[150px] animate-float-orb" />
+        <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] rounded-full bg-cyan-500/[0.10] blur-[120px] animate-float-orb-2" />
+        <div className="absolute top-[40%] right-[25%] w-[350px] h-[350px] rounded-full bg-purple-500/[0.08] blur-[100px] animate-float-orb" style={{ animationDelay: '-10s' }} />
       </div>
 
       {/* Evidence Modal */}
@@ -502,7 +502,7 @@ export default function Home() {
       )}
 
       {/* ═══ Desktop Sidebar ═══ */}
-      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-[#0a0e1a]/90 backdrop-blur-2xl border-r border-white/[0.06]">
+      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-[#0e1326]/90 backdrop-blur-2xl border-r border-white/[0.06]">
         {/* Sidebar Header / Logo */}
         <div className="px-4 py-4 border-b border-white/[0.06]">
           <button
@@ -551,7 +551,7 @@ export default function Home() {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-[#0a0e1a] border-r border-white/[0.06] flex flex-col md:hidden"
+              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-[#0e1326] border-r border-white/[0.06] flex flex-col md:hidden"
             >
               {/* Mobile Sidebar Header */}
               <div className="px-4 py-4 border-b border-white/[0.06] flex items-center justify-between">
@@ -583,7 +583,7 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative bg-[#080b16]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-30"
+          className="relative bg-[#0c1222]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-30"
         >
           <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
           <div className="px-6 py-2.5">

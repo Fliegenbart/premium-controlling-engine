@@ -248,21 +248,21 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#080b16] mesh-gradient noise-overlay text-white overflow-hidden relative">
+    <main className="min-h-screen bg-[#0c1222] mesh-gradient noise-overlay text-white overflow-hidden relative">
       {/* ─── Global Particles ─── */}
       <Particles
         className="absolute inset-0 -z-10"
-        quantity={15}
+        quantity={30}
         ease={70}
-        size={0.4}
-        color="#6b7280"
+        size={0.5}
+        color="#818cf8"
       />
 
       {/* ─── Animated Gradient Orbs ─── */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] rounded-full bg-indigo-500/[0.07] blur-[120px] animate-float-orb" />
-        <div className="absolute top-[60%] right-[10%] w-[400px] h-[400px] rounded-full bg-cyan-500/[0.06] blur-[100px] animate-float-orb-2" />
-        <div className="absolute top-[30%] right-[30%] w-[300px] h-[300px] rounded-full bg-purple-500/[0.05] blur-[80px] animate-float-orb" style={{ animationDelay: '-7s' }} />
+        <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] rounded-full bg-indigo-500/[0.14] blur-[120px] animate-float-orb" />
+        <div className="absolute top-[60%] right-[10%] w-[400px] h-[400px] rounded-full bg-cyan-500/[0.12] blur-[100px] animate-float-orb-2" />
+        <div className="absolute top-[30%] right-[30%] w-[300px] h-[300px] rounded-full bg-purple-500/[0.10] blur-[80px] animate-float-orb" style={{ animationDelay: '-7s' }} />
       </div>
 
       {/* ═══════════ HEADER ═══════════ */}
@@ -270,7 +270,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/[0.04] backdrop-blur-2xl bg-[#080b16]/60"
+        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/[0.08] backdrop-blur-2xl bg-[#0c1222]/60"
       >
         <div className="max-w-7xl mx-auto flex h-[3.5rem] w-full items-center justify-between">
           {/* Logo */}
@@ -316,7 +316,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#080b16]/95 backdrop-blur-[12px]"
+            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#0c1222]/95 backdrop-blur-[12px]"
           >
             <div className="max-w-7xl mx-auto flex h-[3.5rem] items-center justify-between px-4">
               <span className="text-md font-semibold">Premium Controlling</span>
@@ -376,7 +376,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="bg-gradient-to-br from-white via-gray-200 to-white/40 bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tight text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl"
+          className="bg-gradient-to-br from-white via-white/90 to-white/60 bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tight text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl"
         >
           Controlling-KI die
           <br className="hidden md:block" /> Ihre Daten schützt.
@@ -387,7 +387,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="mb-12 text-lg tracking-tight text-gray-300 md:text-xl text-balance"
+          className="mb-12 text-lg tracking-tight text-gray-200 md:text-xl text-balance"
         >
           DATEV, SAP, BMD, Lexware — egal welches System, wir analysieren es.
           <br className="hidden md:block" /> 13-Wochen Liquiditätsplanung, KI-Abweichungskommentare & 100% on-premise.
@@ -416,7 +416,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           className="relative mt-[8rem] [perspective:2000px]"
         >
           <div
-            className={`relative rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] to-white/[0.01] backdrop-blur-xl p-1 before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
+            className={`relative rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-xl p-1 before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
               heroInView ? 'before:animate-image-glow' : ''
             }`}
           >
@@ -528,7 +528,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                 className="col-span-2 row-span-2 flex flex-col gap-1.5 sm:gap-2"
               >
                 {[
-                  { label: 'Kontostand', value: '847.293 €', color: 'text-white', icon: '💰', bg: 'from-white/[0.04] to-white/[0.02]', border: 'border-white/[0.06]' },
+                  { label: 'Kontostand', value: '847.293 €', color: 'text-white', icon: '💰', bg: 'from-white/[0.08] to-white/[0.04]', border: 'border-white/[0.10]' },
                   { label: 'Burn Rate', value: '-42.100 €/W', color: 'text-red-400', icon: '🔥', bg: 'from-red-500/[0.06] to-red-500/[0.02]', border: 'border-red-500/[0.1]' },
                   { label: 'Reichweite', value: '18 Wochen', color: 'text-emerald-400', icon: '📊', bg: 'from-emerald-500/[0.06] to-emerald-500/[0.02]', border: 'border-emerald-500/[0.1]' },
                   { label: 'Prüfungen', value: '10/12 ✓', color: 'text-green-400', icon: '✅', bg: 'from-green-500/[0.06] to-green-500/[0.02]', border: 'border-green-500/[0.1]' },
@@ -589,7 +589,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                 initial={{ opacity: 0, y: 15 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 2.4 }}
-                className="col-span-3 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06] p-3 overflow-hidden"
+                className="col-span-3 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.10] p-3 overflow-hidden"
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
@@ -623,7 +623,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           </div>
 
           {/* Fade overlay at bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#080b16] to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0c1222] to-transparent pointer-events-none" />
         </motion.div>
       </section>
 
@@ -675,14 +675,14 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
         {/* Integration Logos Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
           {[
-            { name: 'DATEV', sub: 'Kanzlei-Rechnungswesen', color: 'from-green-500/20 to-emerald-500/20', border: 'border-green-500/20', text: 'text-green-400' },
-            { name: 'SAP', sub: 'FI / CO Export', color: 'from-blue-500/20 to-sky-500/20', border: 'border-blue-500/20', text: 'text-blue-400' },
-            { name: 'BMD', sub: 'NTCS Export', color: 'from-purple-500/20 to-violet-500/20', border: 'border-purple-500/20', text: 'text-purple-400' },
-            { name: 'Addison', sub: 'Wolters Kluwer', color: 'from-orange-500/20 to-amber-500/20', border: 'border-orange-500/20', text: 'text-orange-400' },
-            { name: 'Lexware', sub: 'buchhaltung', color: 'from-cyan-500/20 to-teal-500/20', border: 'border-cyan-500/20', text: 'text-cyan-400' },
-            { name: 'Agenda', sub: 'Finanzbuchhaltung', color: 'from-pink-500/20 to-rose-500/20', border: 'border-pink-500/20', text: 'text-pink-400' },
-            { name: 'CSV', sub: 'Universalformat', color: 'from-gray-400/20 to-gray-500/20', border: 'border-gray-400/20', text: 'text-gray-300' },
-            { name: 'Excel', sub: '.xlsx / .xls', color: 'from-emerald-500/20 to-green-500/20', border: 'border-emerald-500/20', text: 'text-emerald-400' },
+            { name: 'DATEV', sub: 'Kanzlei-Rechnungswesen', color: 'from-green-500/25 to-emerald-500/25', border: 'border-green-500/25', text: 'text-green-400' },
+            { name: 'SAP', sub: 'FI / CO Export', color: 'from-blue-500/25 to-sky-500/25', border: 'border-blue-500/25', text: 'text-blue-400' },
+            { name: 'BMD', sub: 'NTCS Export', color: 'from-purple-500/25 to-violet-500/25', border: 'border-purple-500/25', text: 'text-purple-400' },
+            { name: 'Addison', sub: 'Wolters Kluwer', color: 'from-orange-500/25 to-amber-500/25', border: 'border-orange-500/25', text: 'text-orange-400' },
+            { name: 'Lexware', sub: 'buchhaltung', color: 'from-cyan-500/25 to-teal-500/25', border: 'border-cyan-500/25', text: 'text-cyan-400' },
+            { name: 'Agenda', sub: 'Finanzbuchhaltung', color: 'from-pink-500/25 to-rose-500/25', border: 'border-pink-500/25', text: 'text-pink-400' },
+            { name: 'CSV', sub: 'Universalformat', color: 'from-gray-400/25 to-gray-500/25', border: 'border-gray-400/25', text: 'text-gray-300' },
+            { name: 'Excel', sub: '.xlsx / .xls', color: 'from-emerald-500/25 to-green-500/25', border: 'border-emerald-500/25', text: 'text-emerald-400' },
           ].map((integration, idx) => (
             <motion.div
               key={integration.name}
@@ -695,7 +695,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             >
               <div className={`text-2xl font-bold ${integration.text} tracking-tight mb-1`}>{integration.name}</div>
               <div className="text-[11px] text-gray-500 tracking-wide">{integration.sub}</div>
-              <div className="absolute inset-0 rounded-xl bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 rounded-xl bg-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity" />
             </motion.div>
           ))}
         </div>
@@ -708,7 +708,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="mt-10 text-center"
         >
-          <div className="inline-flex items-center gap-2 bg-white/[0.04] border border-white/[0.06] rounded-full px-5 py-2.5">
+          <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.10] rounded-full px-5 py-2.5">
             <Zap className="w-4 h-4 text-yellow-400" />
             <span className="text-sm text-gray-300">Magic Upload — Format wird <strong className="text-white">automatisch erkannt</strong></span>
           </div>
@@ -736,7 +736,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent rounded-2xl border border-blue-500/20 p-8 mb-8 overflow-hidden"
+          className="relative bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent rounded-2xl border border-blue-500/25 p-8 mb-8 overflow-hidden"
         >
           {/* Background glow */}
           <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -755,7 +755,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 {['Wiederkehrende Muster', 'Konfidenzintervalle', 'Alerts bei Engpass', 'KI-Empfehlungen'].map((tag) => (
-                  <span key={tag} className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs">
+                  <span key={tag} className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs">
                     {tag}
                   </span>
                 ))}
@@ -846,7 +846,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
           whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-          className="relative rounded-2xl border border-white/[0.06] p-8 md:p-10 overflow-hidden bg-gradient-to-br from-white/[0.04] to-white/[0.01] backdrop-blur-xl shadow-glow-md mb-6"
+          className="relative rounded-2xl border border-white/[0.10] p-8 md:p-10 overflow-hidden bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-xl shadow-glow-md mb-6"
         >
           <BorderBeam size={250} duration={18} colorFrom="#f59e0b" colorTo="#ef4444" />
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
@@ -867,7 +867,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             </div>
             {/* Mini demo */}
             <div className="hidden lg:block flex-shrink-0 w-72">
-              <div className="bg-white/[0.03] rounded-xl border border-white/[0.06] p-4">
+              <div className="bg-white/[0.06] rounded-xl border border-white/[0.10] p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-1 h-4 rounded-full bg-gradient-to-b from-amber-400 to-red-400" />
                   <span className="text-xs text-gray-400">KI-Analyse</span>
@@ -912,7 +912,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} colorFrom="var(--color-one)" colorTo="var(--color-two)" />
             <div className="flex items-center gap-3 mb-4">
@@ -928,7 +928,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               Generiert automatisch vollständige Word-Reports mit KI-Analyse aller Abweichungen, Trends und Anomalien.
             </p>
             {/* Mini Demo: Animated document lines */}
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/5">
                 <FileText className="w-4 h-4 text-[var(--color-one)]" />
                 <span className="text-xs text-gray-500 font-mono">Monatsbericht_Jan_2025.docx</span>
@@ -962,7 +962,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={4} colorFrom="var(--color-two)" colorTo="var(--color-three)" />
             <div className="flex items-center gap-3 mb-4">
@@ -978,7 +978,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               Findet Duplikate, Rundlauf-Buchungen, Wochenend-Buchungen und verdächtige Muster automatisch.
             </p>
             {/* Mini Demo: Booking list with error highlight */}
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               {[
                 { text: '4711 Personalkosten', amount: '12.450,00', ok: true, delay: 0.4 },
                 { text: '6300 Reisekosten', amount: '3.200,50', ok: true, delay: 0.6 },
@@ -1033,7 +1033,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={7} colorFrom="var(--color-three)" colorTo="var(--color-one)" />
             <div className="flex items-center gap-3 mb-4">
@@ -1049,7 +1049,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               Schieben Sie Regler und sehen Sie sofort die Auswirkungen auf Gewinn, Liquidität und Kosten.
             </p>
             {/* Mini Demo: Animated sliders + bar chart */}
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               {[
                 { label: 'Umsatz', value: 72, color: 'bg-emerald-500', delay: 0.5 },
                 { label: 'Personal', value: 45, color: 'bg-[var(--color-two)]', delay: 0.7 },
@@ -1102,7 +1102,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={10} colorFrom="#06b6d4" colorTo="#3b82f6" />
             <div className="flex items-center gap-3 mb-4">
@@ -1118,7 +1118,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               Automatische Forecasts basierend auf historischen Daten, Saisonalitäten und Trends.
             </p>
             {/* Mini Demo: Animated line chart */}
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               <div className="flex items-center gap-4 mb-3 text-xs text-gray-500">
                 <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-cyan-400 rounded inline-block" /> Ist</span>
                 <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-400 rounded inline-block border border-dashed border-blue-400" /> Forecast</span>
@@ -1213,7 +1213,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               Mehrstufige Deckungsbeitragsrechnung nach SKR03/04. Von Rohertrag (DB I) bis Unternehmensergebnis (DB V) — mit Wasserfall-Chart und Kostenstellen-Vergleich.
             </p>
             {/* Mini Demo: Animated Waterfall Chart */}
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
                 <span className="flex items-center gap-1"><span className="w-3 h-1.5 bg-emerald-400 rounded inline-block" /> Erlöse/DB</span>
                 <span className="flex items-center gap-1"><span className="w-3 h-1.5 bg-red-400/60 rounded inline-block" /> Kosten</span>
@@ -1309,7 +1309,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.75, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={14} colorFrom="#22c55e" colorTo="#10b981" />
             <div className="flex items-center gap-3 mb-4">
@@ -1325,7 +1325,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               12 automatische Prüfungen — von Kontenabstimmung bis Storno-Check. Mit Fortschrittsanzeige, Findings und digitaler Freigabe.
             </p>
             {/* Mini Demo: Animated checklist */}
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               <div className="flex items-center gap-3 mb-3">
                 {/* Progress ring mini */}
                 <svg viewBox="0 0 36 36" className="w-10 h-10">
@@ -1394,7 +1394,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
               Automatische Cashflow-Rechnung nach DRS 21 — operativ, investiv, Finanzierung. Mit Free Cashflow, CF-Marge und Monatsvergleich.
             </p>
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               <svg viewBox="0 0 260 90" className="w-full h-auto" fill="none">
                 {/* Animated flow arrows */}
                 <motion.path d="M 30 45 Q 70 15, 130 45" stroke="#10b981" strokeWidth="2" fill="none" strokeLinecap="round"
@@ -1446,7 +1446,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
               Betriebswirtschaftliche Auswertung nach DATEV — von Umsatz über EBITDA bis Netto-Ergebnis. Mit Kostenstruktur-Analyse und Margen-Trend.
             </p>
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               <div className="space-y-2">
                 {[
                   { label: 'Umsatzerlöse', pct: 100, color: '#10b981' },
@@ -1460,7 +1460,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                     transition={{ duration: 0.3, delay: 0.5 + i * 0.15 }}
                   >
                     <span className="text-[9px] text-gray-500 w-16 truncate">{item.label}</span>
-                    <div className="flex-1 h-3 bg-white/[0.04] rounded-full overflow-hidden">
+                    <div className="flex-1 h-3 bg-white/[0.08] rounded-full overflow-hidden">
                       <motion.div className="h-full rounded-full" style={{ backgroundColor: item.color }}
                         initial={{ width: 0 }} whileInView={{ width: `${item.pct}%` }} viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.6 + i * 0.15, ease: 'easeOut' }}
@@ -1503,7 +1503,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
               Innerbetriebliche Leistungsverrechnung — Kostenarten auf Kostenstellen verteilen, Gemeinkostenzuschlagssätze berechnen. Mit Heatmap.
             </p>
-            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
               {/* Mini Heatmap Grid */}
               <div className="grid grid-cols-5 gap-1 mb-3">
                 {Array.from({ length: 20 }, (_, i) => {
@@ -1566,7 +1566,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               interval === 'year' ? 'bg-white' : 'bg-white/20'
             }`}
           >
-            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#080b16] transition-transform ${
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#0c1222] transition-transform ${
               interval === 'year' ? 'translate-x-6' : 'translate-x-0.5'
             }`} />
           </button>
@@ -1582,10 +1582,10 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             <div
               key={price.id}
               className={cn(
-                'relative flex max-w-[400px] flex-col gap-8 rounded-2xl border p-6 text-white overflow-hidden bg-white/[0.03] backdrop-blur-xl',
+                'relative flex max-w-[400px] flex-col gap-8 rounded-2xl border p-6 text-white overflow-hidden bg-white/[0.06] backdrop-blur-xl',
                 {
-                  'border-t-2 border-t-blue-500/40 border-white/[0.06]': price.isMostPopular,
-                  'border-white/[0.06]': !price.isMostPopular,
+                  'border-2 border-blue-500/60 bg-white/[0.08]': price.isMostPopular,
+                  'border-white/[0.10]': !price.isMostPopular,
                 }
               )}
             >
@@ -1674,7 +1674,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
 
             {/* Center CTA Overlay */}
             <div className="absolute z-10">
-              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#080b16]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
+              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#0c1222]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
                 <BarChart3 className="mx-auto size-16 text-white lg:size-24" />
               </div>
               <div className="z-10 mt-4 flex flex-col items-center text-center text-white">
@@ -1692,9 +1692,9 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
                 </button>
               </div>
-              <div className="absolute inset-0 -z-10 rounded-full bg-[#080b16] opacity-40 blur-xl" />
+              <div className="absolute inset-0 -z-10 rounded-full bg-[#0c1222] opacity-40 blur-xl" />
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#080b16] to-70%" />
+            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#0c1222] to-70%" />
           </div>
         </div>
       </section>
@@ -1737,7 +1737,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border-t border-white/[0.06] py-4 px-8 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border-t border-white/[0.10] py-4 px-8 gap-2">
             <span className="text-sm text-gray-500">
               Copyright © {new Date().getFullYear()}{' '}
               <span className="cursor-pointer">Premium Controlling</span>. Alle Rechte vorbehalten.
