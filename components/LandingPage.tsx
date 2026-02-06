@@ -244,14 +244,14 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden relative">
+    <main className="min-h-screen bg-[#0f1117] mesh-gradient noise-overlay text-white overflow-hidden relative">
       {/* ─── Global Particles ─── */}
       <Particles
         className="absolute inset-0 -z-10"
-        quantity={50}
+        quantity={15}
         ease={70}
-        size={0.05}
-        color="#ffffff"
+        size={0.4}
+        color="#6b7280"
       />
 
       {/* ═══════════ HEADER ═══════════ */}
@@ -259,7 +259,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/10 backdrop-blur-[12px]"
+        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/[0.04] backdrop-blur-2xl bg-[#0f1117]/60"
       >
         <div className="max-w-7xl mx-auto flex h-[3.5rem] w-full items-center justify-between">
           {/* Logo */}
@@ -305,7 +305,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#0a0a0f]/95 backdrop-blur-[12px]"
+            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#0f1117]/95 backdrop-blur-[12px]"
           >
             <div className="max-w-7xl mx-auto flex h-[3.5rem] items-center justify-between px-4">
               <span className="text-md font-semibold">Premium Controlling</span>
@@ -365,7 +365,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="bg-gradient-to-br from-white from-30% to-white/40 bg-clip-text py-6 text-5xl font-medium leading-none tracking-tighter text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl"
+          className="bg-gradient-to-br from-white via-gray-200 to-white/40 bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tight text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl"
         >
           Controlling-KI die
           <br className="hidden md:block" /> Ihre Daten schützt.
@@ -376,7 +376,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="mb-12 text-lg tracking-tight text-gray-400 md:text-xl text-balance"
+          className="mb-12 text-lg tracking-tight text-gray-300 md:text-xl text-balance"
         >
           Automatische Abweichungsanalyse mit KI-Kommentaren – komplett on-premise.
           <br className="hidden md:block" /> Jede Aussage mit Evidence Link zur Buchung.
@@ -402,7 +402,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative mt-[8rem] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,#0a0a0f_30%,transparent)]"
+          className="relative mt-[8rem] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,#0f1117_30%,transparent)]"
         >
           <div
             className={`rounded-xl border border-white/10 bg-white/[0.01] before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
@@ -418,8 +418,8 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             />
 
             {/* Dashboard Preview — realistic mockup */}
-            <div className="relative w-full rounded-[inherit] border border-white/5 overflow-hidden select-none pointer-events-none">
-              <div className="bg-[#0c0c14] p-3 sm:p-5 md:p-6">
+            <div className="relative w-full rounded-[inherit] border border-white/[0.06] overflow-hidden select-none pointer-events-none">
+              <div className="bg-[#12141d] p-3 sm:p-5 md:p-6">
                 {/* Mock Header Bar */}
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
                   <div className="flex items-center gap-2">
@@ -573,11 +573,11 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
       {/* ═══════════ 4 KILLER FEATURE TILES ═══════════ */}
       <section id="features" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-xl font-bold tracking-tight text-white mb-2">Features</h2>
-          <p className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
+          <h2 className="text-xl font-semibold tracking-tight text-white mb-2">Features</h2>
+          <p className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
             Vier Killer-Features.
           </p>
-          <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
             Jedes einzelne löst ein echtes Problem im Controlling-Alltag.
           </p>
         </div>
@@ -590,7 +590,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} colorFrom="var(--color-one)" colorTo="var(--color-two)" />
             <div className="flex items-center gap-3 mb-4">
@@ -640,7 +640,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={4} colorFrom="var(--color-two)" colorTo="var(--color-three)" />
             <div className="flex items-center gap-3 mb-4">
@@ -711,7 +711,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={7} colorFrom="var(--color-three)" colorTo="var(--color-one)" />
             <div className="flex items-center gap-3 mb-4">
@@ -780,7 +780,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-white/[0.06] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
           >
             <BorderBeam size={180} duration={14} delay={10} colorFrom="#06b6d4" colorTo="#3b82f6" />
             <div className="flex items-center gap-3 mb-4">
@@ -872,13 +872,13 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
       {/* ═══════════ PRICING SECTION ═══════════ */}
       <section id="pricing" className="mx-auto max-w-screen-xl px-4 py-20 md:px-8">
         <div className="mx-auto max-w-5xl text-center mb-12">
-          <h4 className="text-xl font-bold tracking-tight text-white">
+          <h4 className="text-xl font-semibold tracking-tight text-white">
             Preise
           </h4>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mt-2">
+          <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white mt-2">
             Einfache Preise für jeden.
           </h2>
-          <p className="mt-6 text-lg text-gray-400">
+          <p className="mt-6 text-lg text-gray-300">
             Wählen Sie ein <strong className="text-white">passendes Paket</strong> mit den besten Features für Ihr Controlling-Team.
           </p>
         </div>
@@ -891,7 +891,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               interval === 'year' ? 'bg-white' : 'bg-white/20'
             }`}
           >
-            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#0a0a0f] transition-transform ${
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#0f1117] transition-transform ${
               interval === 'year' ? 'translate-x-6' : 'translate-x-0.5'
             }`} />
           </button>
@@ -907,17 +907,17 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             <div
               key={price.id}
               className={cn(
-                'relative flex max-w-[400px] flex-col gap-8 rounded-2xl border p-6 text-white overflow-hidden',
+                'relative flex max-w-[400px] flex-col gap-8 rounded-2xl border p-6 text-white overflow-hidden bg-white/[0.03] backdrop-blur-xl',
                 {
-                  'border-2 border-[var(--color-one)]': price.isMostPopular,
-                  'border-white/10': !price.isMostPopular,
+                  'border-t-2 border-t-blue-500/40 border-white/[0.06]': price.isMostPopular,
+                  'border-white/[0.06]': !price.isMostPopular,
                 }
               )}
             >
               <div className="flex items-center">
                 <div className="ml-2">
                   <h2 className="text-base font-semibold leading-7">{price.name}</h2>
-                  <p className="h-12 text-sm leading-5 text-gray-400">{price.description}</p>
+                  <p className="h-12 text-sm leading-5 text-gray-300">{price.description}</p>
                 </div>
               </div>
 
@@ -999,14 +999,14 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
 
             {/* Center CTA Overlay */}
             <div className="absolute z-10">
-              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#0a0a0f]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
+              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#0f1117]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
                 <BarChart3 className="mx-auto size-16 text-white lg:size-24" />
               </div>
               <div className="z-10 mt-4 flex flex-col items-center text-center text-white">
-                <h1 className="text-3xl font-bold lg:text-4xl">
+                <h1 className="text-3xl font-semibold lg:text-4xl">
                   Bereit für smartes Controlling?
                 </h1>
-                <p className="mt-2 text-gray-400">
+                <p className="mt-2 text-gray-300">
                   Starten Sie jetzt kostenlos. Keine Kreditkarte nötig.
                 </p>
                 <button
@@ -1017,15 +1017,15 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
                 </button>
               </div>
-              <div className="absolute inset-0 -z-10 rounded-full bg-[#0a0a0f] opacity-40 blur-xl" />
+              <div className="absolute inset-0 -z-10 rounded-full bg-[#0f1117] opacity-40 blur-xl" />
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#0a0a0f] to-70%" />
+            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#0f1117] to-70%" />
           </div>
         </div>
       </section>
 
       {/* ═══════════ FOOTER ═══════════ */}
-      <footer id="contact">
+      <footer id="contact" className="bg-[#0c0e14]">
         <div className="mx-auto w-full max-w-screen-xl xl:pb-2">
           <div className="md:flex md:justify-between px-8 p-4 py-16 sm:pb-16 gap-4">
             <div className="mb-12 flex-col flex gap-4">
@@ -1062,7 +1062,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border-t border-white/10 py-4 px-8 gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border-t border-white/[0.06] py-4 px-8 gap-2">
             <span className="text-sm text-gray-500">
               Copyright © {new Date().getFullYear()}{' '}
               <span className="cursor-pointer">Premium Controlling</span>. Alle Rechte vorbehalten.

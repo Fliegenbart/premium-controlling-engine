@@ -381,12 +381,12 @@ export default function Home() {
 
   // Main App
   return (
-    <main className="min-h-screen bg-[#0a0a0f] relative">
+    <main className="min-h-screen bg-[#0f1117] mesh-gradient noise-overlay relative">
       {/* Subtle Particles Background */}
       <Particles
         className="fixed inset-0 z-0 pointer-events-none"
-        quantity={30}
-        color="#3b82f6"
+        quantity={12}
+        color="#4b5563"
         staticity={80}
         size={0.3}
       />
@@ -404,7 +404,7 @@ export default function Home() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="relative bg-[#12121a]/80 backdrop-blur-2xl border-b border-white/[0.06] sticky top-0 z-50"
+        className="relative bg-[#0f1117]/60 backdrop-blur-2xl border-b border-white/[0.04] sticky top-0 z-50"
       >
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
         <div className="max-w-7xl mx-auto px-6 py-3">
@@ -419,13 +419,13 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white tracking-tight">Premium Controlling</h1>
+                  <h1 className="text-xl font-semibold text-white tracking-[-0.02em]">Premium Controlling</h1>
                   <p className="text-[10px] text-gray-500 tracking-wide uppercase">für den Mittelstand</p>
                 </div>
               </button>
 
               {/* Mode Toggle with animated indicator */}
-              <div className="hidden md:flex bg-white/[0.03] rounded-xl p-1 ml-8 border border-white/[0.06]">
+              <div className="hidden md:flex bg-white/[0.04] rounded-xl p-1 ml-8 border border-white/[0.05]">
                 {modeTabs.map((tab) => (
                   <button
                     key={tab.key}
@@ -435,7 +435,7 @@ export default function Home() {
                     {mode === tab.key && (
                       <motion.div
                         layoutId="activeMode"
-                        className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-cyan-600/90 rounded-lg shadow-lg shadow-blue-500/20"
+                        className="absolute inset-0 bg-gradient-to-r from-blue-500/80 to-cyan-500/80 rounded-lg shadow-glow-blue"
                         transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                       />
                     )}
@@ -450,7 +450,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               {/* Workflow Status */}
               {hasValidData && (
-                <div className="flex items-center gap-1 bg-white/[0.03] rounded-lg p-1 border border-white/[0.06]">
+                <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg p-1 border border-white/[0.05]">
                   {(['draft', 'review', 'approved'] as WorkflowStatus[]).map(status => (
                     <button
                       key={status}
@@ -516,12 +516,12 @@ export default function Home() {
             transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <div className="bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-8 text-center">
+            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-8 text-center">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/20">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Multi-Perioden Trendanalyse</h2>
-              <p className="text-gray-400 mb-6 max-w-lg mx-auto">
+              <h2 className="text-2xl font-semibold text-white mb-2 tracking-tight">Multi-Perioden Trendanalyse</h2>
+              <p className="text-gray-300 mb-6 max-w-lg mx-auto">
                 Laden Sie Buchungsdaten aus mehreren Jahren hoch, um CAGR, Volatilität, Forecasts und Anomalien über 3-5 Perioden zu analysieren.
               </p>
               <p className="text-gray-500 text-sm">
@@ -588,13 +588,13 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 mb-8"
+            className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-6 mb-8"
           >
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 tracking-tight">
               <BarChart3 className="w-5 h-5 text-pink-400" />
               Plan vs. Ist vs. Vorjahr
             </h2>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-gray-300 text-sm mb-6">
               Vergleiche Plan-Daten mit Ist-Buchungen und Vorjahr. Nur Ist ist Pflicht - ohne VJ/Plan wird automatisch verglichen.
             </p>
             <TripleUpload
@@ -613,10 +613,10 @@ export default function Home() {
           transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
         <BlurFade delay={0.05} inView>
-        <div className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 mb-8 overflow-hidden">
+        <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-6 mb-8 overflow-hidden">
           <BorderBeam size={150} duration={20} colorFrom="#ec4899" colorTo="#8b5cf6" />
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 tracking-tight">
               {useMagicUpload ? (
                 <>
                   <Sparkles className="w-5 h-5 text-pink-400" />
@@ -646,7 +646,7 @@ export default function Home() {
           {/* Magic Upload Mode */}
           {mode === 'single' && useMagicUpload && (
             <div className="space-y-4">
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-300 text-sm">
                 Laden Sie Ihre Dateien hoch – SAP, DATEV oder CSV wird automatisch erkannt und geparst.
               </p>
               <div className="grid md:grid-cols-2 gap-4">
@@ -688,7 +688,7 @@ export default function Home() {
           {(!useMagicUpload || mode === 'multi') && (
           <div className="space-y-4">
             {entities.map((entity) => (
-              <div key={entity.id} className="bg-white/5 rounded-xl p-4 border border-white/5">
+              <div key={entity.id} className="bg-white/[0.015] rounded-xl p-4 border border-white/[0.04]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     {mode === 'multi' ? (
@@ -794,7 +794,7 @@ export default function Home() {
                 <button
                   onClick={() => downloadReport('word')}
                   disabled={isGeneratingReport}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/30 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
+                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-blue-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
                   <FileText className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
                   Word
@@ -802,7 +802,7 @@ export default function Home() {
                 <button
                   onClick={() => downloadReport('excel')}
                   disabled={isGeneratingReport}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-green-500/30 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
+                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-green-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
                   <FileSpreadsheet className="w-5 h-5 text-green-400 group-hover:scale-110 transition-transform" />
                   Excel
@@ -817,7 +817,7 @@ export default function Home() {
                       }
                     }
                   }}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-yellow-500/30 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
+                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-yellow-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
                   <Save className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
                   Speichern
@@ -841,15 +841,15 @@ export default function Home() {
           >
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-4">
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Plan</p>
                 <p className="text-xl font-bold text-blue-400">{formatCurrency(tripleResult.meta.total_plan)}</p>
               </motion.div>
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-4">
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Ist</p>
                 <p className="text-xl font-bold text-white">{formatCurrency(tripleResult.meta.total_ist)}</p>
               </motion.div>
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-4">
+              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
                 <p className="text-xl font-bold text-gray-400">{formatCurrency(tripleResult.meta.total_vj)}</p>
               </motion.div>
@@ -867,7 +867,7 @@ export default function Home() {
             </div>
 
             {/* Triple Comparison Table */}
-            <div className="bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6">
+            <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-6">
               <TripleComparisonTable
                 result={tripleResult}
                 onShowEvidence={(deviation: TripleAccountDeviation) => {
@@ -942,27 +942,27 @@ export default function Home() {
             {/* KPI Cards with NumberTicker */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <BlurFade delay={0.05} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={80} duration={12} colorFrom="#3b82f6" colorTo="#8b5cf6" />
-                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
                 <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={mode === 'multi' ? (konzernResult?.entities.length ?? 0) : currentResult.meta.bookings_prev} />
                 </p>
               </motion.div>
               </BlurFade>
               <BlurFade delay={0.1} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={80} duration={12} delay={3} colorFrom="#3b82f6" colorTo="#06b6d4" />
-                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Vorjahr</p>
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Vorjahr</p>
                 <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_prev)} prefix="" suffix=" €" />
                 </p>
               </motion.div>
               </BlurFade>
               <BlurFade delay={0.15} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={80} duration={12} delay={6} colorFrom="#06b6d4" colorTo="#22c55e" />
-                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Aktuell</p>
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Aktuell</p>
                 <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_curr)} prefix="" suffix=" €" />
                 </p>
@@ -973,7 +973,7 @@ export default function Home() {
                 currentResult.summary.total_delta > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
                 <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#06b6d4'} />
-                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Abweichung</p>
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Abweichung</p>
                 <p className={`text-2xl font-bold flex items-center gap-2 tracking-tight ${
                   currentResult.summary.total_delta > 0 ? 'text-red-400' : 'text-green-400'
                 }`}>
@@ -987,15 +987,15 @@ export default function Home() {
             {/* Charts */}
             <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
+              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={100} duration={15} colorFrom="#3b82f6" colorTo="#06b6d4" />
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
                   <BarChart3 className="w-5 h-5 text-blue-400" />
                   {mode === 'multi' ? 'Gesellschaften' : 'Top Abweichungen'}
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={mode === 'multi' ? benchmarkChartData : topDeviationsData} layout="vertical" margin={{ left: 10, right: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f1f2e" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
                     <YAxis type="category" dataKey="name" tick={{ fill: '#9ca3af', fontSize: 11 }} width={100} />
                     <Tooltip formatter={(v) => formatCurrency(v as number)} contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #2d2d44', borderRadius: '8px' }} labelStyle={{ color: '#fff' }} />
@@ -1008,9 +1008,9 @@ export default function Home() {
                 </ResponsiveContainer>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
+              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
                 <BorderBeam size={100} duration={15} delay={7} colorFrom="#8b5cf6" colorTo="#ec4899" />
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <h3 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
                   <PieChart className="w-5 h-5 text-purple-400" />
                   Verteilung
                 </h3>
@@ -1034,7 +1034,7 @@ export default function Home() {
 
             {/* Tabs */}
             <BlurFade delay={0.3} inView>
-            <div className="relative bg-[#12121a]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] overflow-hidden">
+            <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] overflow-hidden">
               <BorderBeam size={200} duration={25} colorFrom="#3b82f6" colorTo="#22c55e" />
               <div className="flex border-b border-white/[0.06]">
                 {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
@@ -1067,7 +1067,7 @@ export default function Home() {
               <div className="p-6">
                 {activeTab === 'overview' && (
                   <div className="space-y-3">
-                    <h4 className="text-white font-medium mb-4 flex items-center gap-2">
+                    <h4 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
                       <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500" />
                       Signifikante Abweichungen
                     </h4>
@@ -1076,7 +1076,7 @@ export default function Home() {
                       <div className="space-y-2">
                         <button
                           onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
-                          className="w-full flex items-center justify-between bg-white/[0.03] hover:bg-white/[0.08] border border-transparent hover:border-white/10 rounded-xl p-4 transition-all text-left group"
+                          className="w-full flex items-center justify-between bg-white/[0.015] hover:bg-white/[0.04] border border-transparent hover:border-white/[0.06] rounded-xl p-4 transition-all text-left group"
                         >
                           <div>
                             <div className="flex items-center gap-2">
@@ -1142,10 +1142,10 @@ export default function Home() {
                       </thead>
                       <tbody className="text-sm">
                         {currentResult.by_account?.slice(0, 15).map((acc, idx) => (
-                          <tr key={idx} className={`border-t border-white/5 hover:bg-white/[0.06] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.02]' : ''}`}>
+                          <tr key={idx} className={`border-t border-white/[0.04] hover:bg-white/[0.04] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.015]' : ''}`}>
                             <td className="py-3.5 text-gray-500 font-mono text-xs">{acc.account}</td>
                             <td className="py-3.5 text-white">{acc.account_name}</td>
-                            <td className="py-3.5 text-right text-gray-400 tabular-nums">{formatCurrency(acc.amount_prev)}</td>
+                            <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(acc.amount_prev)}</td>
                             <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(acc.amount_curr)}</td>
                             <td className={`py-3.5 text-right font-semibold tabular-nums ${acc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
                               {formatCurrency(acc.delta_abs)}
@@ -1178,7 +1178,7 @@ export default function Home() {
                       </thead>
                       <tbody className="text-sm">
                         {currentResult.by_cost_center?.slice(0, 15).map((cc, idx) => (
-                          <tr key={idx} className={`border-t border-white/5 hover:bg-white/[0.06] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.02]' : ''}`}>
+                          <tr key={idx} className={`border-t border-white/[0.04] hover:bg-white/[0.04] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.015]' : ''}`}>
                             <td className="py-3.5 text-white font-medium">{cc.cost_center || '(keine)'}</td>
                             <td className="py-3.5 text-right text-gray-400 tabular-nums">{formatCurrency(cc.amount_prev)}</td>
                             <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(cc.amount_curr)}</td>
@@ -1200,8 +1200,8 @@ export default function Home() {
                         <Link2 className="w-10 h-10 text-blue-400" />
                       </div>
                     </div>
-                    <h4 className="text-white font-semibold text-lg mb-3">Evidence Trail</h4>
-                    <p className="text-gray-400 max-w-md mx-auto leading-relaxed">
+                    <h4 className="text-white font-semibold text-lg mb-3 tracking-tight">Evidence Trail</h4>
+                    <p className="text-gray-300 max-w-md mx-auto leading-relaxed">
                       Klicke auf eine Abweichung in der Übersicht oder Konten-Tabelle,
                       um die verknüpften Buchungen bis auf Belegebene nachzuverfolgen.
                     </p>

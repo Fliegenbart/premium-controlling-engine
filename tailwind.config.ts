@@ -8,6 +8,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        premium: {
+          bg: 'rgb(var(--bg-primary))',
+          elevated: 'rgb(var(--bg-elevated))',
+          surface: 'rgb(var(--bg-surface))',
+        },
+      },
+      boxShadow: {
+        'glow-sm': 'inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+        'glow-md': 'inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 1px 3px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08)',
+        'glow-lg': 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 2px 4px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.12)',
+        'glow-blue': '0 0 20px rgba(59, 130, 246, 0.15), 0 0 40px rgba(59, 130, 246, 0.05)',
+        'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.15), 0 0 40px rgba(6, 182, 212, 0.05)',
+      },
       animation: {
         "gradient": "gradient 8s linear infinite",
         "shimmer-slide": "shimmer-slide var(--speed) ease-in-out infinite alternate",
@@ -20,6 +34,7 @@ const config: Config = {
         "shimmer": "shimmer 8s infinite",
         "marquee": "marquee var(--duration) infinite linear",
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
+        "mesh-pulse": "mesh-pulse 8s ease-in-out infinite",
       },
       keyframes: {
         "gradient": {
@@ -105,6 +120,10 @@ const config: Config = {
         "marquee-vertical": {
           from: { transform: "translateY(0)" },
           to: { transform: "translateY(calc(-100% - var(--gap)))" },
+        },
+        "mesh-pulse": {
+          "0%, 100%": { opacity: "0.6" },
+          "50%": { opacity: "1" },
         },
       },
     },
