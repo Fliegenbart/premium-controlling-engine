@@ -290,15 +290,14 @@ export async function analyzeVariance(
   `);
 
   return result.rows.map((row) => ({
-    dimension: 'account',
-    key: String(row.account),
-    label: String(row.account_name),
-    amountPrev: Number(row.amount_prev),
-    amountCurr: Number(row.amount_curr),
-    deltaAbs: Number(row.delta_abs),
-    deltaPct: Number(row.delta_pct),
-    bookingsPrev: Number(row.bookings_prev),
-    bookingsCurr: Number(row.bookings_curr),
+    account: Number(row.account),
+    account_name: String(row.account_name),
+    amount_prev: Number(row.amount_prev),
+    amount_curr: Number(row.amount_curr),
+    variance: Number(row.delta_abs),
+    variance_pct: Number(row.delta_pct),
+    bookings_prev: Number(row.bookings_prev),
+    bookings_curr: Number(row.bookings_curr),
   }));
 }
 
@@ -323,10 +322,10 @@ export async function getTopBookings(
     amount: Number(r.amount),
     account: Number(r.account),
     account_name: String(r.account_name),
-    cost_center: r.cost_center ? String(r.cost_center) : undefined,
-    profit_center: r.profit_center ? String(r.profit_center) : undefined,
-    vendor: r.vendor ? String(r.vendor) : undefined,
-    customer: r.customer ? String(r.customer) : undefined,
+    cost_center: r.cost_center ? String(r.cost_center) : '',
+    profit_center: r.profit_center ? String(r.profit_center) : '',
+    vendor: r.vendor ? String(r.vendor) : null,
+    customer: r.customer ? String(r.customer) : null,
     document_no: String(r.document_no),
     text: String(r.text),
   }));

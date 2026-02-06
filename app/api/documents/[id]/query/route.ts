@@ -5,21 +5,32 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getDocument, searchDocument, quickSearch } from '@/lib/doc-index';
+import { documentQuerySchema } from '@/lib/validation';
+import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
+import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const requestId = getRequestId();
   try {
+    const tokenError = requireDocumentToken(request);
+    if (tokenError) return tokenError;
+
+    const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const { id } = await params;
     const body = await request.json();
-    const { query, apiKey, quick } = body;
+    const parsed = documentQuerySchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonError('Ungültige Anfrage', 400, requestId);
+    }
+    const { query, quick } = parsed.data;
 
     if (!query || typeof query !== 'string') {
-      return NextResponse.json(
-        { error: 'Frage ist erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Frage ist erforderlich', 400, requestId);
     }
 
     const document = getDocument(id);
@@ -44,16 +55,14 @@ export async function POST(
       });
     }
 
-    // Full reasoning search (requires API key)
-    const key = apiKey || process.env.ANTHROPIC_API_KEY;
-    if (!key) {
-      return NextResponse.json(
-        { error: 'API-Key erforderlich für intelligente Suche' },
-        { status: 400 }
-      );
+    // Full reasoning search (requires LLM)
+    const llm = getHybridLLMService();
+    const status = await llm.getStatus();
+    if (status.activeProvider === 'none') {
+      return jsonError('Kein LLM verfügbar. Bitte Ollama starten.', 503, requestId);
     }
 
-    const result = await searchDocument(document, query, key);
+    const result = await searchDocument(document, query);
 
     return NextResponse.json({
       query: result.query,
@@ -68,10 +77,7 @@ export async function POST(
       reasoning_trace: result.reasoning_trace,
     });
   } catch (error) {
-    console.error('Document query error:', error);
-    return NextResponse.json(
-      { error: 'Fehler bei der Suche: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Document query error:', requestId, sanitizeError(error));
+    return jsonError('Fehler bei der Suche.', 500, requestId);
   }
 }

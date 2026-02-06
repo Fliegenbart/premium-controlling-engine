@@ -1,7 +1,7 @@
 /**
  * Enhanced Analysis API with Domain-RAG and Hybrid LLM
  * - Uses SKR03 knowledge base for context
- * - Supports both Claude (cloud) and Ollama (local)
+ * - Local only (Ollama)
  * - Automatic red flag detection
  */
 
@@ -10,42 +10,47 @@ import { analyzeBookings, parseCSV } from '@/lib/analysis';
 import { getKnowledgeService, RedFlagResult } from '@/lib/rag/knowledge-service';
 import { getHybridLLMService, LLMResponse } from '@/lib/llm/hybrid-service';
 import { AnalysisResult, AccountDeviation } from '@/lib/types';
+import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 interface EnhancedDeviation extends AccountDeviation {
   ragContext?: string;
   redFlags?: RedFlagResult[];
   aiComment?: string;
-  aiProvider?: 'claude' | 'ollama';
+  aiProvider?: 'ollama';
   aiLatencyMs?: number;
 }
 
 interface EnhancedAnalysisResult extends AnalysisResult {
   by_account: EnhancedDeviation[];
   llmStatus?: {
-    provider: 'claude' | 'ollama' | 'none';
+    provider: 'ollama' | 'none';
     ollamaAvailable: boolean;
   };
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const rateLimit = enforceRateLimit(request, { limit: 8, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const formData = await request.formData();
     const prevFile = formData.get('prevFile') as File;
     const currFile = formData.get('currFile') as File;
-    const apiKey = formData.get('apiKey') as string | null;
     const periodPrev = (formData.get('periodPrev') as string) || 'Vorjahr';
     const periodCurr = (formData.get('periodCurr') as string) || 'Aktuelles Jahr';
     const wesentlichkeitAbs = parseInt(formData.get('wesentlichkeitAbs') as string) || 5000;
     const wesentlichkeitPct = parseInt(formData.get('wesentlichkeitPct') as string) || 10;
     const useRAG = formData.get('useRAG') !== 'false'; // Default: true
     const useAI = formData.get('useAI') !== 'false'; // Default: true
-    const forceProvider = formData.get('forceProvider') as 'claude' | 'ollama' | null;
+    // forceProvider ignored (local-only)
 
     if (!prevFile || !currFile) {
-      return NextResponse.json(
-        { error: 'Beide CSV-Dateien sind erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Beide CSV-Dateien sind erforderlich', 400, requestId);
+    }
+    if (prevFile.size > 50 * 1024 * 1024 || currFile.size > 50 * 1024 * 1024) {
+      return jsonError('CSV-Datei zu groß (max. 50MB)', 400, requestId);
     }
 
     // Parse CSV files
@@ -55,10 +60,7 @@ export async function POST(request: NextRequest) {
     const currBookings = parseCSV(currText);
 
     if (prevBookings.length === 0 || currBookings.length === 0) {
-      return NextResponse.json(
-        { error: 'CSV-Dateien konnten nicht gelesen werden oder sind leer' },
-        { status: 400 }
-      );
+      return jsonError('CSV-Dateien konnten nicht gelesen werden oder sind leer', 400, requestId);
     }
 
     // Run base analysis
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     // Initialize services
     const knowledge = getKnowledgeService();
-    const llm = getHybridLLMService({ claudeApiKey: apiKey || undefined });
+    const llm = getHybridLLMService();
 
     // Get LLM status
     const llmStatus = await llm.getStatus();
@@ -134,13 +136,12 @@ export async function POST(request: NextRequest) {
       }
 
       // Generate AI comment with RAG context
-      if (useAI && (apiKey || llmStatus.ollamaAvailable)) {
+      if (useAI && llmStatus.activeProvider !== 'none') {
         try {
           const aiResponse = await generateRAGComment(
             enhanced,
             result.meta,
-            llm,
-            forceProvider || undefined
+            llm
           );
 
           enhanced.aiComment = aiResponse.text;
@@ -165,26 +166,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Analysis error:', error);
-    return NextResponse.json(
-      { error: 'Fehler bei der Analyse: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Analysis error:', requestId, sanitizeError(error));
+    return jsonError('Fehler bei der Analyse.', 500, requestId);
   }
 }
 
 async function generateRAGComment(
   deviation: EnhancedDeviation,
   meta: { period_prev: string; period_curr: string },
-  llm: ReturnType<typeof getHybridLLMService>,
-  forceProvider?: 'claude' | 'ollama'
+  llm: ReturnType<typeof getHybridLLMService>
 ): Promise<LLMResponse> {
   const isExpense = deviation.account >= 5000;
 
   // Build top bookings context
   const topBookingsContext = deviation.top_bookings_curr
     ?.slice(0, 5)
-    .map(b => `- ${b.date}: "${b.text}" (Beleg: ${b.document_no}) - ${formatCurrency(b.amount)}`)
+    .map(b => `- ${sanitizeForPrompt(b.date, 20)}: "${sanitizeForPrompt(b.text || '', 140)}" (Beleg: ${sanitizeForPrompt(b.document_no || '', 40)}) - ${formatCurrency(b.amount)}`)
     .join('\n') || 'Keine Details verfügbar';
 
   // Build new/missing bookings context
@@ -193,14 +190,14 @@ async function generateRAGComment(
     changeContext += '\n\nNeue Buchungsarten im aktuellen Jahr:\n';
     changeContext += deviation.new_bookings
       .slice(0, 3)
-      .map(b => `- "${b.text}" (${b.vendor || 'k.A.'}): ${formatCurrency(b.amount)}`)
+      .map(b => `- "${sanitizeForPrompt(b.text || '', 140)}" (${sanitizeForPrompt(b.vendor || 'k.A.', 60)}): ${formatCurrency(b.amount)}`)
       .join('\n');
   }
   if (deviation.missing_bookings && deviation.missing_bookings.length > 0) {
     changeContext += '\n\nIm Vorjahr vorhanden, jetzt fehlend:\n';
     changeContext += deviation.missing_bookings
       .slice(0, 3)
-      .map(b => `- "${b.text}" (${b.vendor || 'k.A.'}): ${formatCurrency(b.amount)}`)
+      .map(b => `- "${sanitizeForPrompt(b.text || '', 140)}" (${sanitizeForPrompt(b.vendor || 'k.A.', 60)}): ${formatCurrency(b.amount)}`)
       .join('\n');
   }
 
@@ -218,21 +215,22 @@ Du analysierst Abweichungen zwischen Perioden und gibst präzise, faktenbasierte
 Beziehe dich auf konkrete Belegnummern aus den Buchungen.
 Schreibe auf Deutsch, professionell aber verständlich.`;
 
-  const prompt = `Analysiere diese Abweichung und erstelle einen kurzen Kommentar (3-4 Sätze):
+  const prompt = `Analysiere diese Abweichung und erstelle einen kurzen Kommentar (3-4 Sätze).
+${INJECTION_GUARD}
 
 ABWEICHUNGSDATEN:
-Konto: ${deviation.account} - ${deviation.account_name}
-${meta.period_prev}: ${formatCurrency(deviation.amount_prev)}
-${meta.period_curr}: ${formatCurrency(deviation.amount_curr)}
+Konto: ${deviation.account} - ${sanitizeForPrompt(deviation.account_name, 120)}
+${sanitizeForPrompt(meta.period_prev, 60)}: ${formatCurrency(deviation.amount_prev)}
+${sanitizeForPrompt(meta.period_curr, 60)}: ${formatCurrency(deviation.amount_curr)}
 Abweichung: ${formatCurrency(deviation.delta_abs)} (${deviation.delta_pct.toFixed(1)}%)
 Typ: ${isExpense ? 'Aufwandskonto' : 'Ertragskonto'}
 Anzahl Buchungen: ${deviation.bookings_count_prev || 0} → ${deviation.bookings_count_curr || 0}
 
 TOP BUCHUNGEN IM AKTUELLEN JAHR:
-${topBookingsContext}
-${changeContext}
-${deviation.ragContext || ''}
-${redFlagsContext}
+${wrapUntrusted('TOP BUCHUNGEN', topBookingsContext, 1600)}
+${wrapUntrusted('BUCHUNGSAENDERUNGEN', changeContext || 'Keine', 1600)}
+${sanitizeForPrompt(deviation.ragContext || '', 1200)}
+${sanitizeForPrompt(redFlagsContext || '', 800)}
 
 ANWEISUNGEN:
 1. Erkläre die Richtung der Abweichung (positiv/negativ für das Unternehmen)
@@ -246,7 +244,6 @@ Antworte NUR mit dem Kommentar, ohne Einleitung.`;
     systemPrompt,
     temperature: 0.3,
     maxTokens: 400,
-    forceProvider,
   });
 }
 

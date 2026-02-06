@@ -3,7 +3,8 @@
  * Mimics how a human expert would navigate a document
  */
 
-import Anthropic from '@anthropic-ai/sdk';
+import { getHybridLLMService, HybridLLMService } from '@/lib/llm/hybrid-service';
+import { INJECTION_GUARD, wrapUntrusted, sanitizeForPrompt } from '@/lib/prompt-utils';
 import {
   DocNode,
   IndexedDocument,
@@ -25,11 +26,10 @@ const DEFAULT_QUERY_CONFIG: QueryConfig = {
 export async function searchDocument(
   document: IndexedDocument,
   query: string,
-  apiKey: string,
   config: Partial<QueryConfig> = {}
 ): Promise<SearchResult> {
   const cfg = { ...DEFAULT_QUERY_CONFIG, ...config };
-  const client = new Anthropic({ apiKey });
+  const llm = getHybridLLMService();
 
   const reasoningTrace: ReasoningStep[] = [];
   const references: Reference[] = [];
@@ -52,7 +52,7 @@ export async function searchDocument(
 
   // Ask LLM to navigate
   const navigationResult = await navigateTree(
-    client,
+    llm,
     query,
     currentNode,
     treeOverview,
@@ -79,7 +79,7 @@ export async function searchDocument(
 
   // Step 3: Generate answer
   const answer = await generateAnswer(
-    client,
+    llm,
     query,
     relevantContent,
     targetNode,
@@ -152,19 +152,20 @@ interface NavigationResult {
  * Use LLM to navigate the tree
  */
 async function navigateTree(
-  client: Anthropic,
+  llm: HybridLLMService,
   query: string,
   rootNode: DocNode,
   treeOverview: string,
   startStep: number
 ): Promise<NavigationResult> {
   const prompt = `Du bist ein Experte für die Navigation in Dokumenten.
+${INJECTION_GUARD}
 
 DOKUMENTSTRUKTUR:
-${treeOverview}
+${wrapUntrusted('DOKUMENTSTRUKTUR', treeOverview, 8000)}
 
 FRAGE DES NUTZERS:
-${query}
+${wrapUntrusted('FRAGE', query, 2000)}
 
 AUFGABE:
 1. Analysiere die Dokumentstruktur
@@ -183,13 +184,12 @@ Antworte im folgenden JSON-Format:
 }`;
 
   try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await llm.generate(prompt, {
+      maxTokens: 1000,
+      temperature: 0.2,
     });
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+    const text = response.text || '';
 
     // Parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -262,21 +262,23 @@ function gatherRelevantContent(node: DocNode, document: IndexedDocument): string
  * Generate answer using LLM
  */
 async function generateAnswer(
-  client: Anthropic,
+  llm: HybridLLMService,
   query: string,
   content: string,
   node: DocNode,
   documentTitle: string
 ): Promise<string> {
   const prompt = `Du bist ein Finanz- und Controlling-Experte. Beantworte die folgende Frage basierend auf dem Dokumentinhalt.
+${INJECTION_GUARD}
 
-DOKUMENT: ${documentTitle}
-ABSCHNITT: ${node.title} (Seiten ${node.page_start}-${node.page_end})
+DOKUMENT: ${sanitizeForPrompt(documentTitle, 200)}
+ABSCHNITT: ${sanitizeForPrompt(node.title, 200)} (Seiten ${node.page_start}-${node.page_end})
 
 INHALT:
-${content}
+${wrapUntrusted('DOKUMENTINHALT', content, 12000)}
 
-FRAGE: ${query}
+FRAGE:
+${wrapUntrusted('FRAGE', query, 2000)}
 
 WICHTIG:
 - Antworte präzise und faktenbasiert
@@ -287,15 +289,12 @@ WICHTIG:
 Deine Antwort:`;
 
   try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await llm.generate(prompt, {
+      maxTokens: 1500,
+      temperature: 0.2,
     });
 
-    return response.content[0].type === 'text'
-      ? response.content[0].text
-      : 'Keine Antwort generiert.';
+    return response.text || 'Keine Antwort generiert.';
   } catch (error) {
     console.error('Answer generation error:', error);
     return 'Fehler bei der Antwortgenerierung.';

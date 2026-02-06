@@ -1,12 +1,17 @@
 /**
- * LLM Status API - Check availability of Claude and Ollama
+ * LLM Status API - Check availability of Ollama
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getHybridLLMService } from '@/lib/llm/hybrid-service';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const llm = getHybridLLMService();
     const status = await llm.getStatus();
 
@@ -14,27 +19,15 @@ export async function GET() {
       success: true,
       status: {
         ollamaAvailable: status.ollamaAvailable,
-        claudeAvailable: status.claudeAvailable,
         preferredProvider: status.preferredProvider,
         activeProvider: status.activeProvider,
         message: status.ollamaAvailable
           ? '🟢 Lokales LLM (Ollama) verfügbar - Daten bleiben On-Premise'
-          : status.claudeAvailable
-          ? '🟡 Cloud LLM (Claude) aktiv - Daten werden verschlüsselt übertragen'
           : '🔴 Kein LLM verfügbar - Nur regelbasierte Kommentare',
       },
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: (error as Error).message,
-      status: {
-        ollamaAvailable: false,
-        claudeAvailable: false,
-        preferredProvider: 'none',
-        activeProvider: 'none',
-        message: '🔴 Fehler beim Prüfen der LLM-Verfügbarkeit',
-      },
-    });
+    console.error('LLM status error:', requestId, sanitizeError(error));
+    return jsonError('Fehler beim Prüfen der LLM-Verfügbarkeit', 500, requestId);
   }
 }

@@ -3,6 +3,7 @@
 import { SavedAnalysis, AnalysisResult, LabKPIs } from './types';
 
 const STORAGE_KEY = 'patrick_controlling_analyses';
+const STORAGE_ENABLED = process.env.NEXT_PUBLIC_ENABLE_LOCAL_STORAGE !== 'false';
 
 // Generate unique ID
 function generateId(): string {
@@ -12,6 +13,7 @@ function generateId(): string {
 // Get all saved analyses
 export function getSavedAnalyses(): SavedAnalysis[] {
   if (typeof window === 'undefined') return [];
+  if (!STORAGE_ENABLED) return [];
 
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -47,6 +49,10 @@ export function saveAnalysis(
     workflow_status: 'draft',
   };
 
+  if (!STORAGE_ENABLED) {
+    return analysis;
+  }
+
   const existing = getSavedAnalyses();
   existing.unshift(analysis);
 
@@ -69,6 +75,7 @@ export function saveAnalysis(
 
 // Update an existing analysis
 export function updateAnalysis(id: string, updates: Partial<SavedAnalysis>): SavedAnalysis | null {
+  if (!STORAGE_ENABLED) return null;
   const analyses = getSavedAnalyses();
   const index = analyses.findIndex(a => a.id === id);
 
@@ -104,6 +111,7 @@ export function updateWorkflowStatus(
 
 // Delete an analysis
 export function deleteAnalysis(id: string): boolean {
+  if (!STORAGE_ENABLED) return false;
   const analyses = getSavedAnalyses();
   const filtered = analyses.filter(a => a.id !== id);
 
@@ -120,18 +128,21 @@ export function deleteAnalysis(id: string): boolean {
 
 // Get a single analysis by ID
 export function getAnalysisById(id: string): SavedAnalysis | null {
+  if (!STORAGE_ENABLED) return null;
   const analyses = getSavedAnalyses();
   return analyses.find(a => a.id === id) || null;
 }
 
 // Export all analyses as JSON
 export function exportAnalyses(): string {
+  if (!STORAGE_ENABLED) return '[]';
   const analyses = getSavedAnalyses();
   return JSON.stringify(analyses, null, 2);
 }
 
 // Import analyses from JSON
 export function importAnalyses(jsonString: string): number {
+  if (!STORAGE_ENABLED) return 0;
   try {
     const imported = JSON.parse(jsonString) as SavedAnalysis[];
     if (!Array.isArray(imported)) throw new Error('Invalid format');
@@ -153,5 +164,6 @@ export function importAnalyses(jsonString: string): number {
 
 // Clear all saved analyses
 export function clearAllAnalyses(): void {
+  if (!STORAGE_ENABLED) return;
   localStorage.removeItem(STORAGE_KEY);
 }

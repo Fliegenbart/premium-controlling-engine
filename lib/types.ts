@@ -78,6 +78,8 @@ export interface AnalysisResult {
     wesentlichkeit_abs: number;
     wesentlichkeit_pct: number;
     entity?: string;
+    analyzed_at?: string;
+    engine_version?: string;
   };
   summary: {
     total_delta: number;
@@ -96,8 +98,6 @@ export interface AnalysisConfig {
   wesentlichkeit_pct: number;
   period_prev_name: string;
   period_curr_name: string;
-  use_ai_comments: boolean;
-  api_key?: string;
 }
 
 // Multi-Entity Types
@@ -324,11 +324,24 @@ export interface PlanData {
 
 export interface DataProfile {
   rowCount: number;
-  totalAmount: number;
-  dateRange: { from: string; to: string };
-  accountCount: number;
-  costCenterCount: number;
-  columns: string[];
+  uniqueAccounts: number;
+  uniqueCostCenters: number;
+  uniqueDocuments: number;
+  dateRange: { min: string; max: string };
+  totals: {
+    all: number;
+    credits: number;
+    debits: number;
+    balanced: boolean;
+  };
+  quality: {
+    nullAmounts: number;
+    nullDates: number;
+    nullAccounts: number;
+    duplicateDocuments: number;
+    outlierCount: number;
+  };
+  warnings: string[];
 }
 
 export interface UploadResponse {
@@ -345,13 +358,16 @@ export interface UploadResponse {
 export interface SQLQueryRequest {
   sql: string;
   format?: 'json' | 'csv';
+  explain?: boolean;
 }
 
 export interface SQLQueryResponse {
+  success: boolean;
   columns: string[];
   rows: Record<string, unknown>[];
   rowCount: number;
-  executionTime: number;
+  executionTimeMs: number;
+  error?: string;
 }
 
 export interface VarianceResult {
@@ -361,6 +377,8 @@ export interface VarianceResult {
   amount_curr: number;
   variance: number;
   variance_pct: number;
+  bookings_prev?: number;
+  bookings_curr?: number;
 }
 
 export interface VarianceDriver {
@@ -377,45 +395,57 @@ export interface TimeSeriesPoint {
 
 // Agent Types
 export interface AgentResponse {
-  type: 'thinking' | 'tool_call' | 'result' | 'error';
-  content: string;
-  tool?: string;
-  toolInput?: Record<string, unknown>;
-  toolResult?: unknown;
-  sources?: Source[];
-  timestamp: string;
+  answer: string;
+  confidence: number;
+  sources: Source[];
+  toolCalls: ToolCall[];
+  mode?: 'local' | 'cloud';
+  model?: string;
 }
 
 export interface Source {
-  type: 'booking' | 'account' | 'document' | 'calculation';
+  type: 'query' | 'booking' | 'account' | 'document' | 'calculation';
   reference: string;
-  description: string;
+  excerpt?: string;
+  description?: string;
   value?: number;
 }
 
 export interface ToolCall {
-  name: string;
+  tool: string;
   input: Record<string, unknown>;
   output?: unknown;
+  executionTimeMs?: number;
+  error?: string;
+  name?: string;
 }
 
 export interface AnalysisPlan {
-  goal: string;
+  query: string;
+  intent: string;
   steps: PlanStep[];
-  reasoning: string;
+  estimatedCalls: number;
 }
 
 export interface PlanStep {
+  step: number;
   action: string;
   tool: string;
-  params: Record<string, unknown>;
-  expectedOutput: string;
+  rationale: string;
 }
 
 export interface AccountKnowledge {
   account: number;
-  name: string;
-  category: string;
+  account_name: string;
+  name?: string;
+  category: 'revenue' | 'expense' | string;
+  typical_behavior?: string;
+  seasonality?: string;
+  benchmarks?: {
+    absoluteThreshold?: number;
+    revenueRatio?: { min: number; max: number };
+  };
+  related_accounts?: number[];
   typical_range?: { min: number; max: number };
   notes?: string;
 }

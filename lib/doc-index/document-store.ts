@@ -9,6 +9,19 @@ import { parsePDF } from './pdf-parser';
 // In-memory store (in production, use database)
 const documents = new Map<string, IndexedDocument>();
 
+const DEFAULT_MAX_DOCS = 20;
+const DEFAULT_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+const MAX_DOCUMENTS = getNumberEnv('DOCUMENT_MAX_COUNT', DEFAULT_MAX_DOCS);
+const DOCUMENT_TTL_MS = getNumberEnv('DOCUMENT_TTL_MS', DEFAULT_TTL_MS);
+
+function getNumberEnv(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 /**
  * Index a new document from PDF buffer
  */
@@ -17,6 +30,7 @@ export async function indexDocument(
   filename: string
 ): Promise<IndexedDocument> {
   const id = generateDocumentId();
+  const now = new Date().toISOString();
 
   // Parse PDF into tree structure
   const tree = await parsePDF(buffer, filename);
@@ -33,13 +47,16 @@ export async function indexDocument(
     title: tree.title,
     description: tree.summary,
     total_pages: tree.page_end,
-    indexed_at: new Date().toISOString(),
+    indexed_at: now,
+    last_accessed_at: now,
     tree,
     node_index: nodeIndex,
     page_index: pageIndex,
   };
 
   documents.set(id, doc);
+  pruneExpired();
+  evictIfNeeded();
 
   return doc;
 }
@@ -48,13 +65,22 @@ export async function indexDocument(
  * Get document by ID
  */
 export function getDocument(id: string): IndexedDocument | null {
-  return documents.get(id) || null;
+  pruneExpired();
+  const doc = documents.get(id);
+  if (!doc) return null;
+  if (isExpired(doc)) {
+    documents.delete(id);
+    return null;
+  }
+  touchDocument(doc);
+  return doc;
 }
 
 /**
  * List all documents (metadata only)
  */
 export function listDocuments(): DocumentMeta[] {
+  pruneExpired();
   return Array.from(documents.values()).map(doc => ({
     id: doc.id,
     filename: doc.filename,
@@ -76,7 +102,7 @@ export function deleteDocument(id: string): boolean {
  * Get document tree structure (without full content)
  */
 export function getDocumentTree(id: string): DocNode | null {
-  const doc = documents.get(id);
+  const doc = getDocument(id);
   if (!doc) return null;
 
   // Return tree without full content (for UI display)
@@ -87,7 +113,7 @@ export function getDocumentTree(id: string): DocNode | null {
  * Get specific node by ID
  */
 export function getNode(documentId: string, nodeId: string): DocNode | null {
-  const doc = documents.get(documentId);
+  const doc = getDocument(documentId);
   if (!doc) return null;
 
   return doc.node_index.get(nodeId) || null;
@@ -97,7 +123,7 @@ export function getNode(documentId: string, nodeId: string): DocNode | null {
  * Get nodes for a specific page
  */
 export function getNodesForPage(documentId: string, page: number): DocNode[] {
-  const doc = documents.get(documentId);
+  const doc = getDocument(documentId);
   if (!doc) return [];
 
   const nodeIds = doc.page_index.get(page) || [];
@@ -113,6 +139,8 @@ export function searchAllDocuments(query: string): {
   node: DocNode;
   score: number;
 }[] {
+  pruneExpired();
+
   const results: {
     documentId: string;
     documentTitle: string;
@@ -123,8 +151,13 @@ export function searchAllDocuments(query: string): {
   const queryTerms = query.toLowerCase().split(/\s+/);
 
   for (const [docId, doc] of documents) {
+    if (isExpired(doc)) {
+      documents.delete(docId);
+      continue;
+    }
     const docResults = searchInTree(doc.tree, queryTerms);
     for (const { node, score } of docResults) {
+      touchDocument(doc);
       results.push({
         documentId: docId,
         documentTitle: doc.title,
@@ -237,6 +270,44 @@ export function exportStore(): string {
   }
 
   return JSON.stringify(data);
+}
+
+function touchDocument(doc: IndexedDocument): void {
+  doc.last_accessed_at = new Date().toISOString();
+}
+
+function isExpired(doc: IndexedDocument): boolean {
+  if (DOCUMENT_TTL_MS <= 0) return false;
+  const last = doc.last_accessed_at || doc.indexed_at;
+  const ts = Date.parse(last);
+  if (!Number.isFinite(ts)) return false;
+  return Date.now() - ts > DOCUMENT_TTL_MS;
+}
+
+function pruneExpired(): void {
+  if (DOCUMENT_TTL_MS <= 0) return;
+  for (const [id, doc] of documents.entries()) {
+    if (isExpired(doc)) {
+      documents.delete(id);
+    }
+  }
+}
+
+function evictIfNeeded(): void {
+  if (MAX_DOCUMENTS <= 0) return;
+  if (documents.size <= MAX_DOCUMENTS) return;
+
+  const entries = Array.from(documents.entries());
+  entries.sort((a, b) => {
+    const aTime = Date.parse(a[1].last_accessed_at || a[1].indexed_at);
+    const bTime = Date.parse(b[1].last_accessed_at || b[1].indexed_at);
+    return (aTime || 0) - (bTime || 0);
+  });
+
+  while (documents.size > MAX_DOCUMENTS && entries.length > 0) {
+    const [id] = entries.shift()!;
+    documents.delete(id);
+  }
 }
 
 /**

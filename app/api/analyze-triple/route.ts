@@ -14,6 +14,8 @@ import { analyzeTriple, parsePlanCSV } from '@/lib/triple-analysis';
 import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 import { getKnowledgeService } from '@/lib/rag/knowledge-service';
 import { TripleAnalysisResult } from '@/lib/types';
+import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', {
@@ -24,12 +26,15 @@ const formatCurrency = (value: number) =>
   }).format(value);
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const formData = await request.formData();
     const vjFile = formData.get('vjFile') as File;
     const planFile = formData.get('planFile') as File;
     const istFile = formData.get('istFile') as File;
-    const apiKey = formData.get('apiKey') as string | null;
 
     // Config
     const periodVJ = (formData.get('periodVJ') as string) || 'Vorjahr';
@@ -43,10 +48,12 @@ export async function POST(request: NextRequest) {
 
     // Validate required files
     if (!istFile) {
-      return NextResponse.json(
-        { error: 'Mindestens die Ist-Daten (aktuelle Buchungen) sind erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Mindestens die Ist-Daten (aktuelle Buchungen) sind erforderlich', 400, requestId);
+    }
+    const sizeLimit = 50 * 1024 * 1024;
+    const filesToCheck = [istFile, vjFile, planFile].filter(Boolean) as File[];
+    if (filesToCheck.some(file => file.size > sizeLimit)) {
+      return jsonError('Datei zu groß (max. 50MB)', 400, requestId);
     }
 
     // Parse files
@@ -54,10 +61,7 @@ export async function POST(request: NextRequest) {
     const istBookings = parseCSV(istText);
 
     if (istBookings.length === 0) {
-      return NextResponse.json(
-        { error: 'Ist-Datei konnte nicht gelesen werden oder ist leer' },
-        { status: 400 }
-      );
+      return jsonError('Ist-Datei konnte nicht gelesen werden oder ist leer', 400, requestId);
     }
 
     // Parse VJ (optional - use Ist as fallback)
@@ -121,26 +125,26 @@ export async function POST(request: NextRequest) {
     });
 
     // Enhance with AI comments if requested
-    if (useAI && (apiKey || process.env.ANTHROPIC_API_KEY)) {
-      result = await enhanceWithAIComments(result, apiKey);
+    if (useAI) {
+      result = await enhanceWithAIComments(result);
     }
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Triple analysis error:', error);
-    return NextResponse.json(
-      { error: 'Fehler bei der Analyse: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Triple analysis error:', requestId, sanitizeError(error));
+    return jsonError('Fehler bei der Analyse.', 500, requestId);
   }
 }
 
 async function enhanceWithAIComments(
-  result: TripleAnalysisResult,
-  apiKey: string | null
+  result: TripleAnalysisResult
 ): Promise<TripleAnalysisResult> {
   try {
-    const llm = getHybridLLMService({ claudeApiKey: apiKey || undefined });
+    const llm = getHybridLLMService();
+    const status = await llm.getStatus();
+    if (status.activeProvider === 'none') {
+      return result;
+    }
     const knowledge = getKnowledgeService();
 
     // Only enhance top 5 deviations
@@ -152,13 +156,14 @@ async function enhanceWithAIComments(
 
       const bookingsContext = dev.top_bookings_ist
         ?.slice(0, 3)
-        .map(b => `• ${b.date}: "${b.text}" (Beleg: ${b.document_no}) = ${formatCurrency(b.amount)}`)
+        .map(b => `• ${sanitizeForPrompt(b.date, 20)}: "${sanitizeForPrompt(b.text || '', 120)}" (Beleg: ${sanitizeForPrompt(b.document_no || '', 40)}) = ${formatCurrency(b.amount)}`)
         .join('\n') || '';
 
-      const prompt = `Du bist ein Controlling-Experte. Analysiere diese Plan-Ist-VJ-Abweichung:
+      const prompt = `Du bist ein Controlling-Experte. Analysiere diese Plan-Ist-VJ-Abweichung.
+${INJECTION_GUARD}
 
-Konto: ${dev.account} - ${dev.account_name}
-${ragContext ? `Kontext: ${ragContext.typical_behavior}` : ''}
+Konto: ${dev.account} - ${sanitizeForPrompt(dev.account_name, 120)}
+${ragContext ? `Kontext: ${sanitizeForPrompt(ragContext.typical_behavior, 200)}` : ''}
 
 VERGLEICH:
 • Vorjahr: ${formatCurrency(dev.amount_vj)}
@@ -172,7 +177,7 @@ ABWEICHUNGEN:
 Status: ${dev.status === 'critical' ? '🔴 KRITISCH' : dev.status === 'on_track' ? '🟢 IM PLAN' : '🟡 ABWEICHUNG'}
 
 Top Buchungen:
-${bookingsContext}
+${wrapUntrusted('BUCHUNGEN', bookingsContext, 1200)}
 
 Schreibe einen kurzen Kommentar (2-3 Sätze) der:
 1. Die Plan-Abweichung erklärt

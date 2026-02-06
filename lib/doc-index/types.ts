@@ -45,6 +45,7 @@ export interface IndexedDocument {
   description?: string;
   total_pages: number;
   indexed_at: string;
+  last_accessed_at?: string;
   tree: DocNode;
   // Flat lookup for quick access
   node_index: Map<string, DocNode>;

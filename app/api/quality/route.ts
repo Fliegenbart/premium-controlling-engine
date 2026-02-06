@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
       amount: Number(row.amount) || 0,
       account: Number(row.account) || 0,
       account_name: String(row.account_name || ''),
-      cost_center: row.cost_center ? String(row.cost_center) : undefined,
-      profit_center: row.profit_center ? String(row.profit_center) : undefined,
-      vendor: row.vendor ? String(row.vendor) : undefined,
-      customer: row.customer ? String(row.customer) : undefined,
+      cost_center: row.cost_center ? String(row.cost_center) : '',
+      profit_center: row.profit_center ? String(row.profit_center) : '',
+      vendor: row.vendor ? String(row.vendor) : null,
+      customer: row.customer ? String(row.customer) : null,
       document_no: String(row.document_no || ''),
       text: String(row.text || '')
     }));

@@ -6,12 +6,20 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getDocument, getDocumentTree, deleteDocument } from '@/lib/doc-index';
+import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const requestId = getRequestId();
   try {
+    const tokenError = requireDocumentToken(request);
+    if (tokenError) return tokenError;
+
+    const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const { id } = await params;
     const document = getDocument(id);
 
@@ -35,11 +43,8 @@ export async function GET(
       tree,
     });
   } catch (error) {
-    console.error('Get document error:', error);
-    return NextResponse.json(
-      { error: 'Fehler beim Laden des Dokuments' },
-      { status: 500 }
-    );
+    console.error('Get document error:', requestId, sanitizeError(error));
+    return jsonError('Fehler beim Laden des Dokuments', 500, requestId);
   }
 }
 
@@ -47,7 +52,14 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const requestId = getRequestId();
   try {
+    const tokenError = requireDocumentToken(request);
+    if (tokenError) return tokenError;
+
+    const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const { id } = await params;
     const deleted = deleteDocument(id);
 
@@ -60,10 +72,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete document error:', error);
-    return NextResponse.json(
-      { error: 'Fehler beim Löschen des Dokuments' },
-      { status: 500 }
-    );
+    console.error('Delete document error:', requestId, sanitizeError(error));
+    return jsonError('Fehler beim Löschen des Dokuments', 500, requestId);
   }
 }

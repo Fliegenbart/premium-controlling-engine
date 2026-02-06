@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { AnalysisResult } from '@/lib/types';
+import { getHybridLLMService } from '@/lib/llm/hybrid-service';
+import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
+import { summaryRequestSchema } from '@/lib/validation';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
@@ -22,18 +25,28 @@ function generateFallbackSummary(result: AnalysisResult): string {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
+  let analysisResult: AnalysisResult | null = null;
+  let entityName: string | undefined;
   try {
-    const { analysisResult, apiKey, entityName } = await request.json();
+    const rateLimit = enforceRateLimit(request, { limit: 30, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
+    const body = await request.json();
+    const parsed = summaryRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonError('Ungültige Analysedaten', 400, requestId);
+    }
+    analysisResult = parsed.data.analysisResult as AnalysisResult;
+    entityName = parsed.data.entityName;
 
     if (!analysisResult || !analysisResult.meta || !analysisResult.by_account) {
-      return NextResponse.json(
-        { error: 'Ungültige Analysedaten' },
-        { status: 400 }
-      );
+      return jsonError('Ungültige Analysedaten', 400, requestId);
     }
 
-    // If no API key, return rule-based summary
-    if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+    const llm = getHybridLLMService();
+    const status = await llm.getStatus();
+    if (status.activeProvider === 'none') {
       return NextResponse.json({
         summary: generateFallbackSummary(analysisResult),
         generatedByAI: false,
@@ -41,23 +54,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const anthropic = new Anthropic({ apiKey });
-
     const topDeviations = analysisResult.by_account.slice(0, 5);
     const deviationsList = topDeviations
       .map((d: { account_name: string; delta_abs: number; delta_pct: number }) =>
-        `- ${d.account_name}: ${formatCurrency(d.delta_abs)} (${d.delta_pct >= 0 ? '+' : ''}${d.delta_pct.toFixed(1)}%)`
+        `- ${sanitizeForPrompt(d.account_name, 120)}: ${formatCurrency(d.delta_abs)} (${d.delta_pct >= 0 ? '+' : ''}${d.delta_pct.toFixed(1)}%)`
       )
       .join('\n');
 
     const prompt = `Du bist ein erfahrener Controller. Erstelle eine Management Summary (3-5 Sätze) auf Deutsch für diese Abweichungsanalyse.
+${INJECTION_GUARD}
 
-${entityName ? `Gesellschaft: ${entityName}` : ''}
-Zeitraum: ${analysisResult.meta.period_prev} vs. ${analysisResult.meta.period_curr}
+${entityName ? `Gesellschaft: ${sanitizeForPrompt(entityName, 120)}` : ''}
+Zeitraum: ${sanitizeForPrompt(analysisResult.meta.period_prev, 60)} vs. ${sanitizeForPrompt(analysisResult.meta.period_curr, 60)}
 Gesamtabweichung: ${formatCurrency(analysisResult.summary.total_delta)}
 
 Top 5 Abweichungen:
-${deviationsList}
+${wrapUntrusted('TOP ABWEICHUNGEN', deviationsList, 1200)}
 
 Fokussiere auf:
 1. Gesamtbild der finanziellen Entwicklung (besser/schlechter als Vorjahr)
@@ -66,13 +78,12 @@ Fokussiere auf:
 
 Schreibe sachlich und prägnant. Keine Überschriften, nur Fließtext.`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await llm.generate(prompt, {
+      maxTokens: 400,
+      temperature: 0.3,
     });
 
-    const summaryText = (response.content[0] as { type: string; text: string }).text;
+    const summaryText = response.text || '';
 
     return NextResponse.json({
       summary: summaryText,
@@ -80,26 +91,17 @@ Schreibe sachlich und prägnant. Keine Überschriften, nur Fließtext.`;
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Summary generation error:', error);
+    console.error('Summary generation error:', requestId, sanitizeError(error));
 
-    // Try to return fallback on error
-    try {
-      const { analysisResult } = await request.clone().json();
-      if (analysisResult) {
-        return NextResponse.json({
-          summary: generateFallbackSummary(analysisResult),
-          generatedByAI: false,
-          generatedAt: new Date().toISOString(),
-          error: 'KI-Generierung fehlgeschlagen, Fallback verwendet',
-        });
-      }
-    } catch {
-      // Ignore parse error
+    if (analysisResult) {
+      return NextResponse.json({
+        summary: generateFallbackSummary(analysisResult),
+        generatedByAI: false,
+        generatedAt: new Date().toISOString(),
+        error: 'KI-Generierung fehlgeschlagen, Fallback verwendet',
+      });
     }
 
-    return NextResponse.json(
-      { error: 'Fehler bei der Summary-Generierung: ' + (error as Error).message },
-      { status: 500 }
-    );
+    return jsonError('Fehler bei der Summary-Generierung.', 500, requestId);
   }
 }

@@ -138,16 +138,19 @@ export function generateDemoBookings(
           .replace('%YEAR%', String(year))
           .replace('%ITEM%', ['Reagenzien', 'Verbrauchsmaterial', 'Kits'][Math.floor(Math.random() * 3)]);
 
+        const costCenter = COST_CENTERS[Math.floor(Math.random() * COST_CENTERS.length)];
+
         const booking: Booking = {
           posting_date: date,
           amount: Math.round(amount * 100) / 100,
           account: acc.account,
           account_name: acc.name,
-          cost_center: COST_CENTERS[Math.floor(Math.random() * COST_CENTERS.length)],
+          cost_center: costCenter,
+          profit_center: costCenter,
           document_no: `${year}${String(month).padStart(2, '0')}${String(bookings.length + 1).padStart(5, '0')}`,
           text,
-          vendor: acc.category === 'expense' ? VENDORS[Math.floor(Math.random() * VENDORS.length)] : undefined,
-          customer: acc.category === 'revenue' ? CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)] : undefined,
+          vendor: acc.category === 'expense' ? VENDORS[Math.floor(Math.random() * VENDORS.length)] : null,
+          customer: acc.category === 'revenue' ? CUSTOMERS[Math.floor(Math.random() * CUSTOMERS.length)] : null,
         };
 
         bookings.push(booking);

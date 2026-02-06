@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { ChatMessage, AnalysisResult } from '../types';
 
-export function useChat(analysisResult: AnalysisResult | null, apiKey: string) {
+export function useChat(analysisResult: AnalysisResult | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,6 @@ export function useChat(analysisResult: AnalysisResult | null, apiKey: string) {
             message: content,
             context: analysisResult,
             history: messages.filter((m) => !m.isLoading),
-            apiKey,
           }),
         });
 
@@ -68,7 +67,7 @@ export function useChat(analysisResult: AnalysisResult | null, apiKey: string) {
         setIsLoading(false);
       }
     },
-    [analysisResult, apiKey, messages]
+    [analysisResult, messages]
   );
 
   const clearChat = useCallback(() => {

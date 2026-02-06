@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { MessageCircle, X, Send, Loader2, Trash2, Sparkles, FileText, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Trash2, Sparkles, FileText } from 'lucide-react';
 import { ChatMessage, AnalysisResult, AccountDeviation } from '@/lib/types';
 import { useChat } from '@/lib/hooks/useChat';
 
@@ -77,19 +77,17 @@ function formatMessageWithEvidence(content: string, onDocClick?: (docNo: string)
 
 interface ChatInterfaceProps {
   analysisResult: AnalysisResult | null;
-  apiKey: string;
   onShowEvidence?: (account: AccountDeviation) => void;
 }
 
-export function ChatInterface({ analysisResult, apiKey, onShowEvidence }: ChatInterfaceProps) {
+export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { messages, isLoading, error, sendMessage, clearChat } = useChat(
-    analysisResult,
-    apiKey
+    analysisResult
   );
 
   // Generate dynamic questions based on data
@@ -212,29 +210,19 @@ export function ChatInterface({ analysisResult, apiKey, onShowEvidence }: ChatIn
                     Stelle Fragen zu deiner Abweichungsanalyse
                   </p>
 
-                  {!apiKey && (
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 mb-6">
-                      <p className="text-yellow-400 text-sm">
-                        Bitte API-Key hinzufügen, um die Chat-Funktion zu nutzen
-                      </p>
-                    </div>
-                  )}
-
-                  {apiKey && (
-                    <div className="space-y-2">
-                      <p className="text-xs text-gray-500 mb-2">Frag mich zum Beispiel:</p>
-                      {suggestedQuestions.map((q, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSuggestion(q)}
-                          className="block w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 transition-colors group"
-                        >
-                          <span className="text-blue-400 mr-2">→</span>
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-500 mb-2">Frag mich zum Beispiel:</p>
+                    {suggestedQuestions.map((q, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleSuggestion(q)}
+                        className="block w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 transition-colors group"
+                      >
+                        <span className="text-blue-400 mr-2">→</span>
+                        {q}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <>
@@ -279,35 +267,33 @@ export function ChatInterface({ analysisResult, apiKey, onShowEvidence }: ChatIn
             </div>
 
             {/* Input */}
-            {apiKey && (
-              <form
-                onSubmit={handleSubmit}
-                className="p-4 border-t border-white/10"
-              >
-                <div className="flex gap-2">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Frage eingeben..."
-                    disabled={isLoading}
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!input.trim() || isLoading}
-                    className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl transition-colors"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <Send className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
+            <form
+              onSubmit={handleSubmit}
+              className="p-4 border-t border-white/10"
+            >
+              <div className="flex gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Frage eingeben..."
+                  disabled={isLoading}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl transition-colors"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -314,10 +314,10 @@ function parseRow(
     amount,
     account,
     account_name: getValue('account_name') || `Konto ${account}`,
-    cost_center: getValue('cost_center') || undefined,
-    profit_center: getValue('profit_center') || undefined,
-    vendor: getValue('vendor') || undefined,
-    customer: getValue('customer') || undefined,
+    cost_center: getValue('cost_center') || '',
+    profit_center: getValue('profit_center') || '',
+    vendor: getValue('vendor') || null,
+    customer: getValue('customer') || null,
     document_no: getValue('document_no') || `DOC-${Date.now()}`,
     text: getValue('text') || ''
   };

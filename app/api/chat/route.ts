@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { AnalysisResult, ChatMessage, AccountDeviation } from '@/lib/types';
 import { getKnowledgeService } from '@/lib/rag/knowledge-service';
+import { getHybridLLMService } from '@/lib/llm/hybrid-service';
+import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
+import { chatRequestSchema } from '@/lib/validation';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
@@ -68,28 +71,34 @@ function findRelevantAccounts(message: string, accounts: AccountDeviation[]): Ac
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
-    const { message, context, history, apiKey } = await request.json();
+    const rateLimit = enforceRateLimit(request, { limit: 30, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
+    const body = await request.json();
+    const parsed = chatRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonError('Ungültige Anfrage', 400, requestId);
+    }
+    const { message, context, history } = parsed.data;
 
     if (!message || !context) {
-      return NextResponse.json(
-        { error: 'Nachricht und Kontext erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Nachricht und Kontext erforderlich', 400, requestId);
     }
 
-    if (!apiKey || !apiKey.startsWith('sk-ant-')) {
-      return NextResponse.json(
-        { error: 'API-Schlüssel erforderlich für Chat-Funktion. Bitte in den Einstellungen hinzufügen.' },
-        { status: 400 }
-      );
+    const llm = getHybridLLMService();
+    const status = await llm.getStatus();
+    if (status.activeProvider === 'none') {
+      return jsonError('Kein LLM verfügbar. Bitte Ollama starten.', 503, requestId);
     }
-
-    const anthropic = new Anthropic({ apiKey });
     const knowledge = getKnowledgeService();
 
     // Build context summary
     const analysisContext = context as AnalysisResult;
+    if (!analysisContext?.by_account || !analysisContext.meta) {
+      return jsonError('Ungültiger Analysekontext', 400, requestId);
+    }
 
     // Find relevant accounts based on user question
     const relevantAccounts = findRelevantAccounts(message, analysisContext.by_account);
@@ -98,30 +107,29 @@ export async function POST(request: NextRequest) {
     const accountDetails = relevantAccounts.map(d => {
       const ragContext = knowledge.getAccountKnowledge(d.account);
       const bookingsInfo = d.top_bookings_curr?.slice(0, 5).map(b =>
-        `    • ${b.date}: "${b.text}" (Beleg: ${b.document_no}) = ${formatCurrency(b.amount)}`
+        `    • ${sanitizeForPrompt(b.date, 20)}: "${sanitizeForPrompt(b.text || '', 140)}" (Beleg: ${sanitizeForPrompt(b.document_no || '', 40)}) = ${formatCurrency(b.amount)}`
       ).join('\n') || '    (keine Details)';
 
       const newBookingsInfo = d.new_bookings?.slice(0, 3).map(b =>
-        `    • NEU: "${b.text}" (Beleg: ${b.document_no}) = ${formatCurrency(b.amount)}`
+        `    • NEU: "${sanitizeForPrompt(b.text || '', 140)}" (Beleg: ${sanitizeForPrompt(b.document_no || '', 40)}) = ${formatCurrency(b.amount)}`
       ).join('\n') || '';
 
       return `
-📊 KONTO ${d.account} - ${d.account_name}
+📊 KONTO ${d.account} - ${sanitizeForPrompt(d.account_name, 120)}
    Vorjahr: ${formatCurrency(d.amount_prev)} | Aktuell: ${formatCurrency(d.amount_curr)}
    Abweichung: ${formatCurrency(d.delta_abs)} (${d.delta_pct >= 0 ? '+' : ''}${d.delta_pct.toFixed(1)}%)
    Buchungen: ${d.bookings_count_prev || '?'} → ${d.bookings_count_curr || '?'}
-   ${ragContext ? `Typisch: ${ragContext.typical_behavior}` : ''}
+   ${ragContext ? `Typisch: ${sanitizeForPrompt(ragContext.typical_behavior, 200)}` : ''}
 
    Top Buchungen aktuell:
-${bookingsInfo}
-${newBookingsInfo ? `\n   Neue Buchungsarten:\n${newBookingsInfo}` : ''}`;
+${wrapUntrusted('BUCHUNGEN', `${bookingsInfo}${newBookingsInfo ? `\n\n   Neue Buchungsarten:\n${newBookingsInfo}` : ''}`, 1600)}`;
     }).join('\n');
 
     const topAccounts = analysisContext.by_account
       .slice(0, 10)
       .map(
         (d) =>
-          `- ${d.account} ${d.account_name}: ${formatCurrency(d.delta_abs)} (${d.delta_pct >= 0 ? '+' : ''}${d.delta_pct.toFixed(1)}%)`
+          `- ${d.account} ${sanitizeForPrompt(d.account_name, 120)}: ${formatCurrency(d.delta_abs)} (${d.delta_pct >= 0 ? '+' : ''}${d.delta_pct.toFixed(1)}%)`
       )
       .join('\n');
 
@@ -129,7 +137,7 @@ ${newBookingsInfo ? `\n   Neue Buchungsarten:\n${newBookingsInfo}` : ''}`;
       ?.slice(0, 5)
       .map(
         (cc) =>
-          `- ${cc.cost_center || '(keine)'}: Abweichung ${formatCurrency(cc.delta_abs)}`
+          `- ${sanitizeForPrompt(cc.cost_center || '(keine)', 60)}: Abweichung ${formatCurrency(cc.delta_abs)}`
       )
       .join('\n');
 
@@ -137,9 +145,10 @@ ${newBookingsInfo ? `\n   Neue Buchungsarten:\n${newBookingsInfo}` : ''}`;
 Du beantwortest Fragen zu Abweichungsanalysen präzise und mit konkreten Zahlen.
 
 WICHTIG: Nenne IMMER konkrete Belegnummern wenn du Buchungen erwähnst!
+${INJECTION_GUARD}
 
 ANALYSEDATEN:
-Zeitraum: ${analysisContext.meta.period_prev} vs. ${analysisContext.meta.period_curr}
+Zeitraum: ${sanitizeForPrompt(analysisContext.meta.period_prev, 60)} vs. ${sanitizeForPrompt(analysisContext.meta.period_curr, 60)}
 Gesamtabweichung: ${formatCurrency(analysisContext.summary.total_delta)}
 Erlöse: ${formatCurrency(analysisContext.summary.erloese_prev)} → ${formatCurrency(analysisContext.summary.erloese_curr)}
 Aufwendungen: ${formatCurrency(analysisContext.summary.aufwendungen_prev)} → ${formatCurrency(analysisContext.summary.aufwendungen_curr)}
@@ -160,35 +169,41 @@ ANTWORT-REGELN:
 5. Gib eine Einschätzung: [Erwartbar/Prüfenswert/Kritisch]
 6. Halte Antworten fokussiert (3-5 Sätze)`;
 
-    // Convert history to Anthropic format (limit to last 10 messages)
+    // Convert history to plain text (limit to last 10 messages)
     const recentHistory = (history as ChatMessage[])
       .filter((m) => !m.isLoading)
       .slice(-10)
       .map((m) => ({
         role: m.role as 'user' | 'assistant',
-        content: m.content,
+        content: sanitizeForPrompt(m.content, 4000),
       }));
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 500,
-      system: systemPrompt,
-      messages: [
-        ...recentHistory,
-        { role: 'user', content: message },
-      ],
+    const historyBlock = recentHistory.length > 0
+      ? wrapUntrusted(
+          'CHATVERLAUF',
+          recentHistory.map(h => `${h.role === 'user' ? 'User' : 'Assistant'}: ${h.content}`).join('\n'),
+          4000
+        )
+      : 'Keine vorherigen Nachrichten.';
+
+    const prompt = `AKTUELLE FRAGE:
+${wrapUntrusted('NUTZERFRAGE', message, 2000)}
+
+${historyBlock}`;
+
+    const response = await llm.generate(prompt, {
+      systemPrompt,
+      maxTokens: 500,
+      temperature: 0.4,
     });
 
-    const responseText = (response.content[0] as { type: string; text: string }).text;
+    const responseText = response.text || '';
 
     return NextResponse.json({
       response: responseText,
     });
   } catch (error) {
-    console.error('Chat error:', error);
-    return NextResponse.json(
-      { error: 'Fehler bei der Antwortgenerierung: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Chat error:', requestId, sanitizeError(error));
+    return jsonError('Fehler bei der Antwortgenerierung.', 500, requestId);
   }
 }

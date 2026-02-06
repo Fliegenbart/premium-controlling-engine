@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Link2, Shield, Download, TrendingUp, TrendingDown, FileText, Plus, Minus, Sparkles, Loader2, AlertTriangle, Server, Cloud } from 'lucide-react';
+import { X, Link2, Shield, Download, TrendingUp, TrendingDown, FileText, Plus, Minus, Sparkles, Loader2, AlertTriangle, Server } from 'lucide-react';
 import { AccountDeviation, TopBooking } from '@/lib/types';
 
 interface RedFlag {
@@ -14,14 +14,13 @@ interface EnhancedDeviation extends AccountDeviation {
   ragContext?: string;
   redFlags?: RedFlag[];
   aiComment?: string;
-  aiProvider?: 'claude' | 'ollama';
+  aiProvider?: 'ollama';
   aiLatencyMs?: number;
 }
 
 interface EvidenceModalProps {
   deviation: EnhancedDeviation;
   onClose: () => void;
-  apiKey?: string;
   onGenerateComment?: () => void;
 }
 
@@ -30,9 +29,9 @@ const formatCurrency = (value: number) =>
 
 type EvidenceTab = 'curr' | 'prev' | 'new' | 'missing';
 
-export function EvidenceModal({ deviation, onClose, apiKey, onGenerateComment }: EvidenceModalProps) {
+export function EvidenceModal({ deviation, onClose, onGenerateComment }: EvidenceModalProps) {
   const [activeTab, setActiveTab] = useState<EvidenceTab>('curr');
-  const [aiComment, setAiComment] = useState<string | null>(null);
+  const [aiComment, setAiComment] = useState<string | null>(deviation.aiComment ?? null);
   const [isGeneratingComment, setIsGeneratingComment] = useState(false);
 
   const tabs: { id: EvidenceTab; label: string; count: number; icon: React.ReactNode }[] = [
@@ -81,8 +80,6 @@ export function EvidenceModal({ deviation, onClose, apiKey, onGenerateComment }:
   const totalAmount = bookings.reduce((sum, b) => sum + b.amount, 0);
 
   const generateAIComment = async () => {
-    if (!apiKey) return;
-
     setIsGeneratingComment(true);
     try {
       const response = await fetch('/api/generate-comment', {
@@ -90,7 +87,6 @@ export function EvidenceModal({ deviation, onClose, apiKey, onGenerateComment }:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           deviation,
-          apiKey,
         }),
       });
 
@@ -218,19 +214,14 @@ export function EvidenceModal({ deviation, onClose, apiKey, onGenerateComment }:
           )}
 
           {/* AI Comment Section */}
-          {apiKey && (
-            <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-500/20 p-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-500/20 p-4 mb-6">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-white font-medium flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-yellow-400" />
                   KI-Analyse
                   {deviation.aiProvider && (
                     <span className="ml-2 px-2 py-0.5 bg-white/10 rounded text-xs text-gray-400 flex items-center gap-1">
-                      {deviation.aiProvider === 'ollama' ? (
-                        <><Server className="w-3 h-3" /> Lokal</>
-                      ) : (
-                        <><Cloud className="w-3 h-3" /> Cloud</>
-                      )}
+                      <><Server className="w-3 h-3" /> Lokal</>
                       {deviation.aiLatencyMs && ` • ${(deviation.aiLatencyMs / 1000).toFixed(1)}s`}
                     </span>
                   )}
@@ -260,7 +251,6 @@ export function EvidenceModal({ deviation, onClose, apiKey, onGenerateComment }:
                 </p>
               )}
             </div>
-          )}
 
           {/* Tabs */}
           <div className="flex items-center gap-2 mb-4">
@@ -352,7 +342,7 @@ export function EvidenceModal({ deviation, onClose, apiKey, onGenerateComment }:
 
           <p className="text-gray-500 text-xs mt-4 flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Alle Daten bleiben lokal und werden nicht extern verarbeitet
+            Lokale Verarbeitung (Ollama)
           </p>
         </div>
       </div>

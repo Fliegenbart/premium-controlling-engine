@@ -6,9 +6,9 @@ Automatische Analyse und Kommentierung von Buchungsdaten für das Controlling.
 
 - 📊 **CSV-Upload**: Vorjahr und aktuelles Jahr hochladen
 - 🔍 **Automatische Analyse**: Wesentliche Abweichungen identifizieren
-- 💬 **KI-Kommentierung** (optional): Mit Claude API intelligente Kommentare generieren
+- 💬 **KI-Kommentierung**: Lokale Kommentare via Ollama
 - 📄 **Word-Export**: Professioneller Report als .docx
-- 🔒 **Datenschutz**: Alle Daten werden lokal im Browser verarbeitet
+- 🔒 **Datenschutz**: Alle Daten bleiben lokal (On-Premise)
 
 ## Schnellstart
 
@@ -46,27 +46,20 @@ Die CSV-Dateien müssen folgende Spalten enthalten:
 | `document_no` | Belegnummer |
 | `text` | Buchungstext |
 
-## KI-Kommentierung
+## KI-Kommentierung (Lokal)
 
-Ohne API Key werden regelbasierte Kommentare generiert. Für intelligentere Kommentare:
-
-1. [Anthropic API Key](https://console.anthropic.com/) erstellen
-2. In den Einstellungen eingeben (wird nicht gespeichert)
-
-## On-Premise Deployment
-
-Für den Betrieb ohne externe APIs:
+Für lokale KI‑Kommentare:
 
 1. [Ollama](https://ollama.ai) installieren
-2. Modell laden: `ollama pull llama3.2`
-3. API Route anpassen (siehe `/app/api/analyze/route.ts`)
+2. Modell laden: `ollama pull llama3.1`
+3. Ollama starten: `ollama serve`
 
 ```typescript
 // Beispiel für Ollama Integration
 const response = await fetch('http://localhost:11434/api/generate', {
   method: 'POST',
   body: JSON.stringify({
-    model: 'llama3.2',
+    model: 'llama3.1:8b',
     prompt: prompt,
   }),
 });

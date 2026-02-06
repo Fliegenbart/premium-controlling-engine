@@ -6,14 +6,12 @@ import { AnalysisResult } from '@/lib/types';
 
 interface ManagementSummaryProps {
   analysisResult: AnalysisResult;
-  apiKey: string;
   entityName?: string;
   workflowStatus: 'draft' | 'review' | 'approved';
 }
 
 export function ManagementSummary({
   analysisResult,
-  apiKey,
   entityName,
   workflowStatus,
 }: ManagementSummaryProps) {
@@ -32,7 +30,6 @@ export function ManagementSummary({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           analysisResult,
-          apiKey,
           entityName,
         }),
       });
@@ -112,20 +109,13 @@ export function ManagementSummary({
 
       {/* Regenerate Button */}
       {!isLoading && (
-        <button
+      <button
           onClick={generateSummary}
           className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-blue-400 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
-          {apiKey ? 'Neu generieren' : 'Aktualisieren'}
+          Neu generieren
         </button>
-      )}
-
-      {/* No API Key Hint */}
-      {!apiKey && summary && !isLoading && (
-        <p className="mt-2 text-xs text-gray-600">
-          Tipp: Mit API-Key erhalten Sie KI-generierte Summaries
-        </p>
       )}
     </div>
   );

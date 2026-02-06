@@ -1,11 +1,14 @@
 import { Booking, AnalysisResult, AccountDeviation, CostCenterDeviation, DetailDeviation, TopBooking, AnalysisConfig } from './types';
+import { parseCSV as parseGenericCSV } from './parsers';
+
+const isRevenueAccount = (account: number) => account >= 4000 && account < 5000;
+const isExpenseAccount = (account: number) => account >= 5000 && account < 9000;
 
 const DEFAULT_CONFIG: AnalysisConfig = {
   wesentlichkeit_abs: 5000,
   wesentlichkeit_pct: 10,
   period_prev_name: 'Vorjahr',
   period_curr_name: 'Aktuelles Jahr',
-  use_ai_comments: false,
 };
 
 // Aggregation helpers
@@ -107,13 +110,16 @@ function generateComment(
   account: number,
   topBookings: TopBooking[]
 ): string {
-  const isExpense = account >= 5000;
+  const isExpense = isExpenseAccount(account);
+  const isRevenue = isRevenueAccount(account);
   let direction: string;
 
-  if (delta > 0) {
-    direction = isExpense ? 'Kostensenkung' : 'Umsatzsteigerung';
+  if (isExpense) {
+    direction = delta > 0 ? 'Kostensteigerung' : 'Kostensenkung';
+  } else if (isRevenue) {
+    direction = delta > 0 ? 'Umsatzsteigerung' : 'Umsatzrückgang';
   } else {
-    direction = isExpense ? 'Kostensteigerung' : 'Umsatzrückgang';
+    direction = delta > 0 ? 'Verbesserung' : 'Verschlechterung';
   }
 
   const parts: string[] = [
@@ -153,8 +159,8 @@ export function analyzeBookings(
   const cfg = { ...DEFAULT_CONFIG, ...config };
 
   // Aggregate by account
-  const prevByAccount = groupBy(prevBookings, b => `${b.account}|${b.account_name}`);
-  const currByAccount = groupBy(currBookings, b => `${b.account}|${b.account_name}`);
+  const prevByAccount = groupBy(prevBookings, b => JSON.stringify([b.account, b.account_name]));
+  const currByAccount = groupBy(currBookings, b => JSON.stringify([b.account, b.account_name]));
 
   // Get all unique accounts
   const allAccountKeys = new Set([...prevByAccount.keys(), ...currByAccount.keys()]);
@@ -162,7 +168,7 @@ export function analyzeBookings(
   // Calculate account deviations
   const accountDeviations: AccountDeviation[] = [];
   for (const key of allAccountKeys) {
-    const [accountStr, accountName] = key.split('|');
+    const [accountStr, accountName] = JSON.parse(key) as [string, string];
     const account = parseInt(accountStr);
 
     const prevAmount = sumBy(prevByAccount.get(key) || [], b => b.amount);
@@ -221,13 +227,13 @@ export function analyzeBookings(
 
     if (Math.abs(deltaAbs) >= cfg.wesentlichkeit_abs && Math.abs(deltaPct) >= cfg.wesentlichkeit_pct) {
       // Find top accounts for this cost center
-      const ccPrevByAccount = groupBy((prevByCostCenter.get(cc) || []), b => `${b.account}|${b.account_name}`);
-      const ccCurrByAccount = groupBy((currByCostCenter.get(cc) || []), b => `${b.account}|${b.account_name}`);
+      const ccPrevByAccount = groupBy((prevByCostCenter.get(cc) || []), b => JSON.stringify([b.account, b.account_name]));
+      const ccCurrByAccount = groupBy((currByCostCenter.get(cc) || []), b => JSON.stringify([b.account, b.account_name]));
       const ccAllAccounts = new Set([...ccPrevByAccount.keys(), ...ccCurrByAccount.keys()]);
 
       const topAccounts: { account: number; account_name: string; delta_abs: number }[] = [];
       for (const key of ccAllAccounts) {
-        const [accountStr, accountName] = key.split('|');
+        const [accountStr, accountName] = JSON.parse(key) as [string, string];
         const account = parseInt(accountStr);
         const prevAmt = sumBy(ccPrevByAccount.get(key) || [], b => b.amount);
         const currAmt = sumBy(ccCurrByAccount.get(key) || [], b => b.amount);
@@ -254,13 +260,13 @@ export function analyzeBookings(
   costCenterDeviations.sort((a, b) => Math.abs(b.delta_abs) - Math.abs(a.delta_abs));
 
   // Aggregate by account AND cost center (detail)
-  const prevByDetail = groupBy(prevBookings, b => `${b.account}|${b.account_name}|${b.cost_center}`);
-  const currByDetail = groupBy(currBookings, b => `${b.account}|${b.account_name}|${b.cost_center}`);
+  const prevByDetail = groupBy(prevBookings, b => JSON.stringify([b.account, b.account_name, b.cost_center]));
+  const currByDetail = groupBy(currBookings, b => JSON.stringify([b.account, b.account_name, b.cost_center]));
   const allDetailKeys = new Set([...prevByDetail.keys(), ...currByDetail.keys()]);
 
   const detailDeviations: DetailDeviation[] = [];
   for (const key of allDetailKeys) {
-    const [accountStr, accountName, costCenter] = key.split('|');
+    const [accountStr, accountName, costCenter] = JSON.parse(key) as [string, string, string];
     const account = parseInt(accountStr);
 
     const prevAmount = sumBy(prevByDetail.get(key) || [], b => b.amount);
@@ -290,10 +296,10 @@ export function analyzeBookings(
   // Calculate summary
   const totalPrev = sumBy(prevBookings, b => b.amount);
   const totalCurr = sumBy(currBookings, b => b.amount);
-  const erloesesPrev = sumBy(prevBookings.filter(b => b.amount > 0), b => b.amount);
-  const erloesesCurr = sumBy(currBookings.filter(b => b.amount > 0), b => b.amount);
-  const aufwendungenPrev = sumBy(prevBookings.filter(b => b.amount < 0), b => b.amount);
-  const aufwendungenCurr = sumBy(currBookings.filter(b => b.amount < 0), b => b.amount);
+  const erloesesPrev = sumBy(prevBookings.filter(b => isRevenueAccount(b.account)), b => b.amount);
+  const erloesesCurr = sumBy(currBookings.filter(b => isRevenueAccount(b.account)), b => b.amount);
+  const aufwendungenPrev = sumBy(prevBookings.filter(b => isExpenseAccount(b.account)), b => b.amount);
+  const aufwendungenCurr = sumBy(currBookings.filter(b => isExpenseAccount(b.account)), b => b.amount);
 
   return {
     meta: {
@@ -321,57 +327,5 @@ export function analyzeBookings(
 
 // Parse CSV to Booking array
 export function parseCSV(csvText: string): Booking[] {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) return [];
-
-  const headers = lines[0].split(',').map(h => h.trim());
-  const bookings: Booking[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
-    if (values.length !== headers.length) continue;
-
-    const row: Record<string, string> = {};
-    headers.forEach((h, idx) => {
-      row[h] = values[idx];
-    });
-
-    bookings.push({
-      posting_date: row['posting_date'] || '',
-      amount: parseFloat(row['amount']) || 0,
-      account: parseInt(row['account']) || 0,
-      account_name: row['account_name'] || '',
-      cost_center: row['cost_center'] || '',
-      profit_center: row['profit_center'] || '',
-      vendor: row['vendor'] || null,
-      customer: row['customer'] || null,
-      document_no: row['document_no'] || '',
-      text: row['text'] || '',
-    });
-  }
-
-  return bookings;
-}
-
-// Helper to parse CSV line (handles quoted values)
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-
-  return result;
+  return parseGenericCSV(csvText, 'generic_csv');
 }

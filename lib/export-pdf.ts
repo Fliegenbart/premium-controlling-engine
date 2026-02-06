@@ -63,8 +63,9 @@ export async function generateVarianceReport(
 
     // Period info
     doc.fontSize(10).fillColor(COLORS.gray);
+    const analyzedAt = result.meta.analyzed_at ? new Date(result.meta.analyzed_at) : new Date();
     doc.text(`Vergleichszeitraum: ${result.meta.period_prev} vs. ${result.meta.period_curr}`);
-    doc.text(`Erstellt am: ${new Date(result.meta.analyzed_at).toLocaleDateString('de-DE')}`);
+    doc.text(`Erstellt am: ${analyzedAt.toLocaleDateString('de-DE')}`);
     doc.moveDown(1);
 
     // Summary Box

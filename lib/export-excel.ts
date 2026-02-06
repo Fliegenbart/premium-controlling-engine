@@ -166,10 +166,11 @@ export async function exportVarianceAnalysis(result: AnalysisResult): Promise<Bu
 
   // Meta Sheet
   const metaSheet = workbook.addWorksheet('Meta');
-  metaSheet.addRow(['Erstellt am', result.meta.analyzed_at]);
+  const analyzedAt = result.meta.analyzed_at || new Date().toISOString();
+  metaSheet.addRow(['Erstellt am', analyzedAt]);
   metaSheet.addRow(['Periode Vorjahr', result.meta.period_prev]);
   metaSheet.addRow(['Periode Aktuell', result.meta.period_curr]);
-  metaSheet.addRow(['Engine Version', result.meta.engine_version]);
+  metaSheet.addRow(['Engine Version', result.meta.engine_version || 'n/a']);
   metaSheet.addRow(['']);
   metaSheet.addRow(['Exportiert von', 'Premium Controlling Engine']);
   metaSheet.addRow(['Export Zeitpunkt', new Date().toISOString()]);

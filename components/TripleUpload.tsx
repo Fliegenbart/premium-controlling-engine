@@ -6,7 +6,6 @@ import { TripleAnalysisResult } from '@/lib/types';
 
 interface TripleUploadProps {
   onAnalysisComplete: (result: TripleAnalysisResult) => void;
-  apiKey?: string;
 }
 
 interface FileState {
@@ -15,7 +14,7 @@ interface FileState {
   status: 'empty' | 'selected' | 'error';
 }
 
-export function TripleUpload({ onAnalysisComplete, apiKey }: TripleUploadProps) {
+export function TripleUpload({ onAnalysisComplete }: TripleUploadProps) {
   const [files, setFiles] = useState<{
     vj: FileState;
     plan: FileState;
@@ -81,7 +80,6 @@ export function TripleUpload({ onAnalysisComplete, apiKey }: TripleUploadProps) 
       formData.append('periodVJ', periodVJ);
       formData.append('periodPlan', periodPlan);
       formData.append('periodIst', periodIst);
-      if (apiKey) formData.append('apiKey', apiKey);
 
       const response = await fetch('/api/analyze-triple', {
         method: 'POST',

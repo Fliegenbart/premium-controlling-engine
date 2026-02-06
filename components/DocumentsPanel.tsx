@@ -9,15 +9,10 @@ import {
   ChevronRight,
   ChevronDown,
   Trash2,
-  MessageSquare,
   BookOpen,
   FileSearch,
   Sparkles,
-  ExternalLink,
-  X,
   AlertCircle,
-  CheckCircle,
-  Info,
 } from 'lucide-react';
 
 interface DocumentMeta {
@@ -61,11 +56,11 @@ interface QueryResult {
   reasoning_trace: ReasoningStep[];
 }
 
-interface DocumentsPanelProps {
-  apiKey: string | null;
-}
+const DOCUMENT_TOKEN = process.env.NEXT_PUBLIC_DOCUMENT_ACCESS_TOKEN;
 
-export function DocumentsPanel({ apiKey }: DocumentsPanelProps) {
+const docHeaders = DOCUMENT_TOKEN ? { 'x-doc-token': DOCUMENT_TOKEN } : undefined;
+
+export function DocumentsPanel() {
   const [documents, setDocuments] = useState<DocumentMeta[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<DocumentMeta | null>(null);
   const [docTree, setDocTree] = useState<DocNode | null>(null);
@@ -84,7 +79,9 @@ export function DocumentsPanel({ apiKey }: DocumentsPanelProps) {
 
   const loadDocuments = async () => {
     try {
-      const response = await fetch('/api/documents');
+      const response = await fetch('/api/documents', {
+        headers: docHeaders,
+      });
       const data = await response.json();
       setDocuments(data.documents || []);
     } catch (error) {
@@ -103,6 +100,7 @@ export function DocumentsPanel({ apiKey }: DocumentsPanelProps) {
       const response = await fetch('/api/documents', {
         method: 'POST',
         body: formData,
+        headers: docHeaders,
       });
 
       const data = await response.json();
@@ -144,7 +142,9 @@ export function DocumentsPanel({ apiKey }: DocumentsPanelProps) {
     setQueryResult(null);
 
     try {
-      const response = await fetch(`/api/documents/${doc.id}`);
+      const response = await fetch(`/api/documents/${doc.id}`, {
+        headers: docHeaders,
+      });
       const data = await response.json();
       setDocTree(data.tree);
     } catch (error) {
@@ -158,7 +158,10 @@ export function DocumentsPanel({ apiKey }: DocumentsPanelProps) {
     if (!confirm('Dokument wirklich löschen?')) return;
 
     try {
-      await fetch(`/api/documents/${id}`, { method: 'DELETE' });
+      await fetch(`/api/documents/${id}`, {
+        method: 'DELETE',
+        headers: docHeaders,
+      });
       await loadDocuments();
       if (selectedDoc?.id === id) {
         setSelectedDoc(null);
@@ -179,8 +182,11 @@ export function DocumentsPanel({ apiKey }: DocumentsPanelProps) {
     try {
       const response = await fetch(`/api/documents/${selectedDoc.id}/query`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, apiKey }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(docHeaders || {}),
+        },
+        body: JSON.stringify({ query }),
       });
 
       const data = await response.json();

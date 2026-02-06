@@ -7,7 +7,7 @@ export interface AnomalyHint {
 }
 
 /**
- * Rule-based anomaly detection as fallback when no API key is available
+ * Rule-based anomaly detection as fallback when no LLM is available
  */
 export function detectBasicAnomalies(deviation: AccountDeviation): AnomalyHint | null {
   const absPct = Math.abs(deviation.delta_pct);

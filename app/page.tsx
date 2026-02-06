@@ -20,15 +20,12 @@ import {
   Shield,
   Link2,
   FileSpreadsheet,
-  Presentation,
   Clock,
   CheckCircle2,
   Eye,
   X,
   Sparkles,
-  Database,
   Lock,
-  Users,
   ArrowRight,
   Zap,
   Save,
@@ -47,9 +44,7 @@ import {
   Legend,
 } from 'recharts';
 import { AnalysisResult, AccountDeviation, LabKPIs, TripleAnalysisResult, TripleAccountDeviation, Booking } from '@/lib/types';
-import { useApiKey } from '@/lib/hooks/useApiKey';
 import { useSavedAnalyses } from '@/lib/hooks/useSavedAnalyses';
-import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { ManagementSummary } from '@/components/ManagementSummary';
 import { AnomalyBadge } from '@/components/AnomalyBadge';
 import { ChatInterface } from '@/components/ChatInterface';
@@ -114,7 +109,7 @@ const USPS = [
   {
     icon: Lock,
     title: '100% Datensouveränität',
-    description: 'Alle Daten bleiben auf Ihren Servern. Keine Cloud, keine externen APIs, kein Risiko.',
+    description: 'Alle Daten bleiben lokal. Keine Cloud, keine externen APIs.',
     highlight: 'On-Premise',
     color: 'from-green-500 to-emerald-500',
   },
@@ -165,9 +160,6 @@ export default function Home() {
   const [selectedDeviation, setSelectedDeviation] = useState<AccountDeviation | null>(null);
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
 
-  // API Key management
-  const { apiKey, isValidFormat: hasApiKey, saveApiKey, clearApiKey } = useApiKey();
-
   // Saved analyses management
   const { analyses: savedAnalyses, saveAnalysis, deleteAnalysis: deleteSavedAnalysis, refresh: refreshSavedAnalyses } = useSavedAnalyses();
 
@@ -207,7 +199,6 @@ export default function Home() {
         body: JSON.stringify({
           prevBookings,
           currBookings,
-          apiKey: apiKey || undefined,
         }),
       });
 
@@ -245,7 +236,7 @@ export default function Home() {
   };
 
   const updateEntity = (id: string, updates: Partial<EntityUpload>) => {
-    setEntities(entities.map(e => e.id === id ? { ...e, ...updates } : e));
+    setEntities(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
   };
 
   const readFileAsText = (file: File): Promise<string> => {
@@ -264,9 +255,6 @@ export default function Home() {
       const formData = new FormData();
       formData.append('prevFile', entity.prevFile);
       formData.append('currFile', entity.currFile);
-      if (apiKey) {
-        formData.append('apiKey', apiKey);
-      }
       const response = await fetch('/api/analyze', { method: 'POST', body: formData });
       const result = await response.json();
       if (response.ok) {
@@ -294,9 +282,6 @@ export default function Home() {
       );
       const formData = new FormData();
       formData.append('entities', JSON.stringify(entityInputs));
-      if (apiKey) {
-        formData.append('apiKey', apiKey);
-      }
       const response = await fetch('/api/analyze-multi', { method: 'POST', body: formData });
       const result = await response.json();
       if (response.ok) {
@@ -616,7 +601,6 @@ export default function Home() {
         <EvidenceModal
           deviation={selectedDeviation}
           onClose={() => setShowEvidenceModal(false)}
-          apiKey={apiKey}
         />
       )}
 
@@ -700,12 +684,6 @@ export default function Home() {
                 </div>
               )}
 
-              <ApiKeyInput
-                apiKey={apiKey}
-                isValidFormat={hasApiKey}
-                onSave={saveApiKey}
-                onClear={clearApiKey}
-              />
             </div>
           </div>
         </div>
@@ -715,7 +693,7 @@ export default function Home() {
         {/* Documents Section */}
         {mode === 'docs' && (
           <div className="mb-8">
-            <DocumentsPanel apiKey={apiKey} />
+            <DocumentsPanel />
           </div>
         )}
 
@@ -731,7 +709,6 @@ export default function Home() {
             </p>
             <TripleUpload
               onAnalysisComplete={(result) => setTripleResult(result)}
-              apiKey={apiKey}
             />
           </div>
         )}
@@ -1031,7 +1008,6 @@ export default function Home() {
             {/* AI-Generated Management Summary */}
             <ManagementSummary
               analysisResult={currentResult}
-              apiKey={apiKey}
               entityName={mode === 'single' ? entities[0]?.name : 'Konzern'}
               workflowStatus={workflowStatus}
             />
@@ -1256,7 +1232,6 @@ export default function Home() {
       {/* AI Chat Interface */}
       <ChatInterface
         analysisResult={currentResult ?? null}
-        apiKey={apiKey}
       />
     </main>
   );

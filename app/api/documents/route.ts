@@ -6,22 +6,34 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { indexDocument, listDocuments } from '@/lib/doc-index';
+import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const tokenError = requireDocumentToken(request);
+    if (tokenError) return tokenError;
+
+    const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const documents = listDocuments();
     return NextResponse.json({ documents });
   } catch (error) {
-    console.error('List documents error:', error);
-    return NextResponse.json(
-      { error: 'Fehler beim Laden der Dokumente' },
-      { status: 500 }
-    );
+    console.error('List documents error:', requestId, sanitizeError(error));
+    return jsonError('Fehler beim Laden der Dokumente', 500, requestId);
   }
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const tokenError = requireDocumentToken(request);
+    if (tokenError) return tokenError;
+
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -70,10 +82,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Index document error:', error);
-    return NextResponse.json(
-      { error: 'Fehler beim Indexieren des Dokuments: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Index document error:', requestId, sanitizeError(error));
+    return jsonError('Fehler beim Indexieren des Dokuments.', 500, requestId);
   }
 }

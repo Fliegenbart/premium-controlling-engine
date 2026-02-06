@@ -1,24 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { AccountDeviation } from '@/lib/types';
 import { enrichWithBasicAnomalies } from '@/lib/anomaly-detection';
+import { getHybridLLMService } from '@/lib/llm/hybrid-service';
+import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
+import { anomalyRequestSchema } from '@/lib/validation';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
+  let deviations: AccountDeviation[] = [];
   try {
-    const { deviations, apiKey, context } = await request.json();
+    const rateLimit = enforceRateLimit(request, { limit: 25, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
+    const body = await request.json();
+    const parsed = anomalyRequestSchema.safeParse(body);
+    if (!parsed.success) {
+      return jsonError('Ungültige Abweichungsdaten', 400, requestId);
+    }
+    deviations = parsed.data.deviations as AccountDeviation[];
+    const context = parsed.data.context as Record<string, string> | undefined;
 
     if (!deviations || !Array.isArray(deviations)) {
-      return NextResponse.json(
-        { error: 'Ungültige Abweichungsdaten' },
-        { status: 400 }
-      );
+      return jsonError('Ungültige Abweichungsdaten', 400, requestId);
     }
 
-    // If no API key, return rule-based anomalies
-    if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+    const llm = getHybridLLMService();
+    const status = await llm.getStatus();
+    if (status.activeProvider === 'none') {
       const enriched = enrichWithBasicAnomalies(deviations);
       return NextResponse.json({
         deviations: enriched,
@@ -26,27 +38,26 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const anthropic = new Anthropic({ apiKey });
-
     // Only process top 10 deviations to save costs
     const topDeviations = deviations.slice(0, 10);
 
     const deviationsList = topDeviations
       .map(
         (d: AccountDeviation, i: number) =>
-          `${i + 1}. ${d.account_name} (Konto ${d.account}): ` +
+          `${i + 1}. ${sanitizeForPrompt(d.account_name, 120)} (Konto ${d.account}): ` +
           `${formatCurrency(d.amount_prev)} → ${formatCurrency(d.amount_curr)} ` +
           `(${d.delta_pct >= 0 ? '+' : ''}${d.delta_pct.toFixed(1)}%)`
       )
       .join('\n');
 
     const prompt = `Du bist ein Controlling-Experte für die Labor/Diagnostik-Branche. Analysiere diese Abweichungen auf Anomalien.
+${INJECTION_GUARD}
 
-${context?.quarter ? `Zeitraum: ${context.quarter}` : ''}
-${context?.industry ? `Branche: ${context.industry}` : 'Branche: Labor/Diagnostik'}
+${context?.quarter ? `Zeitraum: ${sanitizeForPrompt(context.quarter, 60)}` : ''}
+${context?.industry ? `Branche: ${sanitizeForPrompt(context.industry, 80)}` : 'Branche: Labor/Diagnostik'}
 
 Abweichungen:
-${deviationsList}
+${wrapUntrusted('ABWEICHUNGEN', deviationsList, 1600)}
 
 Für JEDE ungewöhnliche Abweichung, gib einen kurzen Hinweis im folgenden JSON-Format:
 {
@@ -64,13 +75,12 @@ Typen:
 Nur WIRKLICH ungewöhnliche Fälle markieren. Normale Geschäftsschwankungen ignorieren.
 Antworte NUR mit dem JSON, kein anderer Text.`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await llm.generate(prompt, {
+      maxTokens: 500,
+      temperature: 0.2,
     });
 
-    const responseText = (response.content[0] as { type: string; text: string }).text;
+    const responseText = response.text || '';
 
     // Parse AI response
     let aiAnomalies: { index: number; hint: string; type: string; severity: string }[] = [];
@@ -115,26 +125,17 @@ Antworte NUR mit dem JSON, kein anderer Text.`;
       detectedByAI: true,
     });
   } catch (error) {
-    console.error('Anomaly detection error:', error);
+    console.error('Anomaly detection error:', requestId, sanitizeError(error));
 
-    // Fall back to rule-based on error
-    try {
-      const { deviations } = await request.clone().json();
-      if (deviations) {
-        const enriched = enrichWithBasicAnomalies(deviations);
-        return NextResponse.json({
-          deviations: enriched,
-          detectedByAI: false,
-          error: 'KI-Erkennung fehlgeschlagen, Fallback verwendet',
-        });
-      }
-    } catch {
-      // Ignore
+    if (deviations && deviations.length > 0) {
+      const enriched = enrichWithBasicAnomalies(deviations);
+      return NextResponse.json({
+        deviations: enriched,
+        detectedByAI: false,
+        error: 'KI-Erkennung fehlgeschlagen, Fallback verwendet',
+      });
     }
 
-    return NextResponse.json(
-      { error: 'Fehler bei der Anomalie-Erkennung: ' + (error as Error).message },
-      { status: 500 }
-    );
+    return jsonError('Fehler bei der Anomalie-Erkennung.', 500, requestId);
   }
 }

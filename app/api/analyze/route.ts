@@ -1,24 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeBookings, parseCSV } from '@/lib/analysis';
-import Anthropic from '@anthropic-ai/sdk';
 import { AnalysisResult } from '@/lib/types';
+import { getHybridLLMService } from '@/lib/llm/hybrid-service';
+import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const formData = await request.formData();
     const prevFile = formData.get('prevFile') as File;
     const currFile = formData.get('currFile') as File;
-    const apiKey = formData.get('apiKey') as string | null;
     const periodPrev = (formData.get('periodPrev') as string) || 'Vorjahr';
     const periodCurr = (formData.get('periodCurr') as string) || 'Aktuelles Jahr';
     const wesentlichkeitAbs = parseInt(formData.get('wesentlichkeitAbs') as string) || 5000;
     const wesentlichkeitPct = parseInt(formData.get('wesentlichkeitPct') as string) || 10;
 
     if (!prevFile || !currFile) {
-      return NextResponse.json(
-        { error: 'Beide CSV-Dateien sind erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Beide CSV-Dateien sind erforderlich', 400, requestId);
+    }
+
+    if (prevFile.size > 50 * 1024 * 1024 || currFile.size > 50 * 1024 * 1024) {
+      return jsonError('CSV-Datei zu groß (max. 50MB)', 400, requestId);
     }
 
     // Parse CSV files
@@ -29,10 +35,7 @@ export async function POST(request: NextRequest) {
     const currBookings = parseCSV(currText);
 
     if (prevBookings.length === 0 || currBookings.length === 0) {
-      return NextResponse.json(
-        { error: 'CSV-Dateien konnten nicht gelesen werden oder sind leer' },
-        { status: 400 }
-      );
+      return jsonError('CSV-Dateien konnten nicht gelesen werden oder sind leer', 400, requestId);
     }
 
     // Run analysis
@@ -43,64 +46,66 @@ export async function POST(request: NextRequest) {
       wesentlichkeit_pct: wesentlichkeitPct,
     });
 
-    // Enhance with AI comments if API key provided
-    if (apiKey && apiKey.startsWith('sk-ant-')) {
-      result = await enhanceWithAIComments(result, apiKey);
+    // Enhance with AI comments if LLM available
+    const llm = getHybridLLMService();
+    const status = await llm.getStatus();
+    if (status.activeProvider !== 'none') {
+      result = await enhanceWithAIComments(result);
     }
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Analysis error:', error);
-    return NextResponse.json(
-      { error: 'Fehler bei der Analyse: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Analysis error:', requestId, sanitizeError(error));
+    return jsonError('Fehler bei der Analyse.', 500, requestId);
   }
 }
 
 async function enhanceWithAIComments(
-  result: AnalysisResult,
-  apiKey: string
+  result: AnalysisResult
 ): Promise<AnalysisResult> {
-  const anthropic = new Anthropic({ apiKey });
+  const llm = getHybridLLMService();
 
   // Only enhance top 5 account deviations to save API costs
   const topDeviations = result.by_account.slice(0, 5);
 
-  for (let i = 0; i < topDeviations.length; i++) {
-    const dev = topDeviations[i];
+  const systemPrompt = `Du bist ein Controlling-Experte. Analysiere Abweichungen und schreibe kurze, prägnante Kommentare (max. 3 Sätze) auf Deutsch.
+${INJECTION_GUARD}`;
+
+  const tasks = topDeviations.map(async (dev) => {
     const isExpense = dev.account >= 5000;
+    const topBookings = dev.top_bookings
+      ?.map(b => `- ${sanitizeForPrompt(b.text || '', 120)} (${sanitizeForPrompt(b.vendor || b.customer || 'k.A.', 60)}): ${formatCurrency(b.amount)}`)
+      .join('\n') || 'Keine Details verfügbar';
 
-    const prompt = `Du bist ein Controlling-Experte. Analysiere diese Abweichung und erstelle einen kurzen, prägnanten Kommentar (max. 3 Sätze) auf Deutsch:
-
-Konto: ${dev.account} - ${dev.account_name}
-${result.meta.period_prev}: ${formatCurrency(dev.amount_prev)}
-${result.meta.period_curr}: ${formatCurrency(dev.amount_curr)}
+    const prompt = `ANALYSE:
+Konto: ${dev.account} - ${sanitizeForPrompt(dev.account_name, 120)}
+${sanitizeForPrompt(result.meta.period_prev, 60)}: ${formatCurrency(dev.amount_prev)}
+${sanitizeForPrompt(result.meta.period_curr, 60)}: ${formatCurrency(dev.amount_curr)}
 Abweichung: ${formatCurrency(dev.delta_abs)} (${dev.delta_pct.toFixed(1)}%)
 Typ: ${isExpense ? 'Aufwandskonto' : 'Ertragskonto'}
 
-Top-Buchungen im aktuellen Jahr:
-${dev.top_bookings?.map(b => `- ${b.text} (${b.vendor || b.customer || 'k.A.'}): ${formatCurrency(b.amount)}`).join('\n') || 'Keine Details verfügbar'}
+${wrapUntrusted('TOP BUCHUNGEN AKTUELL', topBookings, 1200)}
 
-Erstelle einen Kommentar der:
-1. Die Richtung der Abweichung bewertet (positiv/negativ für das Unternehmen)
-2. Mögliche Ursachen basierend auf den Buchungstexten nennt
-3. Ggf. einen Hinweis zur weiteren Prüfung gibt`;
+ANWEISUNG:
+1. Richtung der Abweichung bewerten (positiv/negativ für das Unternehmen)
+2. Mögliche Ursachen basierend auf den Buchungstexten nennen
+3. Hinweis zur weiteren Prüfung geben (falls relevant)`;
 
-    try {
-      const response = await anthropic.messages.create({
-        model: 'claude-3-5-haiku-20241022',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }],
-      });
+    const response = await llm.generate(prompt, {
+      systemPrompt,
+      maxTokens: 300,
+      temperature: 0.3,
+    });
 
-      const aiComment = (response.content[0] as { type: string; text: string }).text;
-      result.by_account[i].comment = aiComment;
-    } catch (error) {
-      console.error('AI comment error for account', dev.account, error);
-      // Keep the rule-based comment
+    return response.text?.trim() || '';
+  });
+
+  const results = await Promise.allSettled(tasks);
+  results.forEach((res, idx) => {
+    if (res.status === 'fulfilled' && res.value) {
+      result.by_account[idx].comment = res.value;
     }
-  }
+  });
 
   return result;
 }

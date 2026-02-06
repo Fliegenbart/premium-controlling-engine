@@ -1,18 +1,15 @@
 /**
- * Agent API - Intelligent Analysis (Local + Cloud)
+ * Agent API - Intelligent Analysis (Local only)
  * POST /api/agent
- * 
- * Supports:
- * - Local mode (Ollama) - DEFAULT, no API key needed
- * - Cloud mode (Anthropic) - if API key provided
+ *
+ * Uses Ollama for local inference.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { LocalControllingAgent, getLocalAgent } from '@/lib/local-agent';
-import { ControllingAgent } from '@/lib/agent';
+import { getLocalAgent } from '@/lib/local-agent';
 import { getOllamaClient, RECOMMENDED_MODELS } from '@/lib/ollama-client';
 import { initDatabase } from '@/lib/duckdb-engine';
-import { AgentResponse } from '@/lib/types';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 interface AgentRequest {
   question: string;
@@ -22,69 +19,48 @@ interface AgentRequest {
     totalDeviation?: number;
     topAccounts?: Array<{ account: number; name: string; delta: number }>;
   };
-  apiKey?: string;  // If provided, use cloud API
   model?: string;   // Local model override
-  forceLocal?: boolean;  // Force local even if API key present
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse<AgentResponse | { error: string }>> {
+export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const rateLimit = enforceRateLimit(request, { limit: 15, windowMs: 60_000 });
+    if (rateLimit) return rateLimit as NextResponse;
+
     const body: AgentRequest = await request.json();
-    const { question, context, apiKey, model, forceLocal } = body;
+    const { question, context, model } = body;
     
     if (!question || typeof question !== 'string') {
-      return NextResponse.json(
-        { error: 'Frage ist erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Frage ist erforderlich', 400, requestId);
     }
     
     // Initialize DuckDB
     await initDatabase(process.env.DATABASE_PATH);
     
-    // Decide: Local (Ollama) or Cloud (Anthropic)
-    const useCloud = apiKey && !forceLocal;
-    
-    if (useCloud) {
-      // Cloud mode with Anthropic
-      console.log('Using cloud API (Anthropic)');
-      const agent = new ControllingAgent(apiKey);
-      const response = await agent.answer(question, context);
-      return NextResponse.json({
-        ...response,
-        mode: 'cloud',
-        model: 'claude-sonnet-4'
-      });
-    } else {
-      // Local mode with Ollama
-      console.log('Using local LLM (Ollama)');
-      
-      const localAgent = getLocalAgent(model);
-      
-      // Check if Ollama is ready
-      const readyCheck = await localAgent.isReady();
-      if (!readyCheck.ready) {
-        return NextResponse.json({
-          error: `Ollama nicht bereit: ${readyCheck.error}. Bitte starte Ollama mit: ollama serve`,
-        }, { status: 503 });
-      }
-      
-      const response = await localAgent.answer(question, context);
-      
-      // Add model info to response
-      return NextResponse.json({
-        ...response,
-        model: readyCheck.model,
-        mode: 'local'
-      });
+    // Local mode with Ollama
+    console.log('Using local LLM (Ollama)');
+
+    const localAgent = getLocalAgent(model);
+
+    // Check if Ollama is ready
+    const readyCheck = await localAgent.isReady();
+    if (!readyCheck.ready) {
+      return jsonError(`Ollama nicht bereit. ${readyCheck.error || ''}`.trim(), 503, requestId);
     }
+
+    const response = await localAgent.answer(question, context);
+
+    // Add model info to response
+    return NextResponse.json({
+      ...response,
+      model: readyCheck.model,
+      mode: 'local'
+    });
     
   } catch (error) {
-    console.error('Agent error:', error);
-    return NextResponse.json(
-      { error: `Analyse fehlgeschlagen: ${(error as Error).message}` },
-      { status: 500 }
-    );
+    console.error('Agent error:', requestId, sanitizeError(error));
+    return jsonError('Analyse fehlgeschlagen.', 500, requestId);
   }
 }
 
