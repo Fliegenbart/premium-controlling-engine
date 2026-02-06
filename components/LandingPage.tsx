@@ -417,20 +417,122 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               colorTo="var(--color-two)"
             />
 
-            {/* Dashboard Preview */}
-            <div className="relative w-full rounded-[inherit] border border-white/5 overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-gray-900/80 to-gray-800/80 flex flex-col items-center justify-center p-8">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-one)]/20 to-[var(--color-two)]/20 flex items-center justify-center mb-4">
-                  <BarChart3 className="w-8 h-8 text-white/60" />
+            {/* Dashboard Preview — realistic mockup */}
+            <div className="relative w-full rounded-[inherit] border border-white/5 overflow-hidden select-none pointer-events-none">
+              <div className="bg-[#0c0c14] p-3 sm:p-5 md:p-6">
+                {/* Mock Header Bar */}
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                      <BarChart3 className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-xs font-semibold text-white/80">Premium Controlling</span>
+                    <div className="hidden sm:flex ml-4 gap-1">
+                      {['Einzelanalyse', 'Konzern', 'Fehler', 'Forecast'].map((tab, i) => (
+                        <span key={tab} className={`px-2 py-0.5 rounded text-[9px] font-medium ${i === 0 ? 'bg-blue-600 text-white' : 'text-gray-500'}`}>{tab}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded text-[9px] bg-yellow-500/20 text-yellow-400">Entwurf</span>
+                    <span className="px-2 py-0.5 rounded text-[9px] bg-blue-500/20 text-blue-400">Prüfung</span>
+                    <span className="px-2 py-0.5 rounded text-[9px] bg-green-500/20 text-green-400">Freigabe</span>
+                  </div>
                 </div>
-                <p className="text-gray-500 text-sm">Dashboard Preview</p>
-                <div className="mt-6 grid grid-cols-4 gap-4 w-full max-w-lg">
-                  {['Buchungen VJ', 'Aktuell', 'Abweichung', 'Konten'].map((label, i) => (
-                    <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
-                      <div className="text-xs text-gray-500 mb-1">{label}</div>
-                      <div className="text-sm font-mono text-white/60">--</div>
+
+                {/* KPI Row */}
+                <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-4">
+                  {[
+                    { label: 'Buchungen VJ', value: '4.218', color: 'text-white' },
+                    { label: 'Vorjahr', value: '2.847.392 €', color: 'text-white' },
+                    { label: 'Aktuell', value: '3.124.508 €', color: 'text-white' },
+                    { label: 'Abweichung', value: '+277.116 €', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
+                  ].map((kpi, i) => (
+                    <div key={i} className={`rounded-lg border p-2 sm:p-3 ${kpi.bg || 'bg-white/[0.02] border-white/5'}`}>
+                      <div className="text-[8px] sm:text-[10px] text-gray-500 mb-0.5">{kpi.label}</div>
+                      <div className={`text-[11px] sm:text-sm font-bold font-mono ${kpi.color}`}>{kpi.value}</div>
                     </div>
                   ))}
+                </div>
+
+                {/* Charts Row */}
+                <div className="grid grid-cols-5 gap-2 sm:gap-3 mb-4">
+                  {/* Bar Chart */}
+                  <div className="col-span-3 rounded-lg border border-white/5 bg-white/[0.02] p-2 sm:p-3">
+                    <div className="text-[9px] text-gray-500 mb-2 flex items-center gap-1">
+                      <BarChart3 className="w-2.5 h-2.5 text-blue-400" />
+                      Top Abweichungen
+                    </div>
+                    <div className="flex items-end gap-1 h-16 sm:h-20">
+                      {[
+                        { h: '75%', c: 'from-red-500 to-red-400', label: 'Personal' },
+                        { h: '55%', c: 'from-red-500/80 to-red-400/80', label: 'Material' },
+                        { h: '40%', c: 'from-green-500 to-green-400', label: 'Miete' },
+                        { h: '60%', c: 'from-red-500/70 to-red-400/70', label: 'IT' },
+                        { h: '30%', c: 'from-green-500/80 to-green-400/80', label: 'Reise' },
+                        { h: '45%', c: 'from-red-500/60 to-red-400/60', label: 'Beratg.' },
+                        { h: '20%', c: 'from-green-500/60 to-green-400/60', label: 'Versich.' },
+                      ].map((bar, i) => (
+                        <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                          <div className={`w-full rounded-t bg-gradient-to-t ${bar.c}`} style={{ height: bar.h }} />
+                          <span className="text-[6px] text-gray-600 truncate w-full text-center">{bar.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pie / Donut */}
+                  <div className="col-span-2 rounded-lg border border-white/5 bg-white/[0.02] p-2 sm:p-3 flex flex-col items-center justify-center">
+                    <div className="text-[9px] text-gray-500 mb-2 self-start flex items-center gap-1">
+                      <Target className="w-2.5 h-2.5 text-purple-400" />
+                      Verteilung
+                    </div>
+                    <svg viewBox="0 0 80 80" className="w-14 h-14 sm:w-16 sm:h-16">
+                      <circle cx="40" cy="40" r="30" fill="none" stroke="#ef4444" strokeWidth="10" strokeDasharray="120 69" strokeDashoffset="0" className="opacity-80" />
+                      <circle cx="40" cy="40" r="30" fill="none" stroke="#22c55e" strokeWidth="10" strokeDasharray="69 120" strokeDashoffset="-120" className="opacity-80" />
+                      <text x="40" y="42" textAnchor="middle" className="fill-white text-[10px] font-bold">63/37</text>
+                    </svg>
+                    <div className="flex gap-2 mt-1">
+                      <span className="flex items-center gap-0.5 text-[7px] text-gray-500"><span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />Steig.</span>
+                      <span className="flex items-center gap-0.5 text-[7px] text-gray-500"><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />Senk.</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Deviation Table */}
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] overflow-hidden">
+                  <div className="px-3 py-1.5 border-b border-white/5 text-[9px] text-gray-500 flex items-center gap-1">
+                    <span className="w-1 h-3 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500 inline-block" />
+                    Signifikante Abweichungen
+                  </div>
+                  <table className="w-full text-[8px] sm:text-[10px]">
+                    <thead>
+                      <tr className="text-gray-600 border-b border-white/5">
+                        <th className="text-left py-1 px-2 sm:px-3 font-medium">Konto</th>
+                        <th className="text-left py-1 px-1 font-medium hidden sm:table-cell">Bezeichnung</th>
+                        <th className="text-right py-1 px-1 font-medium hidden sm:table-cell">Vorjahr</th>
+                        <th className="text-right py-1 px-1 font-medium hidden sm:table-cell">Aktuell</th>
+                        <th className="text-right py-1 px-2 sm:px-3 font-medium">Abweichung</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { konto: '4120', name: 'Gehälter', vj: '845.200', akt: '923.400', delta: '+78.200 €', neg: true },
+                        { konto: '4960', name: 'Reisekosten', vj: '124.800', akt: '98.300', delta: '-26.500 €', neg: false },
+                        { konto: '6300', name: 'Sonst. Aufwand', vj: '67.400', akt: '112.900', delta: '+45.500 €', neg: true },
+                        { konto: '4830', name: 'Abschreibungen', vj: '234.100', akt: '241.800', delta: '+7.700 €', neg: true },
+                        { konto: '6800', name: 'IT-Kosten', vj: '189.500', akt: '156.200', delta: '-33.300 €', neg: false },
+                      ].map((row, i) => (
+                        <tr key={i} className={`border-b border-white/[0.03] ${i % 2 === 0 ? 'bg-white/[0.01]' : ''}`}>
+                          <td className="py-1 px-2 sm:px-3 text-gray-500 font-mono">{row.konto}</td>
+                          <td className="py-1 px-1 text-white/70 hidden sm:table-cell">{row.name}</td>
+                          <td className="py-1 px-1 text-right text-gray-500 font-mono hidden sm:table-cell">{row.vj}</td>
+                          <td className="py-1 px-1 text-right text-gray-400 font-mono hidden sm:table-cell">{row.akt}</td>
+                          <td className={`py-1 px-2 sm:px-3 text-right font-mono font-semibold ${row.neg ? 'text-red-400' : 'text-green-400'}`}>{row.delta}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
