@@ -7,21 +7,14 @@ import {
   Shield,
   Zap,
   FileText,
-  Sparkles,
   CheckCircle2,
-  ChevronDown,
   ArrowRight,
   Brain,
   Lock,
   TrendingUp,
   AlertTriangle,
-  Search,
   Target,
   ChevronRight,
-  Globe,
-  File,
-  HeartHandshake,
-  Rss,
   AlignJustify,
   XIcon,
 } from 'lucide-react';
@@ -262,7 +255,12 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
       />
 
       {/* ═══════════ HEADER ═══════════ */}
-      <header className="fixed left-0 top-0 z-50 w-full px-4 animate-fade-in border-b border-white/10 opacity-0 backdrop-blur-[12px] [--animation-delay:600ms]">
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/10 backdrop-blur-[12px]"
+      >
         <div className="max-w-7xl mx-auto flex h-[3.5rem] w-full items-center justify-between">
           {/* Logo */}
           <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-md flex items-center gap-2 font-semibold">
@@ -298,7 +296,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             {hamburgerMenuIsOpen ? <XIcon /> : <AlignJustify />}
           </button>
         </div>
-      </header>
+      </motion.header>
 
       {/* Mobile Nav */}
       <AnimatePresence>
@@ -350,38 +348,61 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
         className="relative mx-auto mt-32 max-w-[80rem] px-6 text-center md:px-8"
       >
         {/* Badge */}
-        <div className="backdrop-filter-[12px] inline-flex h-7 items-center justify-between rounded-full border border-white/10 bg-white/10 px-3 text-xs text-white transition-all ease-in hover:cursor-pointer hover:bg-white/20 group gap-1 translate-y-[-1rem] animate-fade-in opacity-0">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="backdrop-filter-[12px] inline-flex h-7 items-center justify-between rounded-full border border-white/10 bg-white/10 px-3 text-xs text-white transition-all ease-in hover:cursor-pointer hover:bg-white/20 group gap-1"
+        >
           <TextShimmer className="inline-flex items-center justify-center">
             <span>✨ KI-Controlling für den Mittelstand</span>{' '}
             <ArrowRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
           </TextShimmer>
-        </div>
+        </motion.div>
 
         {/* Headline */}
-        <h1 className="bg-gradient-to-br from-white from-30% to-white/40 bg-clip-text py-6 text-5xl font-medium leading-none tracking-tighter text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+        <motion.h1
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="bg-gradient-to-br from-white from-30% to-white/40 bg-clip-text py-6 text-5xl font-medium leading-none tracking-tighter text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl"
+        >
           Controlling-KI die
           <br className="hidden md:block" /> Ihre Daten schützt.
-        </h1>
+        </motion.h1>
 
         {/* Subtitle */}
-        <p className="mb-12 text-lg tracking-tight text-gray-400 md:text-xl text-balance translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+        <motion.p
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="mb-12 text-lg tracking-tight text-gray-400 md:text-xl text-balance"
+        >
           Automatische Abweichungsanalyse mit KI-Kommentaren – komplett on-premise.
           <br className="hidden md:block" /> Jede Aussage mit Evidence Link zur Buchung.
-        </p>
+        </motion.p>
 
         {/* CTA Button */}
-        <button
+        <motion.button
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0, ease: [0.21, 0.47, 0.32, 0.98] }}
           onClick={onStartApp}
-          className="inline-flex items-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-medium hover:bg-gray-200 transition-all translate-y-[-1rem] animate-fade-in opacity-0 ease-in-out [--animation-delay:600ms]"
+          className="inline-flex items-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-medium hover:bg-gray-200 transition-all ease-in-out"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
         >
           <span>Kostenlos starten</span>
-          <ArrowRight className="ml-1 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-1" />
-        </button>
+          <ArrowRight className="ml-1 size-4" />
+        </motion.button>
 
         {/* Hero Image / Dashboard Mockup */}
-        <div
+        <motion.div
           ref={heroRef}
-          className="relative mt-[8rem] animate-fade-up opacity-0 [--animation-delay:400ms] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,#0a0a0f_30%,transparent)]"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="relative mt-[8rem] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,#0a0a0f_30%,transparent)]"
         >
           <div
             className={`rounded-xl border border-white/10 bg-white/[0.01] before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
@@ -414,7 +435,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ═══════════ CLIENT / TRUST SECTION ═══════════ */}
@@ -447,68 +468,302 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
       {/* ═══════════ SPHERE MASK ═══════════ */}
       <SphereMask />
 
-      {/* ═══════════ FEATURES SECTION ═══════════ */}
+      {/* ═══════════ 4 KILLER FEATURE TILES ═══════════ */}
       <section id="features" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
         <div className="text-center mb-16">
           <h2 className="text-xl font-bold tracking-tight text-white mb-2">Features</h2>
           <p className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
-            Alles was Ihr Controlling braucht.
+            Vier Killer-Features.
           </p>
           <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
-            Von automatischer Abweichungsanalyse bis hin zu KI-generierten Monatsberichten – komplett lokal und prüfungssicher.
+            Jedes einzelne löst ein echtes Problem im Controlling-Alltag.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: Brain,
-              title: 'KI-Monatsberichte',
-              desc: 'Generiert automatisch vollständige Word-Reports mit KI-Analyse aller Abweichungen, Trends und Anomalien.',
-              gradient: 'from-[var(--color-one)] to-[var(--color-two)]',
-            },
-            {
-              icon: AlertTriangle,
-              title: 'Buchungsfehler-Erkennung',
-              desc: 'Smart Detection von Duplikaten, Rundlauf-Buchungen, Wochenend-Buchungen und verdächtigen Mustern.',
-              gradient: 'from-[var(--color-two)] to-[var(--color-three)]',
-            },
-            {
-              icon: Target,
-              title: 'Szenario-Simulation',
-              desc: 'What-if Analysen mit Real-Time Ergebnissen. Schieben Sie Regler und sehen Sie sofort die Auswirkungen.',
-              gradient: 'from-[var(--color-three)] to-[var(--color-one)]',
-            },
-            {
-              icon: TrendingUp,
-              title: 'Rollierender Forecast',
-              desc: 'Automatische Forecasts basierend auf historischen Daten, Trends und Saisonalitäten.',
-              gradient: 'from-cyan-500 to-blue-500',
-            },
-            {
-              icon: Search,
-              title: 'Natural Language Queries',
-              desc: 'Fragen Sie Ihre Daten auf Deutsch. Die KI versteht Kontext und liefert präzise Antworten.',
-              gradient: 'from-green-500 to-emerald-500',
-            },
-            {
-              icon: Shield,
-              title: '100% On-Premise',
-              desc: 'Alle Daten bleiben lokal auf Ihrem Server. Keine Cloud, keine Abhängigkeiten, volle Kontrolle.',
-              gradient: 'from-indigo-500 to-purple-500',
-            },
-          ].map((feature, idx) => (
-            <div
-              key={idx}
-              className="relative flex flex-col gap-4 rounded-2xl border border-white/10 p-6 overflow-hidden group hover:border-white/20 transition-all bg-white/[0.02]"
-            >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity`}>
-                <feature.icon className="w-6 h-6 text-white" />
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* ── Tile 1: KI-Monatsberichte ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} colorFrom="var(--color-one)" colorTo="var(--color-two)" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-one)] to-[var(--color-two)] flex items-center justify-center">
+                <Brain className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{feature.desc}</p>
+              <div>
+                <h3 className="text-xl font-bold text-white">KI-Monatsberichte</h3>
+                <p className="text-xs text-gray-500">Ein Klick → fertig</p>
+              </div>
             </div>
-          ))}
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Generiert automatisch vollständige Word-Reports mit KI-Analyse aller Abweichungen, Trends und Anomalien.
+            </p>
+            {/* Mini Demo: Animated document lines */}
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/5">
+                <FileText className="w-4 h-4 text-[var(--color-one)]" />
+                <span className="text-xs text-gray-500 font-mono">Monatsbericht_Jan_2025.docx</span>
+              </div>
+              {[
+                { w: '85%', delay: 0.3, color: 'bg-white/10' },
+                { w: '92%', delay: 0.5, color: 'bg-white/8' },
+                { w: '65%', delay: 0.7, color: 'bg-[var(--color-one)]/20' },
+                { w: '78%', delay: 0.9, color: 'bg-white/10' },
+                { w: '55%', delay: 1.1, color: 'bg-white/8' },
+                { w: '88%', delay: 1.3, color: 'bg-[var(--color-two)]/20' },
+                { w: '70%', delay: 1.5, color: 'bg-white/10' },
+              ].map((line, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: line.delay, ease: 'easeOut' }}
+                  className={`h-2 rounded-full mb-2 ${line.color}`}
+                  style={{ width: line.w }}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* ── Tile 2: Buchungsfehler-Erkennung ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={4} colorFrom="var(--color-two)" colorTo="var(--color-three)" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-two)] to-[var(--color-three)] flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Buchungsfehler-Erkennung</h3>
+                <p className="text-xs text-gray-500">Smart Detection</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Findet Duplikate, Rundlauf-Buchungen, Wochenend-Buchungen und verdächtige Muster automatisch.
+            </p>
+            {/* Mini Demo: Booking list with error highlight */}
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              {[
+                { text: '4711 Personalkosten', amount: '12.450,00', ok: true, delay: 0.4 },
+                { text: '6300 Reisekosten', amount: '3.200,50', ok: true, delay: 0.6 },
+                { text: '4711 Personalkosten', amount: '12.450,00', ok: false, delay: 0.8 },
+                { text: '7100 Abschreibungen', amount: '8.900,00', ok: true, delay: 1.0 },
+                { text: '6800 Sa/So Buchung', amount: '1.550,00', ok: false, delay: 1.2 },
+              ].map((row, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -15 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: row.delay, ease: 'easeOut' }}
+                  className={cn(
+                    'flex items-center justify-between py-2 px-3 rounded-lg mb-1.5 text-xs font-mono',
+                    row.ok
+                      ? 'bg-white/[0.02] text-gray-400'
+                      : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {!row.ok && (
+                      <motion.div
+                        animate={{ opacity: [1, 0.4, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        <AlertTriangle className="w-3 h-3 text-red-400" />
+                      </motion.div>
+                    )}
+                    <span>{row.text}</span>
+                  </div>
+                  <span>{row.amount} €</span>
+                </motion.div>
+              ))}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 1.6 }}
+                className="mt-2 text-xs text-red-400 flex items-center gap-1.5"
+              >
+                <AlertTriangle className="w-3 h-3" />
+                2 Fehler erkannt — Duplikat & Wochenend-Buchung
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* ── Tile 3: Szenario-Simulation ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={7} colorFrom="var(--color-three)" colorTo="var(--color-one)" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-three)] to-[var(--color-one)] flex items-center justify-center">
+                <Target className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Szenario-Simulation</h3>
+                <p className="text-xs text-gray-500">What-if Analyse</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Schieben Sie Regler und sehen Sie sofort die Auswirkungen auf Gewinn, Liquidität und Kosten.
+            </p>
+            {/* Mini Demo: Animated sliders + bar chart */}
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              {[
+                { label: 'Umsatz', value: 72, color: 'bg-emerald-500', delay: 0.5 },
+                { label: 'Personal', value: 45, color: 'bg-[var(--color-two)]', delay: 0.7 },
+                { label: 'Material', value: 58, color: 'bg-[var(--color-one)]', delay: 0.9 },
+              ].map((slider, i) => (
+                <div key={i} className="mb-4">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1.5">
+                    <span>{slider.label}</span>
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: slider.delay + 0.3 }}
+                      className="text-white font-mono"
+                    >
+                      {slider.value}%
+                    </motion.span>
+                  </div>
+                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${slider.value}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: slider.delay, ease: [0.21, 0.47, 0.32, 0.98] }}
+                      className={`h-full rounded-full ${slider.color}`}
+                    />
+                  </div>
+                </div>
+              ))}
+              {/* Impact bars */}
+              <div className="flex items-end gap-2 mt-4 h-16">
+                {[40, 65, 30, 80, 55, 70, 45].map((h, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ height: 0 }}
+                    whileInView={{ height: `${h}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 1.2 + i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="flex-1 rounded-t bg-gradient-to-t from-[var(--color-three)]/40 to-[var(--color-one)]/40"
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── Tile 4: Rollierender Forecast ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-white/10 p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.02] min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={10} colorFrom="#06b6d4" colorTo="#3b82f6" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Rollierender Forecast</h3>
+                <p className="text-xs text-gray-500">Automatische Prognose</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Automatische Forecasts basierend auf historischen Daten, Saisonalitäten und Trends.
+            </p>
+            {/* Mini Demo: Animated line chart */}
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              <div className="flex items-center gap-4 mb-3 text-xs text-gray-500">
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-cyan-400 rounded inline-block" /> Ist</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-400 rounded inline-block border border-dashed border-blue-400" /> Forecast</span>
+              </div>
+              <svg viewBox="0 0 280 100" className="w-full h-auto" fill="none">
+                {/* Grid lines */}
+                {[25, 50, 75].map((y) => (
+                  <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.05)" />
+                ))}
+                {/* Actual data line */}
+                <motion.path
+                  d="M 0 70 L 35 55 L 70 60 L 105 40 L 140 45 L 175 30"
+                  stroke="#06b6d4"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0 }}
+                  whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.5, delay: 0.5, ease: 'easeOut' }}
+                />
+                {/* Forecast line (dashed) */}
+                <motion.path
+                  d="M 175 30 L 210 22 L 245 18 L 280 12"
+                  stroke="#3b82f6"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeDasharray="6 4"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  whileInView={{ pathLength: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: 2, ease: 'easeOut' }}
+                />
+                {/* Forecast area */}
+                <motion.path
+                  d="M 175 30 L 210 22 L 245 18 L 280 12 L 280 100 L 175 100 Z"
+                  fill="url(#forecastGrad)"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 0.3 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 2.5 }}
+                />
+                {/* Data points */}
+                {[[0, 70], [35, 55], [70, 60], [105, 40], [140, 45], [175, 30]].map(([x, y], i) => (
+                  <motion.circle
+                    key={i}
+                    cx={x}
+                    cy={y}
+                    r="3"
+                    fill="#06b6d4"
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: 0.5 + i * 0.25 }}
+                  />
+                ))}
+                <defs>
+                  <linearGradient id="forecastGrad" x1="175" y1="12" x2="175" y2="100" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#3b82f6" stopOpacity="0.4" />
+                    <stop offset="1" stopColor="#3b82f6" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="flex justify-between text-[10px] text-gray-600 mt-1 px-1">
+                {['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep'].map((m) => (
+                  <span key={m}>{m}</span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
