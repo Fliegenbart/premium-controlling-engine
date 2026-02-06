@@ -56,6 +56,9 @@ import { TripleUpload } from '@/components/TripleUpload';
 import { TripleComparisonTable } from '@/components/TripleComparisonTable';
 import { MagicUpload } from '@/components/MagicUpload';
 import { DocumentsPanel } from '@/components/DocumentsPanel';
+import { NLQueryBar } from '@/components/NLQueryBar';
+import { RootCausePanel } from '@/components/RootCausePanel';
+
 
 interface EntityUpload {
   id: string;
@@ -83,7 +86,7 @@ interface KonzernResult {
 }
 
 type WorkflowStatus = 'draft' | 'review' | 'approved';
-type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs';
+type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends';
 
 const PREMIUM_ENTITIES = [
   'Ganzimmun Diagnostics',
@@ -159,6 +162,7 @@ export default function Home() {
   const [workflowStatus, setWorkflowStatus] = useState<WorkflowStatus>('draft');
   const [selectedDeviation, setSelectedDeviation] = useState<AccountDeviation | null>(null);
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
+  const [rootCauseDeviation, setRootCauseDeviation] = useState<AccountDeviation | null>(null);
 
   // Saved analyses management
   const { analyses: savedAnalyses, saveAnalysis, deleteAnalysis: deleteSavedAnalysis, refresh: refreshSavedAnalyses } = useSavedAnalyses();
@@ -656,6 +660,14 @@ export default function Home() {
                 >
                   📄 Dokumente
                 </button>
+                <button
+                  onClick={() => setMode('trends')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    mode === 'trends' ? 'bg-gradient-to-r from-green-600 to-teal-600 text-white' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  📈 Trends
+                </button>
               </div>
             </div>
 
@@ -694,6 +706,24 @@ export default function Home() {
         {mode === 'docs' && (
           <div className="mb-8">
             <DocumentsPanel />
+          </div>
+        )}
+
+        {/* Trends Section */}
+        {mode === 'trends' && (
+          <div className="mb-8">
+            <div className="bg-[#12121a] rounded-2xl border border-white/10 p-8 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-600 to-teal-600 flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Multi-Perioden Trendanalyse</h2>
+              <p className="text-gray-400 mb-6 max-w-lg mx-auto">
+                Laden Sie Buchungsdaten aus mehreren Jahren hoch, um CAGR, Volatilität, Forecasts und Anomalien über 3-5 Perioden zu analysieren.
+              </p>
+              <p className="text-gray-500 text-sm">
+                Nutzen Sie die Einzelanalyse, um zunächst Daten zu laden. Die Trend-Engine analysiert dann automatisch Ihre historischen Perioden.
+              </p>
+            </div>
           </div>
         )}
 
@@ -1002,6 +1032,11 @@ export default function Home() {
           onRefresh={refreshSavedAnalyses}
         />
 
+        {/* Natural Language Query */}
+        {mode !== 'triple' && mode !== 'docs' && mode !== 'trends' && hasValidData && (
+          <NLQueryBar />
+        )}
+
         {/* Results (for single and multi mode) */}
         {mode !== 'triple' && hasValidData && currentResult && (
           <>
@@ -1116,34 +1151,55 @@ export default function Home() {
                   <div className="space-y-3">
                     <h4 className="text-white font-medium mb-4">Signifikante Abweichungen</h4>
                     {currentResult.by_account?.slice(0, 10).map((dev, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
-                        className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-colors text-left"
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <p className="text-white font-medium">{dev.account_name}</p>
-                            <AnomalyBadge
-                              hint={dev.anomalyHint}
-                              type={dev.anomalyType}
-                              severity={dev.anomalySeverity}
-                            />
+                      <div key={idx} className="space-y-2">
+                        <button
+                          onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
+                          className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-lg p-4 transition-colors text-left"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-medium">{dev.account_name}</p>
+                              <AnomalyBadge
+                                hint={dev.anomalyHint}
+                                type={dev.anomalyType}
+                                severity={dev.anomalySeverity}
+                              />
+                            </div>
+                            <p className="text-sm text-gray-500">Konto {dev.account}</p>
                           </div>
-                          <p className="text-sm text-gray-500">Konto {dev.account}</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <p className={`font-bold ${dev.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                              {formatCurrency(dev.delta_abs)}
-                            </p>
-                            <p className={`text-sm ${dev.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                              {formatPercent(dev.delta_pct)}
-                            </p>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <p className={`font-bold ${dev.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                {formatCurrency(dev.delta_abs)}
+                              </p>
+                              <p className={`text-sm ${dev.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                {formatPercent(dev.delta_pct)}
+                              </p>
+                            </div>
+                            <Link2 className="w-4 h-4 text-blue-400" />
                           </div>
-                          <Link2 className="w-4 h-4 text-blue-400" />
+                        </button>
+                        <div className="flex gap-2 ml-4">
+                          <button
+                            onClick={() => setRootCauseDeviation(rootCauseDeviation?.account === dev.account ? null : dev)}
+                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
+                              rootCauseDeviation?.account === dev.account
+                                ? 'bg-purple-500/30 text-purple-300 border border-purple-500/30'
+                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            🔍 Warum?
+                          </button>
                         </div>
-                      </button>
+                        {rootCauseDeviation?.account === dev.account && (
+                          <RootCausePanel
+                            deviation={dev}
+                            prevBookings={prevBookings}
+                            currBookings={currBookings}
+                            onClose={() => setRootCauseDeviation(null)}
+                          />
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
