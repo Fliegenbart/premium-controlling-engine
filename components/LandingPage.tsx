@@ -1,80 +1,49 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useId } from 'react';
+import { motion, AnimatePresence, useAnimation, useInView } from 'framer-motion';
 import {
   BarChart3,
   Shield,
   Zap,
   FileText,
-  Upload,
   Sparkles,
   CheckCircle2,
   ChevronDown,
   ArrowRight,
-  Building2,
-  Factory,
-  Landmark,
   Brain,
   Lock,
   TrendingUp,
   AlertTriangle,
   Search,
   Target,
-  Clock,
-  Users,
+  ChevronRight,
+  Globe,
+  File,
+  HeartHandshake,
+  Rss,
+  AlignJustify,
+  XIcon,
 } from 'lucide-react';
-import { NumberTicker } from '@/components/magicui/number-ticker';
-import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
-import { ShimmerButton } from '@/components/magicui/shimmer-button';
-import { Particles } from '@/components/magicui/particles';
+import TextShimmer from '@/components/magicui/text-shimmer';
 import { BorderBeam } from '@/components/magicui/border-beam';
-import { BlurFade } from '@/components/magicui/blur-fade';
-import { Meteors } from '@/components/magicui/meteors';
+import { Particles } from '@/components/magicui/particles';
+import { SphereMask } from '@/components/magicui/sphere-mask';
+import Marquee from '@/components/magicui/marquee';
+import { cn } from '@/lib/utils';
 
 interface LandingPageProps {
   onStartApp: () => void;
 }
 
-const faqs = [
-  {
-    question: 'Wie sicher sind meine Daten?',
-    answer:
-      'Alle Daten bleiben 100% lokal auf Ihrem System. Keine Cloud-Synchronisation, keine externen APIs, keine Datenübertragung. Sie behalten vollständige Kontrolle.',
-  },
-  {
-    question: 'Welche Dateiformate werden unterstützt?',
-    answer:
-      'Wir unterstützen CSV, Excel, SAP-Exporte und DATEV-Formate. Die Magic Upload erkennt das Format automatisch und parst die Buchungen ohne manuelles Mapping.',
-  },
-  {
-    question: 'Brauche ich Ollama oder andere Tools?',
-    answer:
-      'Nein, Ollama ist optional. Die KI läuft vollständig on-premise im Container. Sie können aber Ollama integrieren, um lokale LLM-Modelle zu nutzen.',
-  },
-  {
-    question: 'Was kostet die Lösung?',
-    answer:
-      'Starter ist kostenlos mit grundlegenden Features. Professional bietet vollständige KI-Analyse für 49€/Monat. Enterprise-Kunden können maßgeschneiderte Lösungen mit us besprechen.',
-  },
-  {
-    question: 'Kann ich es on-premise installieren?',
-    answer:
-      'Ja! Die komplette Lösung ist Docker-ready. Sie können sie in Ihrer IT-Infrastruktur, hinter Ihrer Firewall oder auf lokalen Servern deployen.',
-  },
-  {
-    question: 'Gibt es Support und Updates?',
-    answer:
-      'Ja, regelmäßige Updates und Support sind enthalten. Für Professional und Enterprise Kunden bieten wir dedizierten Support und Customization.',
-  },
-];
+/* ───────── Pricing Data ───────── */
+type Interval = 'month' | 'year';
 
 const pricingPlans = [
   {
+    id: 'starter',
     name: 'Starter',
-    price: 'Kostenlos',
-    period: 'Für immer',
-    description: 'Perfekt zum Ausprobieren',
+    description: 'Perfekt zum Ausprobieren und für kleine Teams',
     features: [
       'Bis zu 5 Analysen/Monat',
       'Einzelentity-Analyse',
@@ -82,14 +51,14 @@ const pricingPlans = [
       'Basis-Reports',
       'Community Support',
     ],
-    cta: 'Kostenlos starten',
-    highlighted: false,
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    isMostPopular: false,
   },
   {
+    id: 'professional',
     name: 'Professional',
-    price: '49',
-    period: '€/Monat',
-    description: 'Für ernsthafte Controlling-Teams',
+    description: 'Für ernsthafte Controlling-Teams im Mittelstand',
     features: [
       'Unbegrenzte Analysen',
       'Multi-Entity & Konzern',
@@ -97,16 +66,15 @@ const pricingPlans = [
       'Szenario-Simulation',
       'Root-Cause Analyse',
       'Email Support',
-      'API-Zugang',
     ],
-    cta: 'Jetzt upgraden',
-    highlighted: true,
+    monthlyPrice: 4900,
+    yearlyPrice: 49000,
+    isMostPopular: true,
   },
   {
+    id: 'enterprise',
     name: 'Enterprise',
-    price: 'Custom',
-    period: 'Auf Anfrage',
-    description: 'Für große Organisationen',
+    description: 'On-Premise Deployment für große Organisationen',
     features: [
       'Alles aus Professional',
       'Dedizierter Support',
@@ -116,674 +84,635 @@ const pricingPlans = [
       'Training & Onboarding',
       'Compliance Features',
     ],
-    cta: 'Demo anfragen',
-    highlighted: false,
+    monthlyPrice: 14900,
+    yearlyPrice: 149000,
+    isMostPopular: false,
   },
 ];
 
-export default function LandingPage({ onStartApp }: LandingPageProps) {
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+const toHumanPrice = (price: number, decimals: number = 0) => {
+  return new Intl.NumberFormat('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(price / 100);
+};
+
+/* ───────── CTA Tiles ───────── */
+const tiles = [
+  {
+    icon: <BarChart3 className="size-full" />,
+    bg: (
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-orange-600 via-rose-600 to-violet-600 opacity-70 blur-[20px] filter"></div>
+    ),
+  },
+  {
+    icon: <Shield className="size-full" />,
+    bg: (
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 opacity-70 blur-[20px] filter"></div>
+    ),
+  },
+  {
+    icon: <Brain className="size-full" />,
+    bg: (
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-green-500 via-teal-500 to-emerald-600 opacity-70 blur-[20px] filter"></div>
+    ),
+  },
+  {
+    icon: <Target className="size-full" />,
+    bg: (
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600 opacity-70 blur-[20px] filter"></div>
+    ),
+  },
+  {
+    icon: <TrendingUp className="size-full" />,
+    bg: (
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 opacity-70 blur-[20px] filter"></div>
+    ),
+  },
+  {
+    icon: <Zap className="size-full" />,
+    bg: (
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-gray-600 via-gray-500 to-gray-400 opacity-70 blur-[20px] filter"></div>
+    ),
+  },
+];
+
+const shuffleArray = (array: any[]) => {
+  const arr = [...array];
+  let currentIndex = arr.length, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+  }
+  return arr;
+};
+
+/* ───────── CTA Card ───────── */
+const CTACard = (card: { icon: JSX.Element; bg: JSX.Element }) => {
+  const id = useId();
+  const controls = useAnimation();
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start({
+        opacity: 1,
+        transition: { delay: Math.random() * 2, ease: 'easeOut', duration: 1 },
+      });
+    }
+  }, [controls, inView]);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
-      {/* Animated Particle Background */}
+    <motion.div
+      key={id}
+      ref={ref}
+      initial={{ opacity: 0 }}
+      animate={controls}
+      className={cn(
+        'relative size-20 cursor-pointer overflow-hidden rounded-2xl border p-4',
+        'bg-white/5 [box-shadow:0_0_0_1px_rgba(255,255,255,.05),0_2px_4px_rgba(0,0,0,.2),0_12px_24px_rgba(0,0,0,.2)]',
+        'transform-gpu [border:1px_solid_rgba(255,255,255,.1)] [box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]'
+      )}
+    >
+      {card.icon}
+      {card.bg}
+    </motion.div>
+  );
+};
+
+/* ───────── Nav Items ───────── */
+const menuItems = [
+  { id: 1, label: 'Features', href: '#features' },
+  { id: 2, label: 'Preise', href: '#pricing' },
+  { id: 3, label: 'FAQ', href: '#faq' },
+  { id: 4, label: 'Kontakt', href: '#contact' },
+];
+
+/* ───────── Footer ───────── */
+const footerNavs = [
+  {
+    label: 'Produkt',
+    items: [
+      { href: '#features', name: 'Features' },
+      { href: '#pricing', name: 'Preise' },
+      { href: '#faq', name: 'FAQ' },
+    ],
+  },
+  {
+    label: 'Ressourcen',
+    items: [
+      { href: '#', name: 'Dokumentation' },
+      { href: '#', name: 'API Docs' },
+      { href: '#', name: 'Support' },
+    ],
+  },
+  {
+    label: 'Rechtliches',
+    items: [
+      { href: '#', name: 'Datenschutz' },
+      { href: '#', name: 'Impressum' },
+      { href: '#', name: 'AGB' },
+    ],
+  },
+];
+
+/* ═══════════════════ MAIN COMPONENT ═══════════════════ */
+export default function LandingPage({ onStartApp }: LandingPageProps) {
+  const heroRef = useRef(null);
+  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
+  const [hamburgerMenuIsOpen, setHamburgerMenuIsOpen] = useState(false);
+  const [interval, setInterval] = useState<Interval>('month');
+  const [randomTiles1, setRandomTiles1] = useState<typeof tiles>([]);
+  const [randomTiles2, setRandomTiles2] = useState<typeof tiles>([]);
+  const [randomTiles3, setRandomTiles3] = useState<typeof tiles>([]);
+  const [randomTiles4, setRandomTiles4] = useState<typeof tiles>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRandomTiles1(shuffleArray(tiles));
+      setRandomTiles2(shuffleArray(tiles));
+      setRandomTiles3(shuffleArray(tiles));
+      setRandomTiles4(shuffleArray(tiles));
+    }
+  }, []);
+
+  useEffect(() => {
+    const html = document.querySelector('html');
+    if (html) html.classList.toggle('overflow-hidden', hamburgerMenuIsOpen);
+  }, [hamburgerMenuIsOpen]);
+
+  useEffect(() => {
+    const closeNav = () => setHamburgerMenuIsOpen(false);
+    window.addEventListener('orientationchange', closeNav);
+    window.addEventListener('resize', closeNav);
+    return () => {
+      window.removeEventListener('orientationchange', closeNav);
+      window.removeEventListener('resize', closeNav);
+    };
+  }, []);
+
+  return (
+    <main className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden relative">
+      {/* ─── Global Particles ─── */}
       <Particles
-        className="fixed inset-0"
-        quantity={80}
-        ease={80}
-        color="#22c55e"
-        size={0.5}
+        className="absolute inset-0 -z-10"
+        quantity={50}
+        ease={70}
+        size={0.05}
+        color="#ffffff"
       />
 
-      {/* Section 1: Header/Navbar */}
-      <header className="relative z-10 sticky top-0 backdrop-blur-sm bg-[#0a0a0f]/80 border-b border-white/10">
-        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      {/* ═══════════ HEADER ═══════════ */}
+      <header className="fixed left-0 top-0 z-50 w-full px-4 animate-fade-in border-b border-white/10 opacity-0 backdrop-blur-[12px] [--animation-delay:600ms]">
+        <div className="max-w-7xl mx-auto flex h-[3.5rem] w-full items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-white" />
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-md flex items-center gap-2 font-semibold">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-one)] to-[var(--color-two)] flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-white" />
             </div>
-            <div>
-              <span className="text-lg font-bold">Premium Controlling</span>
-              <span className="hidden sm:block text-xs text-gray-500">KI-gestützt • 100% Lokal</span>
+            Premium Controlling
+          </button>
+
+          {/* Desktop Nav */}
+          <div className="ml-auto flex h-full items-center">
+            <div className="hidden md:flex items-center gap-6 mr-6">
+              {menuItems.map((item) => (
+                <a key={item.id} href={item.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  {item.label}
+                </a>
+              ))}
             </div>
+            <button
+              onClick={onStartApp}
+              className="mr-2 rounded-lg bg-white text-black px-4 py-1.5 text-sm font-medium hover:bg-gray-200 transition-colors"
+            >
+              App starten
+            </button>
           </div>
 
-          {/* Center Nav */}
-          <div className="hidden md:flex items-center gap-8">
-            {['Features', 'Szenario', 'Fehler', 'Forecast', 'Preise'].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
-
-          {/* CTA Button */}
-          <ShimmerButton
-            onClick={onStartApp}
-            shimmerColor="#22c55e"
-            shimmerSize="0.1em"
-            background="linear-gradient(135deg, #166534 0%, #059669 100%)"
-            className="text-sm font-semibold py-2 px-6"
+          {/* Mobile Hamburger */}
+          <button
+            className="ml-4 md:hidden"
+            onClick={() => setHamburgerMenuIsOpen((o) => !o)}
           >
-            <span className="flex items-center gap-2">
-              Jetzt starten
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </ShimmerButton>
-        </nav>
+            <span className="sr-only">Toggle menu</span>
+            {hamburgerMenuIsOpen ? <XIcon /> : <AlignJustify />}
+          </button>
+        </div>
       </header>
 
-      {/* Section 2: Hero Section */}
-      <section className="relative z-10 px-6 pt-32 pb-20">
-        <div className="max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <BlurFade delay={0.1} inView>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 mb-8">
-              <Sparkles className="w-4 h-4 text-green-400" />
-              <span className="text-sm font-medium text-green-400">KI-gestützt • 100% lokal</span>
-            </div>
-          </BlurFade>
-
-          {/* Headline */}
-          <BlurFade delay={0.2} inView>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="text-white">Controlling-KI</span>
-              <br />
-              <AnimatedGradientText className="text-5xl md:text-7xl font-bold !bg-gradient-to-r !from-green-400 !via-emerald-300 !to-green-400">
-                die Ihre Daten schützt
-              </AnimatedGradientText>
-            </h1>
-          </BlurFade>
-
-          {/* Subtitle */}
-          <BlurFade delay={0.3} inView>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
-              Automatische Abweichungsanalyse mit KI-Kommentaren – komplett on-premise.
-              <br />
-              <span className="text-white font-medium">Jede Aussage mit Evidence Link zur Buchung.</span>
-            </p>
-          </BlurFade>
-
-          {/* CTA Buttons */}
-          <BlurFade delay={0.4} inView>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <ShimmerButton
-                onClick={onStartApp}
-                shimmerColor="#22c55e"
-                shimmerSize="0.1em"
-                background="linear-gradient(135deg, #166534 0%, #059669 100%)"
-                className="shadow-lg shadow-green-500/25 text-lg font-semibold py-3 px-8"
-              >
-                <span className="flex items-center gap-3">
-                  Kostenlos starten
-                  <ArrowRight className="w-5 h-5" />
-                </span>
-              </ShimmerButton>
-              <button className="px-8 py-3 border border-white/20 rounded-xl font-semibold hover:bg-white/5 transition-colors">
-                Demo ansehen
+      {/* Mobile Nav */}
+      <AnimatePresence>
+        {hamburgerMenuIsOpen && (
+          <motion.nav
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#0a0a0f]/95 backdrop-blur-[12px]"
+          >
+            <div className="max-w-7xl mx-auto flex h-[3.5rem] items-center justify-between px-4">
+              <span className="text-md font-semibold">Premium Controlling</span>
+              <button onClick={() => setHamburgerMenuIsOpen(false)}>
+                <XIcon />
               </button>
             </div>
-          </BlurFade>
-
-          {/* Stats */}
-          <BlurFade delay={0.5} inView>
-            <div className="flex flex-wrap justify-center gap-12">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400">
-                  <NumberTicker value={100} suffix="%" />
-                </div>
-                <div className="text-sm text-gray-500">100% Lokal</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400">
-                  {'<'}<NumberTicker value={5} /> Min
-                </div>
-                <div className="text-sm text-gray-500">Setup Time</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400">
-                  <NumberTicker value={50} suffix="+" />
-                </div>
-                <div className="text-sm text-gray-500">Gesellschaften</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-pink-400">
-                  <NumberTicker value={211} />
-                </div>
-                <div className="text-sm text-gray-500">Tests</div>
-              </div>
-            </div>
-          </BlurFade>
-
-          {/* Hero Image/Mockup */}
-          <BlurFade delay={0.6} inView>
-            <div className="mt-16 relative mx-auto max-w-3xl">
-              <div className="relative rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 overflow-hidden backdrop-blur-sm">
-                <BorderBeam size={150} duration={20} colorFrom="#3b82f6" colorTo="#06b6d4" />
-                <div className="aspect-video bg-gradient-to-br from-gray-900/50 to-gray-800/50 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mx-auto mb-4">
-                      <BarChart3 className="w-8 h-8 text-blue-400" />
-                    </div>
-                    <p className="text-gray-400">Dashboard Preview</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </BlurFade>
-        </div>
-      </section>
-
-      {/* Section 3: Logos/Trust Section */}
-      <section className="relative z-10 px-6 py-16 border-y border-white/10">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-400 mb-8">Vertraut von führenden Unternehmen</p>
-          <div className="flex justify-center items-center gap-12 flex-wrap">
-            {[Building2, Factory, Landmark, Users].map((Icon, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <Icon className="w-8 h-8 text-gray-500" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 4: Problem Section */}
-      <section className="relative z-10 px-6 py-20">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
-          {/* Left: Problem Description */}
-          <BlurFade delay={0.1} inView>
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <AlertTriangle className="w-8 h-8 text-red-500" />
-                <h2 className="text-3xl font-bold">Das Problem</h2>
-              </div>
-              <p className="text-gray-400 mb-6">
-                Controlling in deutschen Mittelständen ist zeitintensiv und fehleranfällig. Excel-Tabellen, manuelle Analysen und keine prüfungssicheren Nachweise.
-              </p>
-              <ul className="space-y-3 text-gray-400">
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  Excel-Hölle: Tausende Zeilen, keine Struktur
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  Cloud-Risiko: Fremde Server, Compliance-Probleme
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  Manuelle Reports: Tage statt Minuten
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-red-500" />
-                  Keine KI-Hilfe: Abweichungen bleiben unerkannt
-                </li>
-              </ul>
-            </div>
-          </BlurFade>
-
-          {/* Right: Pain Points */}
-          <div className="space-y-4">
-            {[
-              {
-                icon: AlertTriangle,
-                title: 'Excel-Hölle',
-                desc: 'Tausende unstrukturierte Zeilen',
-                color: 'from-red-500/20 to-orange-500/20',
-                border: 'border-red-500/20',
-              },
-              {
-                icon: Lock,
-                title: 'Cloud-Risiko',
-                desc: 'Datensouveränität gefährdet',
-                color: 'from-orange-500/20 to-yellow-500/20',
-                border: 'border-orange-500/20',
-              },
-              {
-                icon: Clock,
-                title: 'Manuelle Reports',
-                desc: 'Tage voller Klicks und Formeln',
-                color: 'from-yellow-500/20 to-red-500/20',
-                border: 'border-yellow-500/20',
-              },
-              {
-                icon: Brain,
-                title: 'Keine KI-Hilfe',
-                desc: 'Anomalien und Trends bleiben unsichtbar',
-                color: 'from-red-500/20 to-pink-500/20',
-                border: 'border-red-500/20',
-              },
-            ].map((card, idx) => (
-              <BlurFade key={idx} delay={0.15 + idx * 0.05} inView>
-                <div
-                  className={`relative p-4 rounded-xl bg-gradient-to-br ${card.color} border ${card.border} overflow-hidden`}
-                >
-                  <BorderBeam size={80} duration={10} colorFrom="#ef4444" colorTo="#f97316" />
-                  <div className="flex items-start gap-4 relative z-10">
-                    <card.icon className="w-5 h-5 text-red-400 flex-shrink-0 mt-1" />
-                    <div>
-                      <h4 className="font-semibold text-white mb-1">{card.title}</h4>
-                      <p className="text-sm text-gray-400">{card.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 5: Solution Section */}
-      <section className="relative z-10 px-6 py-20 bg-gradient-to-b from-white/5 to-transparent">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">
-              <AnimatedGradientText className="!bg-gradient-to-r !from-green-400 !via-emerald-300 !to-green-400">
-                Die Lösung
-              </AnimatedGradientText>
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Premium Controlling kombiniert lokale KI mit prüfungssicheren Evidence Links.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Shield,
-                title: 'Lokale KI',
-                desc: 'Alle Daten bleiben auf Ihrem Server. Keine Cloud, keine Abhängigkeiten.',
-                color: 'from-green-500/20 to-emerald-500/20',
-                borderColor: 'border-green-500/20',
-              },
-              {
-                icon: Zap,
-                title: 'Automatische Analyse',
-                desc: 'Abweichungen, Trends und Anomalien werden in Sekunden identifiziert.',
-                color: 'from-blue-500/20 to-cyan-500/20',
-                borderColor: 'border-blue-500/20',
-              },
-              {
-                icon: FileText,
-                title: 'Ein-Klick Reports',
-                desc: 'Word-Reports mit KI-Kommentaren, sofort exportierbar.',
-                color: 'from-purple-500/20 to-pink-500/20',
-                borderColor: 'border-purple-500/20',
-              },
-            ].map((solution, idx) => (
-              <BlurFade key={idx} delay={0.1 * idx} inView>
-                <div
-                  className={`relative p-6 rounded-xl bg-gradient-to-br ${solution.color} border ${solution.borderColor} overflow-hidden group hover:border-white/30 transition-all`}
-                >
-                  <BorderBeam size={100} duration={12} colorFrom="#22c55e" colorTo="#3b82f6" />
-                  <div className="relative z-10">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <solution.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold mb-3 text-white">{solution.title}</h3>
-                    <p className="text-gray-400 text-sm">{solution.desc}</p>
-                  </div>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 6: How It Works */}
-      <section className="relative z-10 px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">So funktioniert's</h2>
-            <p className="text-gray-400">Drei einfache Schritte zum perfekten Controlling-Report</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                number: '1',
-                icon: Upload,
-                title: 'Daten hochladen',
-                desc: 'CSV, DATEV oder SAP – wird automatisch erkannt',
-                color: 'from-blue-500 to-cyan-500',
-              },
-              {
-                number: '2',
-                icon: Sparkles,
-                title: 'KI analysiert',
-                desc: 'Abweichungen, Trends und Anomalien werden identifiziert',
-                color: 'from-purple-500 to-pink-500',
-              },
-              {
-                number: '3',
-                icon: FileText,
-                title: 'Report erhalten',
-                desc: 'Word-Report mit KI-Kommentaren in Sekunden',
-                color: 'from-green-500 to-emerald-500',
-              },
-            ].map((step, idx) => (
-              <BlurFade key={idx} delay={0.1 * idx} inView>
-                <div className="flex flex-col items-center text-center">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4 shadow-lg`}>
-                    <div className="absolute -top-3 -right-3 w-8 h-8 bg-white text-gray-900 rounded-full flex items-center justify-center font-bold text-sm">
-                      {step.number}
-                    </div>
-                    <step.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-white mb-2">{step.title}</h3>
-                  <p className="text-sm text-gray-400">{step.desc}</p>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 7: Features/Bento Grid */}
-      <section className="relative z-10 px-6 py-20 bg-gradient-to-b from-transparent via-white/5 to-transparent">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center">Alles was Sie brauchen</h2>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Large Feature 1 */}
-            <BlurFade delay={0.05} inView>
-              <div className="md:col-span-2 relative p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 overflow-hidden group hover:border-blue-500/40 transition-all">
-                <BorderBeam size={200} duration={20} colorFrom="#3b82f6" colorTo="#06b6d4" />
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center mb-4">
-                    <Brain className="w-7 h-7 text-blue-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white">KI-Monatsberichte</h3>
-                  <p className="text-gray-400">Generiert automatisch vollständige Word-Reports mit KI-Analyse aller Abweichungen und Trends.</p>
-                </div>
-              </div>
-            </BlurFade>
-
-            {/* Large Feature 2 */}
-            <BlurFade delay={0.1} inView>
-              <div className="md:row-span-2 relative p-8 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 overflow-hidden group hover:border-purple-500/40 transition-all">
-                <BorderBeam size={200} duration={20} colorFrom="#a855f7" colorTo="#ec4899" />
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
-                    <TrendingUp className="w-7 h-7 text-purple-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-white">Szenario-Simulation</h3>
-                  <p className="text-gray-400 mb-6">What-if Analysen mit Real-Time Ergebnissen. Schieben Sie Regler und sehen Sie sofort die Auswirkungen.</p>
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-300 font-mono">• Gewinn-Impact</div>
-                    <div className="text-sm text-gray-300 font-mono">• Liquidität-Szenarien</div>
-                    <div className="text-sm text-gray-300 font-mono">• Kosten-Variationen</div>
-                  </div>
-                </div>
-              </div>
-            </BlurFade>
-
-            {/* Small Features Grid */}
-            {[
-              { icon: AlertTriangle, title: 'Buchungsfehler-Erkennung', desc: 'Smart duplicate & error detection' },
-              { icon: Target, title: 'Rollierender Forecast', desc: 'Automatische yearly forecast' },
-              { icon: Search, title: 'Natural Language Queries', desc: 'Frage deine Daten auf Deutsch' },
-              { icon: Brain, title: 'Root-Cause Analyse', desc: 'Deep-dive warum Abweichungen' },
-            ].map((feature, idx) => (
-              <BlurFade key={idx} delay={0.15 + idx * 0.05} inView>
-                <div className="relative p-6 rounded-xl bg-gradient-to-br from-white/5 to-white/2 border border-white/10 overflow-hidden group hover:border-white/20 transition-all">
-                  <BorderBeam size={80} duration={12} colorFrom="#3b82f6" colorTo="#22c55e" />
-                  <div className="relative z-10">
-                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center mb-3">
-                      <feature.icon className="w-5 h-5 text-gray-300" />
-                    </div>
-                    <h4 className="font-semibold text-white mb-1 text-sm">{feature.title}</h4>
-                    <p className="text-xs text-gray-400">{feature.desc}</p>
-                  </div>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 8: Testimonial Highlight */}
-      <section className="relative z-10 px-6 py-20">
-        <div className="max-w-3xl mx-auto">
-          <BlurFade delay={0.1} inView>
-            <div className="relative p-12 rounded-2xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 overflow-hidden">
-              <BorderBeam size={200} duration={20} colorFrom="#22c55e" colorTo="#059669" />
-              <div className="relative z-10 text-center">
-                <div className="mb-8">
-                  <svg className="w-12 h-12 text-green-400 mx-auto opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-4.25-2-7-2s-7 .75-7 2v8c0 7 4 8 7 8z" />
-                  </svg>
-                </div>
-                <p className="text-2xl font-semibold text-white mb-6 leading-relaxed">
-                  "Premium Controlling hat unsere Abweichungsanalyse von Tagen auf Stunden reduziert. Die Evidence Links sind für unsere Revision Gold wert."
-                </p>
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-3">
-                    <span className="text-white font-bold">TM</span>
-                  </div>
-                  <p className="font-semibold text-white">Dr. Thomas Müller</p>
-                  <p className="text-sm text-gray-400">CFO, mittelständisches Unternehmen</p>
-                </div>
-              </div>
-            </div>
-          </BlurFade>
-        </div>
-      </section>
-
-      {/* Section 9: Stats Section */}
-      <section className="relative z-10 px-6 py-20 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-blue-900/20 rounded-2xl">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { value: 5210, suffix: '+', label: 'Lines of Code' },
-              { value: 211, suffix: '', label: 'Tests Passing' },
-              { value: 5, suffix: ' Min', label: 'Setup Time' },
-              { value: 100, suffix: '%', label: 'Data Privacy' },
-            ].map((stat, idx) => (
-              <BlurFade key={idx} delay={0.1 * idx} inView>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-white mb-2">
-                    <NumberTicker value={stat.value} suffix={stat.suffix} />
-                  </div>
-                  <p className="text-gray-400">{stat.label}</p>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 10: Pricing Section */}
-      <section className="relative z-10 px-6 py-20" id="Preise">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Einfache Preise</h2>
-            <p className="text-gray-400">Für jeden Anspruch das richtige Paket</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, idx) => (
-              <BlurFade key={idx} delay={0.1 * idx} inView>
-                <div
-                  className={`relative p-8 rounded-2xl overflow-hidden transition-all ${
-                    plan.highlighted
-                      ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 scale-105'
-                      : 'bg-white/5 border border-white/10 hover:border-white/20'
-                  }`}
-                >
-                  {plan.highlighted && <BorderBeam size={150} duration={15} colorFrom="#22c55e" colorTo="#059669" />}
-
-                  <div className="relative z-10">
-                    {plan.highlighted && (
-                      <div className="inline-block px-3 py-1 rounded-full bg-green-500/30 text-green-400 text-xs font-medium mb-4">
-                        Beliebt
-                      </div>
-                    )}
-
-                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                    <p className="text-gray-400 text-sm mb-6">{plan.description}</p>
-
-                    <div className="mb-6">
-                      <span className="text-5xl font-bold text-white">{plan.price}</span>
-                      {plan.period && <span className="text-gray-400 ml-2">{plan.period}</span>}
-                    </div>
-
-                    <button
-                      onClick={onStartApp}
-                      className={`w-full py-3 px-6 rounded-lg font-semibold transition-all mb-8 ${
-                        plan.highlighted
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
-                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
-                      }`}
-                    >
-                      {plan.cta}
-                    </button>
-
-                    <div className="space-y-3 border-t border-white/10 pt-8">
-                      {plan.features.map((feature, fidx) => (
-                        <div key={fidx} className="flex items-center gap-3">
-                          <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
-                          <span className="text-sm text-gray-300">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 11: FAQ Section */}
-      <section className="relative z-10 px-6 py-20 bg-white/5">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Häufige Fragen</h2>
-          </div>
-
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => (
-              <BlurFade key={idx} delay={0.05 * idx} inView>
-                <div className="border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-colors">
-                  <button
-                    onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
-                    className="w-full flex items-center justify-between p-5 bg-white/5 hover:bg-white/10 transition-colors"
-                  >
-                    <span className="font-semibold text-white text-left">{faq.question}</span>
-                    <ChevronDown
-                      className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${
-                        expandedFaq === idx ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  <AnimatePresence>
-                    {expandedFaq === idx && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <p className="p-5 text-gray-400 bg-white/[0.02]">{faq.answer}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 12: Final CTA */}
-      <section className="relative z-10 px-6 py-20">
-        <div className="max-w-4xl mx-auto relative rounded-3xl p-12 bg-gradient-to-br from-emerald-900/30 to-green-900/30 border border-green-500/20 overflow-hidden">
-          <Meteors number={20} />
-          <div className="relative z-10 text-center">
-            <h2 className="text-4xl font-bold mb-4 text-white">Bereit für smartes Controlling?</h2>
-            <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-              Starten Sie jetzt kostenlos. Keine Kreditkarte nötig. Ihre Daten bleiben lokal.
-            </p>
-            <ShimmerButton
-              onClick={onStartApp}
-              shimmerColor="#22c55e"
-              shimmerSize="0.1em"
-              background="linear-gradient(135deg, #166534 0%, #059669 100%)"
-              className="shadow-lg shadow-green-500/25 text-lg font-semibold py-3 px-10"
+            <motion.ul
+              className="flex flex-col px-6 pt-4"
+              initial="initial"
+              animate="open"
+              variants={{ open: { transition: { staggerChildren: 0.06 } } }}
             >
-              <span className="flex items-center gap-3">
-                Jetzt kostenlos starten
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            </ShimmerButton>
-            <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-                Keine Registrierung
-              </div>
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-green-500" />
-                100% Lokal
-              </div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-green-500" />
-                Open Source
+              {menuItems.map((item) => (
+                <motion.li
+                  key={item.id}
+                  variants={{
+                    initial: { y: '-20px', opacity: 0 },
+                    open: { y: 0, opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } },
+                  }}
+                  className="border-b border-white/10 py-3"
+                >
+                  <a
+                    href={item.href}
+                    onClick={() => setHamburgerMenuIsOpen(false)}
+                    className="text-xl text-white"
+                  >
+                    {item.label}
+                  </a>
+                </motion.li>
+              ))}
+            </motion.ul>
+          </motion.nav>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════ HERO SECTION ═══════════ */}
+      <section
+        id="hero"
+        className="relative mx-auto mt-32 max-w-[80rem] px-6 text-center md:px-8"
+      >
+        {/* Badge */}
+        <div className="backdrop-filter-[12px] inline-flex h-7 items-center justify-between rounded-full border border-white/10 bg-white/10 px-3 text-xs text-white transition-all ease-in hover:cursor-pointer hover:bg-white/20 group gap-1 translate-y-[-1rem] animate-fade-in opacity-0">
+          <TextShimmer className="inline-flex items-center justify-center">
+            <span>✨ KI-Controlling für den Mittelstand</span>{' '}
+            <ArrowRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+          </TextShimmer>
+        </div>
+
+        {/* Headline */}
+        <h1 className="bg-gradient-to-br from-white from-30% to-white/40 bg-clip-text py-6 text-5xl font-medium leading-none tracking-tighter text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:200ms]">
+          Controlling-KI die
+          <br className="hidden md:block" /> Ihre Daten schützt.
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mb-12 text-lg tracking-tight text-gray-400 md:text-xl text-balance translate-y-[-1rem] animate-fade-in opacity-0 [--animation-delay:400ms]">
+          Automatische Abweichungsanalyse mit KI-Kommentaren – komplett on-premise.
+          <br className="hidden md:block" /> Jede Aussage mit Evidence Link zur Buchung.
+        </p>
+
+        {/* CTA Button */}
+        <button
+          onClick={onStartApp}
+          className="inline-flex items-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-medium hover:bg-gray-200 transition-all translate-y-[-1rem] animate-fade-in opacity-0 ease-in-out [--animation-delay:600ms]"
+        >
+          <span>Kostenlos starten</span>
+          <ArrowRight className="ml-1 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-1" />
+        </button>
+
+        {/* Hero Image / Dashboard Mockup */}
+        <div
+          ref={heroRef}
+          className="relative mt-[8rem] animate-fade-up opacity-0 [--animation-delay:400ms] [perspective:2000px] after:absolute after:inset-0 after:z-50 after:[background:linear-gradient(to_top,#0a0a0f_30%,transparent)]"
+        >
+          <div
+            className={`rounded-xl border border-white/10 bg-white/[0.01] before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
+              heroInView ? 'before:animate-image-glow' : ''
+            }`}
+          >
+            <BorderBeam
+              size={200}
+              duration={12}
+              delay={11}
+              colorFrom="var(--color-one)"
+              colorTo="var(--color-two)"
+            />
+
+            {/* Dashboard Preview */}
+            <div className="relative w-full rounded-[inherit] border border-white/5 overflow-hidden">
+              <div className="aspect-video bg-gradient-to-br from-gray-900/80 to-gray-800/80 flex flex-col items-center justify-center p-8">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-one)]/20 to-[var(--color-two)]/20 flex items-center justify-center mb-4">
+                  <BarChart3 className="w-8 h-8 text-white/60" />
+                </div>
+                <p className="text-gray-500 text-sm">Dashboard Preview</p>
+                <div className="mt-6 grid grid-cols-4 gap-4 w-full max-w-lg">
+                  {['Buchungen VJ', 'Aktuell', 'Abweichung', 'Konten'].map((label, i) => (
+                    <div key={i} className="bg-white/5 rounded-lg p-3 text-center">
+                      <div className="text-xs text-gray-500 mb-1">{label}</div>
+                      <div className="text-sm font-mono text-white/60">--</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 13: Footer */}
-      <footer className="relative z-10 px-6 py-12 border-t border-white/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="font-semibold text-white mb-4">Produkt</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Changelog</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Ressourcen</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Dokumentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Docs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Rechtliches</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Datenschutz</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Impressum</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">AGB</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Kontakt</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="mailto:info@example.com" className="hover:text-white transition-colors">support@premium-controlling.de</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Twitter/X</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
-              </ul>
+      {/* ═══════════ CLIENT / TRUST SECTION ═══════════ */}
+      <section id="clients" className="text-center mx-auto max-w-[80rem] px-6 md:px-8">
+        <div className="py-14">
+          <div className="mx-auto max-w-screen-xl px-4 md:px-8">
+            <h2 className="text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">
+              Vertraut von Controlling-Teams im DACH-Raum
+            </h2>
+            <div className="mt-6">
+              <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-16">
+                {[
+                  { icon: Shield, label: '100% Lokal' },
+                  { icon: Lock, label: 'DSGVO-konform' },
+                  { icon: Brain, label: 'On-Premise KI' },
+                  { icon: FileText, label: 'Evidence Links' },
+                  { icon: Zap, label: 'Real-Time' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-gray-500">
+                    <item.icon className="w-5 h-5" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <p>Copyright 2024 Premium Controlling. Alle Rechte vorbehalten.</p>
-            <p className="flex items-center gap-2">
-              <span>Entwickelt für den deutschen Mittelstand</span>
-            </p>
+        </div>
+      </section>
+
+      {/* ═══════════ SPHERE MASK ═══════════ */}
+      <SphereMask />
+
+      {/* ═══════════ FEATURES SECTION ═══════════ */}
+      <section id="features" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-xl font-bold tracking-tight text-white mb-2">Features</h2>
+          <p className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
+            Alles was Ihr Controlling braucht.
+          </p>
+          <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
+            Von automatischer Abweichungsanalyse bis hin zu KI-generierten Monatsberichten – komplett lokal und prüfungssicher.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            {
+              icon: Brain,
+              title: 'KI-Monatsberichte',
+              desc: 'Generiert automatisch vollständige Word-Reports mit KI-Analyse aller Abweichungen, Trends und Anomalien.',
+              gradient: 'from-[var(--color-one)] to-[var(--color-two)]',
+            },
+            {
+              icon: AlertTriangle,
+              title: 'Buchungsfehler-Erkennung',
+              desc: 'Smart Detection von Duplikaten, Rundlauf-Buchungen, Wochenend-Buchungen und verdächtigen Mustern.',
+              gradient: 'from-[var(--color-two)] to-[var(--color-three)]',
+            },
+            {
+              icon: Target,
+              title: 'Szenario-Simulation',
+              desc: 'What-if Analysen mit Real-Time Ergebnissen. Schieben Sie Regler und sehen Sie sofort die Auswirkungen.',
+              gradient: 'from-[var(--color-three)] to-[var(--color-one)]',
+            },
+            {
+              icon: TrendingUp,
+              title: 'Rollierender Forecast',
+              desc: 'Automatische Forecasts basierend auf historischen Daten, Trends und Saisonalitäten.',
+              gradient: 'from-cyan-500 to-blue-500',
+            },
+            {
+              icon: Search,
+              title: 'Natural Language Queries',
+              desc: 'Fragen Sie Ihre Daten auf Deutsch. Die KI versteht Kontext und liefert präzise Antworten.',
+              gradient: 'from-green-500 to-emerald-500',
+            },
+            {
+              icon: Shield,
+              title: '100% On-Premise',
+              desc: 'Alle Daten bleiben lokal auf Ihrem Server. Keine Cloud, keine Abhängigkeiten, volle Kontrolle.',
+              gradient: 'from-indigo-500 to-purple-500',
+            },
+          ].map((feature, idx) => (
+            <div
+              key={idx}
+              className="relative flex flex-col gap-4 rounded-2xl border border-white/10 p-6 overflow-hidden group hover:border-white/20 transition-all bg-white/[0.02]"
+            >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity`}>
+                <feature.icon className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">{feature.title}</h3>
+              <p className="text-sm text-gray-400 leading-relaxed">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════ PRICING SECTION ═══════════ */}
+      <section id="pricing" className="mx-auto max-w-screen-xl px-4 py-20 md:px-8">
+        <div className="mx-auto max-w-5xl text-center mb-12">
+          <h4 className="text-xl font-bold tracking-tight text-white">
+            Preise
+          </h4>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mt-2">
+            Einfache Preise für jeden.
+          </h2>
+          <p className="mt-6 text-lg text-gray-400">
+            Wählen Sie ein <strong className="text-white">passendes Paket</strong> mit den besten Features für Ihr Controlling-Team.
+          </p>
+        </div>
+
+        {/* Interval Toggle */}
+        <div className="flex w-full items-center justify-center space-x-3 mb-10">
+          <button
+            onClick={() => setInterval(interval === 'month' ? 'year' : 'month')}
+            className={`relative w-12 h-6 rounded-full transition-colors ${
+              interval === 'year' ? 'bg-white' : 'bg-white/20'
+            }`}
+          >
+            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#0a0a0f] transition-transform ${
+              interval === 'year' ? 'translate-x-6' : 'translate-x-0.5'
+            }`} />
+          </button>
+          <span className="text-sm text-gray-400">Jährlich</span>
+          <span className="inline-block whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase leading-5 tracking-wide text-black">
+            2 MONATE GRATIS ✨
+          </span>
+        </div>
+
+        {/* Cards */}
+        <div className="mx-auto grid w-full justify-center sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pricingPlans.map((price, idx) => (
+            <div
+              key={price.id}
+              className={cn(
+                'relative flex max-w-[400px] flex-col gap-8 rounded-2xl border p-6 text-white overflow-hidden',
+                {
+                  'border-2 border-[var(--color-one)]': price.isMostPopular,
+                  'border-white/10': !price.isMostPopular,
+                }
+              )}
+            >
+              <div className="flex items-center">
+                <div className="ml-2">
+                  <h2 className="text-base font-semibold leading-7">{price.name}</h2>
+                  <p className="h-12 text-sm leading-5 text-gray-400">{price.description}</p>
+                </div>
+              </div>
+
+              <motion.div
+                key={`${price.id}-${interval}`}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.4,
+                  delay: 0.1 + idx * 0.05,
+                  ease: [0.21, 0.47, 0.32, 0.98],
+                }}
+                className="flex flex-row gap-1"
+              >
+                <span className="text-4xl font-bold text-white">
+                  {price.monthlyPrice === 0 ? 'Kostenlos' : (
+                    <>
+                      {toHumanPrice(interval === 'year' ? price.yearlyPrice : price.monthlyPrice)}€
+                      <span className="text-xs text-gray-400"> / {interval === 'year' ? 'Jahr' : 'Monat'}</span>
+                    </>
+                  )}
+                </span>
+              </motion.div>
+
+              <button
+                onClick={onStartApp}
+                className={cn(
+                  'group relative w-full gap-2 overflow-hidden rounded-lg py-3 text-base font-semibold tracking-tight transition-all duration-300',
+                  price.isMostPopular
+                    ? 'bg-white text-black hover:bg-gray-200'
+                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
+                )}
+              >
+                <span className="absolute right-0 -mt-12 h-32 w-8 translate-x-12 rotate-12 transform-gpu bg-white opacity-10 transition-all duration-1000 ease-out group-hover:-translate-x-96" />
+                {price.monthlyPrice === 0 ? 'Kostenlos starten' : 'Jetzt upgraden'}
+              </button>
+
+              <hr className="m-0 h-px w-full border-none bg-gradient-to-r from-neutral-800/0 via-neutral-500/30 to-neutral-800/0" />
+
+              {price.features.length > 0 && (
+                <ul className="flex flex-col gap-2 font-normal">
+                  {price.features.map((feature, fidx) => (
+                    <li key={fidx} className="flex items-center gap-3 text-xs font-medium text-white">
+                      <CheckCircle2 className="h-5 w-5 shrink-0 rounded-full bg-green-500/20 text-green-400 p-[2px]" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════ CTA SECTION ═══════════ */}
+      <section id="cta" className="py-14">
+        <div className="flex w-full flex-col items-center justify-center">
+          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
+            <Marquee reverse className="-delay-[200ms] [--duration:20s]" repeat={5}>
+              {randomTiles1.map((tile, idx) => (
+                <CTACard key={idx} {...tile} />
+              ))}
+            </Marquee>
+            <Marquee reverse className="[--duration:30s]" repeat={5}>
+              {randomTiles2.map((tile, idx) => (
+                <CTACard key={idx} {...tile} />
+              ))}
+            </Marquee>
+            <Marquee reverse className="-delay-[200ms] [--duration:20s]" repeat={5}>
+              {randomTiles3.map((tile, idx) => (
+                <CTACard key={idx} {...tile} />
+              ))}
+            </Marquee>
+            <Marquee reverse className="[--duration:30s]" repeat={5}>
+              {randomTiles4.map((tile, idx) => (
+                <CTACard key={idx} {...tile} />
+              ))}
+            </Marquee>
+
+            {/* Center CTA Overlay */}
+            <div className="absolute z-10">
+              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#0a0a0f]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
+                <BarChart3 className="mx-auto size-16 text-white lg:size-24" />
+              </div>
+              <div className="z-10 mt-4 flex flex-col items-center text-center text-white">
+                <h1 className="text-3xl font-bold lg:text-4xl">
+                  Bereit für smartes Controlling?
+                </h1>
+                <p className="mt-2 text-gray-400">
+                  Starten Sie jetzt kostenlos. Keine Kreditkarte nötig.
+                </p>
+                <button
+                  onClick={onStartApp}
+                  className="group mt-4 inline-flex items-center gap-2 rounded-[2rem] border border-white/20 bg-white/10 px-6 py-2.5 text-sm font-medium text-white hover:bg-white/20 transition-all"
+                >
+                  Jetzt starten
+                  <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
+                </button>
+              </div>
+              <div className="absolute inset-0 -z-10 rounded-full bg-[#0a0a0f] opacity-40 blur-xl" />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#0a0a0f] to-70%" />
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ FOOTER ═══════════ */}
+      <footer id="contact">
+        <div className="mx-auto w-full max-w-screen-xl xl:pb-2">
+          <div className="md:flex md:justify-between px-8 p-4 py-16 sm:pb-16 gap-4">
+            <div className="mb-12 flex-col flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-one)] to-[var(--color-two)] flex items-center justify-center">
+                  <BarChart3 className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-2xl font-semibold text-white">
+                  Premium Controlling
+                </span>
+              </div>
+              <p className="max-w-xs text-gray-400 text-sm">KI-Controlling-Suite für den deutschen Mittelstand</p>
+            </div>
+            <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-3">
+              {footerNavs.map((nav) => (
+                <div key={nav.label}>
+                  <h2 className="mb-6 text-sm tracking-tighter font-medium text-white uppercase">
+                    {nav.label}
+                  </h2>
+                  <ul className="gap-2 grid">
+                    {nav.items.map((item) => (
+                      <li key={item.name}>
+                        <a
+                          href={item.href}
+                          className="cursor-pointer text-gray-400 hover:text-gray-200 duration-200 font-[450] text-sm"
+                        >
+                          {item.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border-t border-white/10 py-4 px-8 gap-2">
+            <span className="text-sm text-gray-500">
+              Copyright © {new Date().getFullYear()}{' '}
+              <span className="cursor-pointer">Premium Controlling</span>. Alle Rechte vorbehalten.
+            </span>
+            <span className="text-sm text-gray-500">
+              Entwickelt für den deutschen Mittelstand
+            </span>
           </div>
         </div>
       </footer>
