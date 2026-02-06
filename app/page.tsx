@@ -67,6 +67,9 @@ import RollingForecastDashboard from '@/components/RollingForecastDashboard';
 import { LiquidityDashboard } from '@/components/LiquidityDashboard';
 import { MonthlyClosingDashboard } from '@/components/MonthlyClosingDashboard';
 import { ContributionDashboard } from '@/components/ContributionDashboard';
+import { CashflowDashboard } from '@/components/CashflowDashboard';
+import { BWADashboard } from '@/components/BWADashboard';
+import { BABDashboard } from '@/components/BABDashboard';
 import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
 import { NumberTicker } from '@/components/magicui/number-ticker';
 import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
@@ -105,7 +108,7 @@ interface KonzernResult {
 }
 
 type WorkflowStatus = 'draft' | 'review' | 'approved';
-type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast' | 'liquidity' | 'closing' | 'contribution';
+type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast' | 'liquidity' | 'closing' | 'contribution' | 'cashflow' | 'bwa' | 'bab';
 
 // Beispiel-Gesellschaften für Konzernanalyse (vom Nutzer anpassbar)
 const EXAMPLE_ENTITIES = [
@@ -376,6 +379,9 @@ export default function Home() {
     { key: 'liquidity', label: 'Liquidität' },
     { key: 'closing', label: 'Abschluss' },
     { key: 'contribution', label: 'DB-Rechnung' },
+    { key: 'cashflow', label: 'Cashflow' },
+    { key: 'bwa', label: 'BWA' },
+    { key: 'bab', label: 'BAB' },
     { key: 'single', label: 'Einzelanalyse' },
     { key: 'triple', label: 'Plan vs Ist' },
     { key: 'multi', label: 'Konzern' },
@@ -788,6 +794,100 @@ export default function Home() {
           </motion.div>
         )}
 
+        {/* Kapitalflussrechnung Section */}
+        {mode === 'cashflow' && (
+          <motion.div
+            key="cashflow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
+            {/* Section Hero */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-cyan-500/[0.08] via-blue-500/[0.04] to-transparent border border-cyan-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/25">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Kapitalflussrechnung (DRS 21)</h2>
+                  <p className="text-sm text-gray-400">Operativ • Investition • Finanzierung mit Free Cashflow</p>
+                </div>
+              </div>
+            </motion.div>
+            <CashflowDashboard bookings={currBookings} />
+          </motion.div>
+        )}
+
+        {/* BWA Section */}
+        {mode === 'bwa' && (
+          <motion.div
+            key="bwa"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-orange-500/[0.08] via-amber-500/[0.04] to-transparent border border-orange-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-500/25">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Betriebswirtschaftliche Auswertung</h2>
+                  <p className="text-sm text-gray-400">BWA nach DATEV-Standard mit Margen-Analyse & KI-Insights</p>
+                </div>
+              </div>
+            </motion.div>
+            <BWADashboard bookings={currBookings} prevBookings={prevBookings} />
+          </motion.div>
+        )}
+
+        {/* BAB Section */}
+        {mode === 'bab' && (
+          <motion.div
+            key="bab"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="mb-8"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative mb-6 p-6 rounded-2xl bg-gradient-to-r from-rose-500/[0.08] via-pink-500/[0.04] to-transparent border border-rose-500/[0.1] overflow-hidden"
+            >
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg shadow-rose-500/25">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-white tracking-tight">Betriebsabrechnungsbogen</h2>
+                  <p className="text-sm text-gray-400">Kostenstellenrechnung mit Gemeinkostenzuschlägen & Heatmap</p>
+                </div>
+              </div>
+            </motion.div>
+            <BABDashboard bookings={currBookings} />
+          </motion.div>
+        )}
+
         {/* Rolling Forecast Section */}
         {mode === 'forecast' && (
           <motion.div
@@ -846,7 +946,7 @@ export default function Home() {
         )}
 
         {/* Upload Section */}
-        {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && mode !== 'contribution' && (
+        {mode !== 'triple' && mode !== 'docs' && mode !== 'errors' && mode !== 'scenario' && mode !== 'forecast' && mode !== 'contribution' && mode !== 'cashflow' && mode !== 'bwa' && mode !== 'bab' && (
         <motion.div
           key="upload"
           initial={{ opacity: 0, y: 20 }}

@@ -726,7 +726,7 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
             Was kein anderes Tool kann.
           </h2>
           <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-            Sechs KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
+            Neun KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
           </p>
         </div>
 
@@ -1370,6 +1370,177 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
               ))}
             </div>
           </motion.div>
+
+          {/* ── Tile 7: Kapitalflussrechnung ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-cyan-500/[0.12] p-8 overflow-hidden group hover:border-cyan-500/30 transition-colors bg-gradient-to-br from-cyan-500/[0.06] to-blue-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={16} colorFrom="#06b6d4" colorTo="#3b82f6" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Kapitalflussrechnung</h3>
+                <p className="text-xs text-gray-500">DRS 21</p>
+              </div>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Automatische Cashflow-Rechnung nach DRS 21 — operativ, investiv, Finanzierung. Mit Free Cashflow, CF-Marge und Monatsvergleich.
+            </p>
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              <svg viewBox="0 0 260 90" className="w-full h-auto" fill="none">
+                {/* Animated flow arrows */}
+                <motion.path d="M 30 45 Q 70 15, 130 45" stroke="#10b981" strokeWidth="2" fill="none" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                />
+                <motion.path d="M 130 45 Q 170 75, 230 45" stroke="#3b82f6" strokeWidth="2" fill="none" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
+                  transition={{ duration: 1, delay: 1 }}
+                />
+                <motion.circle cx="130" cy="45" r="8" fill="#080b16" stroke="#06b6d4" strokeWidth="1.5"
+                  initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 1.5 }}
+                />
+                <text x="30" y="38" fill="#10b981" fontSize="7" opacity="0.7">Operativ</text>
+                <text x="200" y="38" fill="#3b82f6" fontSize="7" opacity="0.7">Invest</text>
+                <text x="115" y="70" fill="#a855f7" fontSize="7" opacity="0.7">Finanz</text>
+              </svg>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {['DRS 21', 'Free CF', 'CF-Marge', 'Monatstrend'].map((tag, i) => (
+                  <motion.span key={tag} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 2 + i * 0.1 }}
+                    className="px-1.5 py-0.5 rounded text-[8px] bg-cyan-500/10 text-cyan-400/70 border border-cyan-500/10"
+                  >{tag}</motion.span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── Tile 8: BWA ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-orange-500/[0.12] p-8 overflow-hidden group hover:border-orange-500/30 transition-colors bg-gradient-to-br from-orange-500/[0.06] to-amber-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={18} colorFrom="#f97316" colorTo="#f59e0b" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">BWA-Automatik</h3>
+                <p className="text-xs text-gray-500">DATEV-Standard</p>
+              </div>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Betriebswirtschaftliche Auswertung nach DATEV — von Umsatz über EBITDA bis Netto-Ergebnis. Mit Kostenstruktur-Analyse und Margen-Trend.
+            </p>
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              <div className="space-y-2">
+                {[
+                  { label: 'Umsatzerlöse', pct: 100, color: '#10b981' },
+                  { label: 'Rohertrag', pct: 62, color: '#0ea5e9' },
+                  { label: 'EBITDA', pct: 28, color: '#6366f1' },
+                  { label: 'EBIT', pct: 18, color: '#8b5cf6' },
+                  { label: 'Netto', pct: 8, color: '#22c55e' },
+                ].map((item, i) => (
+                  <motion.div key={i} className="flex items-center gap-2"
+                    initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                    transition={{ duration: 0.3, delay: 0.5 + i * 0.15 }}
+                  >
+                    <span className="text-[9px] text-gray-500 w-16 truncate">{item.label}</span>
+                    <div className="flex-1 h-3 bg-white/[0.04] rounded-full overflow-hidden">
+                      <motion.div className="h-full rounded-full" style={{ backgroundColor: item.color }}
+                        initial={{ width: 0 }} whileInView={{ width: `${item.pct}%` }} viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.6 + i * 0.15, ease: 'easeOut' }}
+                      />
+                    </div>
+                    <span className="text-[9px] text-gray-500 w-7 text-right">{item.pct}%</span>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {['GuV', 'Margen', 'Kostenstruktur', 'KI-Analyse'].map((tag, i) => (
+                  <motion.span key={tag} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 2 + i * 0.1 }}
+                    className="px-1.5 py-0.5 rounded text-[8px] bg-orange-500/10 text-orange-400/70 border border-orange-500/10"
+                  >{tag}</motion.span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ── Tile 9: Betriebsabrechnungsbogen ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-rose-500/[0.12] p-8 overflow-hidden group hover:border-rose-500/30 transition-colors bg-gradient-to-br from-rose-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} delay={20} colorFrom="#f43f5e" colorTo="#ec4899" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">BAB</h3>
+                <p className="text-xs text-gray-500">Betriebsabrechnungsbogen</p>
+              </div>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+              Innerbetriebliche Leistungsverrechnung — Kostenarten auf Kostenstellen verteilen, Gemeinkostenzuschlagssätze berechnen. Mit Heatmap.
+            </p>
+            <div className="flex-1 relative bg-white/[0.03] rounded-xl border border-white/5 p-4 overflow-hidden">
+              {/* Mini Heatmap Grid */}
+              <div className="grid grid-cols-5 gap-1 mb-3">
+                {Array.from({ length: 20 }, (_, i) => {
+                  const intensity = Math.random();
+                  return (
+                    <motion.div key={i}
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.2, delay: 0.4 + i * 0.05 }}
+                      className="h-5 rounded-sm"
+                      style={{
+                        backgroundColor: intensity > 0.7
+                          ? `rgba(244, 63, 94, ${0.3 + intensity * 0.4})`
+                          : intensity > 0.3
+                          ? `rgba(251, 146, 60, ${0.2 + intensity * 0.3})`
+                          : `rgba(255, 255, 255, ${0.03 + intensity * 0.05})`,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-2 text-[8px] text-gray-500 mb-2">
+                <span className="w-3 h-1.5 bg-white/10 rounded" /> niedrig
+                <span className="w-3 h-1.5 bg-orange-500/40 rounded" /> mittel
+                <span className="w-3 h-1.5 bg-rose-500/60 rounded" /> hoch
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['Kostenstellen', 'GK-Zuschläge', 'Heatmap', 'Verteilung'].map((tag, i) => (
+                  <motion.span key={tag} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 2 + i * 0.1 }}
+                    className="px-1.5 py-0.5 rounded text-[8px] bg-rose-500/10 text-rose-400/70 border border-rose-500/10"
+                  >{tag}</motion.span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
         </div>
       </section>
 
