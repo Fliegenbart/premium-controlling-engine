@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+// Skip loading Google fonts to work in offline/CI environments
+// const inter = Inter({ subsets: ['latin'] });
+const inter = { className: 'font-sans' };
 
 export const metadata: Metadata = {
   title: 'Controlling Abweichungsanalyse',

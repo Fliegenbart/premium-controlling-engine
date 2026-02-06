@@ -95,6 +95,48 @@ export class HybridLLMService {
   }
 
   /**
+   * Generate a streaming response using Ollama
+   */
+  async *generateStream(
+    prompt: string,
+    options: {
+      systemPrompt?: string;
+      temperature?: number;
+      maxTokens?: number;
+    } = {}
+  ): AsyncGenerator<{text: string; done: boolean}, void, unknown> {
+    const startTime = Date.now();
+
+    try {
+      const available = await this.checkOllamaAvailable();
+      if (!available) {
+        throw new Error('Ollama ist nicht verfügbar');
+      }
+
+      let totalText = '';
+      for await (const chunk of this.ollama.generateStream(prompt, {
+        systemPrompt: options.systemPrompt,
+        temperature: options.temperature,
+        maxTokens: options.maxTokens,
+      })) {
+        totalText += chunk;
+        yield {
+          text: chunk,
+          done: false,
+        };
+      }
+
+      // Emit final done signal
+      yield {
+        text: totalText,
+        done: true,
+      };
+    } catch (error) {
+      throw new Error(`LLM streaming failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
    * Get current provider status
    */
   async getStatus(): Promise<{

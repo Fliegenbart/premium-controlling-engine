@@ -158,6 +158,108 @@ export class OllamaService {
   }
 
   /**
+   * Generate a completion with streaming using Ollama
+   */
+  async *generateStream(prompt: string, options: {
+    temperature?: number;
+    maxTokens?: number;
+    systemPrompt?: string;
+  } = {}): AsyncGenerator<string, void, unknown> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+
+    try {
+      const body: any = {
+        model: this.config.model,
+        prompt,
+        stream: true,
+        options: {
+          temperature: options.temperature ?? 0.3,
+          num_predict: options.maxTokens ?? 500,
+          top_p: 0.9,
+        },
+      };
+
+      if (options.systemPrompt) {
+        body.system = options.systemPrompt;
+      }
+
+      const response = await fetch(`${this.config.baseUrl}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Ollama stream error: ${response.status} - ${errorText}`);
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('No response body from Ollama');
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+
+          // Process complete lines
+          for (let i = 0; i < lines.length - 1; i++) {
+            const line = lines[i].trim();
+            if (line) {
+              try {
+                const chunk: OllamaResponse = JSON.parse(line);
+                if (chunk.response) {
+                  yield chunk.response;
+                }
+              } catch {
+                // Skip malformed JSON lines
+              }
+            }
+          }
+
+          // Keep incomplete line in buffer
+          buffer = lines[lines.length - 1];
+        }
+
+        // Process any remaining data
+        buffer += decoder.decode();
+        if (buffer.trim()) {
+          try {
+            const chunk: OllamaResponse = JSON.parse(buffer);
+            if (chunk.response) {
+              yield chunk.response;
+            }
+          } catch {
+            // Skip malformed JSON
+          }
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error(`Ollama stream timeout after ${this.config.timeout}ms`);
+      }
+
+      throw error;
+    }
+  }
+
+  /**
    * Get model info
    */
   async getModelInfo(): Promise<{

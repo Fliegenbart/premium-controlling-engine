@@ -56,3 +56,17 @@ export const documentsSearchSchema = z.object({
   question: z.string().min(1).max(2000),
   limit: z.coerce.number().int().min(1).max(50).optional(),
 });
+
+export const rootCauseRequestSchema = z.object({
+  account: z.coerce.number().int().positive(),
+  prevBookings: bookingsArraySchema,
+  currBookings: bookingsArraySchema,
+  includeLLMNarrative: z.boolean().optional(),
+});
+
+export const rootCauseBatchRequestSchema = z.object({
+  accounts: z.array(z.coerce.number().int().positive()).min(1).max(50),
+  prevBookings: bookingsArraySchema,
+  currBookings: bookingsArraySchema,
+  includeLLMNarrative: z.boolean().optional(),
+});

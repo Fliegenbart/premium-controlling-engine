@@ -1,9 +1,12 @@
 /**
- * Simple Authentication System
- * Basic user management with JWT tokens
+ * Secure Authentication System
+ * Uses bcryptjs for password hashing and better-sqlite3 for persistence
  */
 
-import { createHash, randomBytes } from 'crypto';
+import * as bcryptjs from 'bcryptjs';
+import Database from 'better-sqlite3';
+import { randomBytes } from 'crypto';
+import * as path from 'path';
 
 // Types
 export interface User {
@@ -34,32 +37,114 @@ export interface AuditEntry {
   ip?: string;
 }
 
-// In-memory stores (replace with DB in production)
-const users: Map<string, User> = new Map();
-const sessions: Map<string, Session> = new Map();
-const auditLog: AuditEntry[] = [];
+// Database initialization
+let db: Database.Database;
 
-// Initialize with demo users
-const DEMO_USERS: Omit<User, 'passwordHash'>[] = [
-  { id: 'admin-1', email: 'admin@controlling.local', name: 'Administrator', role: 'admin', createdAt: new Date().toISOString() },
-  { id: 'controller-1', email: 'controller@controlling.local', name: 'Max Mustermann', role: 'controller', createdAt: new Date().toISOString() },
-  { id: 'viewer-1', email: 'viewer@controlling.local', name: 'Leser Zugang', role: 'viewer', createdAt: new Date().toISOString() },
-];
+function initializeDatabase(): Database.Database {
+  const dbPath = process.env.DB_PATH || './data/controlling.db';
+  const dbDir = path.dirname(dbPath);
 
-// Initialize demo users with password "demo123"
-DEMO_USERS.forEach(u => {
-  users.set(u.id, {
-    ...u,
-    passwordHash: hashPassword('demo123')
-  });
-});
+  // Create data directory if it doesn't exist
+  if (dbDir !== '.' && dbDir !== '') {
+    try {
+      const fs = require('fs');
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+      }
+    } catch (error) {
+      console.warn('Could not create data directory:', error);
+    }
+  }
+
+  const database = new Database(dbPath);
+  database.pragma('journal_mode = WAL');
+
+  // Create tables if they don't exist
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      passwordHash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'viewer',
+      createdAt TEXT NOT NULL,
+      lastLogin TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      userId TEXT NOT NULL,
+      token TEXT PRIMARY KEY,
+      expiresAt INTEGER NOT NULL,
+      createdAt INTEGER NOT NULL,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS auditLog (
+      id TEXT PRIMARY KEY,
+      userId TEXT NOT NULL,
+      userName TEXT NOT NULL,
+      action TEXT NOT NULL,
+      resource TEXT NOT NULL,
+      details TEXT,
+      timestamp TEXT NOT NULL,
+      ip TEXT,
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_sessions_expiry ON sessions(expiresAt);
+    CREATE INDEX IF NOT EXISTS idx_auditlog_timestamp ON auditLog(timestamp DESC);
+    CREATE INDEX IF NOT EXISTS idx_auditlog_userId ON auditLog(userId);
+  `);
+
+  return database;
+}
+
+// Get or initialize database
+function getDb(): Database.Database {
+  if (!db) {
+    db = initializeDatabase();
+    initializeDemoUsers();
+  }
+  return db;
+}
+
+// Initialize demo users on first run
+function initializeDemoUsers(): void {
+  const database = getDb();
+  const demoUsers = [
+    { id: 'admin-1', email: 'admin@controlling.local', name: 'Administrator', role: 'admin' },
+    { id: 'controller-1', email: 'controller@controlling.local', name: 'Max Mustermann', role: 'controller' },
+    { id: 'viewer-1', email: 'viewer@controlling.local', name: 'Leser Zugang', role: 'viewer' },
+  ];
+
+  const stmt = database.prepare('SELECT COUNT(*) as count FROM users');
+  const result = stmt.get() as { count: number };
+
+  if (result.count === 0) {
+    const insertStmt = database.prepare(
+      'INSERT INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
+    );
+
+    const now = new Date().toISOString();
+    for (const user of demoUsers) {
+      const passwordHash = bcryptjs.hashSync('demo123', 12);
+      insertStmt.run(user.id, user.email, user.name, passwordHash, user.role, now);
+    }
+  }
+}
 
 /**
- * Hash password with salt
+ * Hash password with bcryptjs
  */
 export function hashPassword(password: string): string {
-  const salt = 'controlling-engine-salt-v1'; // In production: use random salt per user
-  return createHash('sha256').update(password + salt).digest('hex');
+  return bcryptjs.hashSync(password, 12);
+}
+
+/**
+ * Verify password against hash
+ */
+function verifyPassword(password: string, hash: string): boolean {
+  return bcryptjs.compareSync(password, hash);
 }
 
 /**
@@ -70,77 +155,117 @@ function generateToken(): string {
 }
 
 /**
+ * Clean up expired sessions
+ */
+function cleanupExpiredSessions(): void {
+  const database = getDb();
+  const now = Date.now();
+  database.prepare('DELETE FROM sessions WHERE expiresAt < ?').run(now);
+}
+
+/**
  * Authenticate user
  */
 export async function authenticate(
   email: string,
   password: string
 ): Promise<{ success: boolean; user?: Omit<User, 'passwordHash'>; token?: string; error?: string }> {
-  const user = Array.from(users.values()).find(u => u.email === email);
+  try {
+    const database = getDb();
+    const stmt = database.prepare('SELECT * FROM users WHERE email = ?');
+    const user = stmt.get(email) as User | undefined;
 
-  if (!user) {
-    return { success: false, error: 'Benutzer nicht gefunden' };
+    if (!user) {
+      return { success: false, error: 'Benutzer nicht gefunden' };
+    }
+
+    if (!verifyPassword(password, user.passwordHash)) {
+      return { success: false, error: 'Falsches Passwort' };
+    }
+
+    // Create session
+    const token = generateToken();
+    const now = Date.now();
+    const expiresAt = now + (24 * 60 * 60 * 1000); // 24 hours
+
+    const insertSession = database.prepare(
+      'INSERT INTO sessions (userId, token, expiresAt, createdAt) VALUES (?, ?, ?, ?)'
+    );
+    insertSession.run(user.id, token, expiresAt, now);
+
+    // Update last login
+    const updateStmt = database.prepare('UPDATE users SET lastLogin = ? WHERE id = ?');
+    updateStmt.run(new Date().toISOString(), user.id);
+
+    // Audit
+    await logAudit(user.id, user.name, 'LOGIN', 'auth', { email });
+
+    const { passwordHash, ...safeUser } = user;
+    return { success: true, user: safeUser, token };
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return { success: false, error: 'Ein Fehler ist aufgetreten' };
   }
-
-  if (user.passwordHash !== hashPassword(password)) {
-    return { success: false, error: 'Falsches Passwort' };
-  }
-
-  // Create session
-  const token = generateToken();
-  const session: Session = {
-    userId: user.id,
-    token,
-    expiresAt: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
-    createdAt: Date.now()
-  };
-  sessions.set(token, session);
-
-  // Update last login
-  user.lastLogin = new Date().toISOString();
-
-  // Audit
-  await logAudit(user.id, user.name, 'LOGIN', 'auth', { email });
-
-  const { passwordHash, ...safeUser } = user;
-  return { success: true, user: safeUser, token };
 }
 
 /**
  * Validate session token
  */
 export async function validateSession(token: string): Promise<{ valid: boolean; user?: Omit<User, 'passwordHash'> }> {
-  const session = sessions.get(token);
+  try {
+    const database = getDb();
 
-  if (!session) {
+    // Clean up expired sessions
+    cleanupExpiredSessions();
+
+    const sessionStmt = database.prepare('SELECT * FROM sessions WHERE token = ?');
+    const session = sessionStmt.get(token) as Session | undefined;
+
+    if (!session) {
+      return { valid: false };
+    }
+
+    if (session.expiresAt < Date.now()) {
+      database.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+      return { valid: false };
+    }
+
+    const userStmt = database.prepare('SELECT * FROM users WHERE id = ?');
+    const user = userStmt.get(session.userId) as User | undefined;
+
+    if (!user) {
+      return { valid: false };
+    }
+
+    const { passwordHash, ...safeUser } = user;
+    return { valid: true, user: safeUser };
+  } catch (error) {
+    console.error('Session validation error:', error);
     return { valid: false };
   }
-
-  if (session.expiresAt < Date.now()) {
-    sessions.delete(token);
-    return { valid: false };
-  }
-
-  const user = users.get(session.userId);
-  if (!user) {
-    return { valid: false };
-  }
-
-  const { passwordHash, ...safeUser } = user;
-  return { valid: true, user: safeUser };
 }
 
 /**
  * Logout / invalidate session
  */
 export async function logout(token: string): Promise<void> {
-  const session = sessions.get(token);
-  if (session) {
-    const user = users.get(session.userId);
-    if (user) {
-      await logAudit(user.id, user.name, 'LOGOUT', 'auth');
+  try {
+    const database = getDb();
+    const sessionStmt = database.prepare('SELECT * FROM sessions WHERE token = ?');
+    const session = sessionStmt.get(token) as Session | undefined;
+
+    if (session) {
+      const userStmt = database.prepare('SELECT * FROM users WHERE id = ?');
+      const user = userStmt.get(session.userId) as User | undefined;
+
+      if (user) {
+        await logAudit(user.id, user.name, 'LOGOUT', 'auth');
+      }
+
+      database.prepare('DELETE FROM sessions WHERE token = ?').run(token);
     }
-    sessions.delete(token);
+  } catch (error) {
+    console.error('Logout error:', error);
   }
 }
 
@@ -148,7 +273,15 @@ export async function logout(token: string): Promise<void> {
  * Get all users (admin only)
  */
 export async function getUsers(): Promise<Omit<User, 'passwordHash'>[]> {
-  return Array.from(users.values()).map(({ passwordHash, ...u }) => u);
+  try {
+    const database = getDb();
+    const stmt = database.prepare('SELECT * FROM users ORDER BY createdAt DESC');
+    const users = stmt.all() as User[];
+    return users.map(({ passwordHash, ...u }) => u);
+  } catch (error) {
+    console.error('Get users error:', error);
+    return [];
+  }
 }
 
 /**
@@ -160,23 +293,39 @@ export async function createUser(
   password: string,
   role: User['role']
 ): Promise<{ success: boolean; user?: Omit<User, 'passwordHash'>; error?: string }> {
-  if (Array.from(users.values()).some(u => u.email === email)) {
-    return { success: false, error: 'Email bereits vergeben' };
+  try {
+    const database = getDb();
+
+    // Check if email already exists
+    const checkStmt = database.prepare('SELECT COUNT(*) as count FROM users WHERE email = ?');
+    const result = checkStmt.get(email) as { count: number };
+
+    if (result.count > 0) {
+      return { success: false, error: 'Email bereits vergeben' };
+    }
+
+    const userId = `user-${Date.now()}`;
+    const now = new Date().toISOString();
+    const passwordHash = hashPassword(password);
+
+    const insertStmt = database.prepare(
+      'INSERT INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
+    );
+    insertStmt.run(userId, email, name, passwordHash, role, now);
+
+    const user: Omit<User, 'passwordHash'> = {
+      id: userId,
+      email,
+      name,
+      role,
+      createdAt: now,
+    };
+
+    return { success: true, user };
+  } catch (error) {
+    console.error('Create user error:', error);
+    return { success: false, error: 'Ein Fehler ist aufgetreten' };
   }
-
-  const user: User = {
-    id: `user-${Date.now()}`,
-    email,
-    name,
-    passwordHash: hashPassword(password),
-    role,
-    createdAt: new Date().toISOString()
-  };
-
-  users.set(user.id, user);
-
-  const { passwordHash, ...safeUser } = user;
-  return { success: true, user: safeUser };
 }
 
 /**
@@ -190,22 +339,31 @@ export async function logAudit(
   details?: Record<string, unknown>,
   ip?: string
 ): Promise<void> {
-  const entry: AuditEntry = {
-    id: `audit-${Date.now()}-${randomBytes(4).toString('hex')}`,
-    userId,
-    userName,
-    action,
-    resource,
-    details,
-    timestamp: new Date().toISOString(),
-    ip
-  };
+  try {
+    const database = getDb();
+    const id = `audit-${Date.now()}-${randomBytes(4).toString('hex')}`;
+    const timestamp = new Date().toISOString();
+    const detailsJson = details ? JSON.stringify(details) : null;
 
-  auditLog.push(entry);
+    const stmt = database.prepare(
+      'INSERT INTO auditLog (id, userId, userName, action, resource, details, timestamp, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    );
+    stmt.run(id, userId, userName, action, resource, detailsJson, timestamp, ip || null);
 
-  // Keep only last 10000 entries
-  if (auditLog.length > 10000) {
-    auditLog.splice(0, auditLog.length - 10000);
+    // Cleanup old audit logs (keep only last 10000 entries)
+    const countStmt = database.prepare('SELECT COUNT(*) as count FROM auditLog');
+    const result = countStmt.get() as { count: number };
+
+    if (result.count > 10000) {
+      const deleteStmt = database.prepare(`
+        DELETE FROM auditLog WHERE id NOT IN (
+          SELECT id FROM auditLog ORDER BY timestamp DESC LIMIT 10000
+        )
+      `);
+      deleteStmt.run();
+    }
+  } catch (error) {
+    console.error('Audit logging error:', error);
   }
 }
 
@@ -215,26 +373,47 @@ export async function logAudit(
 export async function getAuditLog(
   options: { userId?: string; action?: string; limit?: number; offset?: number } = {}
 ): Promise<{ entries: AuditEntry[]; total: number }> {
-  let filtered = [...auditLog];
+  try {
+    const database = getDb();
+    const limit = options.limit || 50;
+    const offset = options.offset || 0;
 
-  if (options.userId) {
-    filtered = filtered.filter(e => e.userId === options.userId);
+    let query = 'SELECT * FROM auditLog WHERE 1=1';
+    const params: unknown[] = [];
+
+    if (options.userId) {
+      query += ' AND userId = ?';
+      params.push(options.userId);
+    }
+
+    if (options.action) {
+      query += ' AND action = ?';
+      params.push(options.action);
+    }
+
+    // Get total count
+    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as count');
+    const countStmt = database.prepare(countQuery);
+    const countResult = countStmt.get(...params) as { count: number };
+    const total = countResult.count;
+
+    // Get paginated results
+    query += ' ORDER BY timestamp DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+
+    const stmt = database.prepare(query);
+    const results = stmt.all(...params) as Array<Omit<AuditEntry, 'details'> & { details: string | null }>;
+
+    const entries: AuditEntry[] = results.map(entry => ({
+      ...entry,
+      details: entry.details ? JSON.parse(entry.details) : undefined,
+    }));
+
+    return { entries, total };
+  } catch (error) {
+    console.error('Get audit log error:', error);
+    return { entries: [], total: 0 };
   }
-  if (options.action) {
-    filtered = filtered.filter(e => e.action === options.action);
-  }
-
-  // Sort by timestamp descending
-  filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-  const total = filtered.length;
-  const offset = options.offset || 0;
-  const limit = options.limit || 50;
-
-  return {
-    entries: filtered.slice(offset, offset + limit),
-    total
-  };
 }
 
 /**
@@ -250,3 +429,6 @@ export function hasPermission(user: Omit<User, 'passwordHash'>, action: string):
   const userPerms = permissions[user.role];
   return userPerms.includes('*') || userPerms.includes(action);
 }
+
+// Initialize database on module load
+getDb();
