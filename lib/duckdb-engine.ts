@@ -8,11 +8,24 @@
  * - Time series analysis
  */
 
-import * as duckdb from 'duckdb';
+// Dynamic require — DuckDB native module may not exist at build time
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+let duckdb: any = null;
+function getDuckDB() {
+  if (!duckdb) {
+    try {
+      duckdb = require('duckdb');
+    } catch {
+      throw new Error('DuckDB native module not available. Run: npm rebuild duckdb');
+    }
+  }
+  return duckdb;
+}
+
 import { Booking, DataProfile, VarianceResult, TimeSeriesPoint } from './types';
 
 // Singleton DuckDB instance
-let db: duckdb.Database | null = null;
+let db: any = null;
 
 /**
  * Initialize DuckDB with in-memory database
@@ -21,7 +34,7 @@ export async function initDatabase(persistPath?: string): Promise<void> {
   if (db) return;
 
   return new Promise((resolve, reject) => {
-    db = new duckdb.Database(persistPath || ':memory:', (err) => {
+    db = new (getDuckDB()).Database(persistPath || ':memory:', (err: any) => {
       if (err) {
         reject(err);
         return;
@@ -34,7 +47,7 @@ export async function initDatabase(persistPath?: string): Promise<void> {
         CREATE SCHEMA IF NOT EXISTS staging;
         CREATE SCHEMA IF NOT EXISTS analysis;
       `,
-        (err) => {
+        (err: any) => {
           if (err) reject(err);
           else {
             console.log('DuckDB initialized successfully');
@@ -49,7 +62,7 @@ export async function initDatabase(persistPath?: string): Promise<void> {
 /**
  * Get database instance (auto-init if needed)
  */
-export async function getDatabase(): Promise<duckdb.Database> {
+export async function getDatabase(): Promise<any> {
   if (!db) {
     await initDatabase();
   }
@@ -79,7 +92,7 @@ export async function executeSQL(sql: string): Promise<{
   }
 
   return new Promise((resolve, reject) => {
-    database.all(sql, (err, rows) => {
+    database.all(sql, (err: any, rows: any) => {
       if (err) {
         reject(err);
         return;
@@ -102,7 +115,7 @@ export async function executeSQL(sql: string): Promise<{
 async function runSQL(sql: string): Promise<void> {
   const database = await getDatabase();
   return new Promise((resolve, reject) => {
-    database.run(sql, (err) => {
+    database.run(sql, (err: any) => {
       if (err) reject(err);
       else resolve();
     });
@@ -446,7 +459,7 @@ export async function getTimeSeries(
 /**
  * Export to get connection for direct queries
  */
-export async function getConnection(): Promise<duckdb.Database> {
+export async function getConnection(): Promise<any> {
   return getDatabase();
 }
 
@@ -456,7 +469,7 @@ export async function getConnection(): Promise<duckdb.Database> {
 export async function exportToParquet(tableName: string, filePath: string): Promise<void> {
   const database = await getDatabase();
   return new Promise((resolve, reject) => {
-    database.run(`COPY ${tableName} TO '${filePath}' (FORMAT PARQUET)`, (err) => {
+    database.run(`COPY ${tableName} TO '${filePath}' (FORMAT PARQUET)`, (err: any) => {
       if (err) reject(err);
       else resolve();
     });

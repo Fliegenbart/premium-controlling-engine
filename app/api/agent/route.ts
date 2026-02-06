@@ -8,7 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLocalAgent } from '@/lib/local-agent';
 import { getOllamaClient, RECOMMENDED_MODELS } from '@/lib/ollama-client';
-import { initDatabase } from '@/lib/duckdb-engine';
+// Dynamic import — DuckDB native module may not be available at build time
+// import { initDatabase } from '@/lib/duckdb-engine';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 
 interface AgentRequest {
@@ -35,8 +36,13 @@ export async function POST(request: NextRequest) {
       return jsonError('Frage ist erforderlich', 400, requestId);
     }
     
-    // Initialize DuckDB
-    await initDatabase(process.env.DATABASE_PATH);
+    // Initialize DuckDB (dynamic import — native module may not exist at build time)
+    try {
+      const { initDatabase } = await import('@/lib/duckdb-engine');
+      await initDatabase(process.env.DATABASE_PATH);
+    } catch {
+      console.warn('DuckDB not available — skipping database init');
+    }
     
     // Local mode with Ollama
     console.log('Using local LLM (Ollama)');
