@@ -10,7 +10,7 @@ export default function Home() {
   const [showApp, setShowApp] = useState(false);
   const [mode, setMode] = useState<AnalysisMode>('single');
   const [entities, setEntities] = useState<EntityUpload[]>([
-    { id: '1', name: 'Ganzimmun Diagnostics', prevFile: null, currFile: null, result: null, status: 'pending', expanded: true },
+    { id: '1', name: 'Hauptgesellschaft', prevFile: null, currFile: null, result: null, status: 'pending', expanded: true },
   ]);
   const [konzernResult, setKonzernResult] = useState<KonzernResult | null>(null);
   const [tripleResult, setTripleResult] = useState<TripleAnalysisResult | null>(null);

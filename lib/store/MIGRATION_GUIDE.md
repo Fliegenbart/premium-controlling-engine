@@ -81,7 +81,7 @@ const { showApp, setShowApp, mode, setMode, activeTab, setActiveTab, workflowSta
 **Before:**
 ```typescript
 const [entities, setEntities] = useState<EntityUpload[]>([
-  { id: '1', name: 'Ganzimmun Diagnostics', ... },
+  { id: '1', name: 'Hauptgesellschaft', ... },
 ]);
 const [useMagicUpload, setUseMagicUpload] = useState(true);
 ```

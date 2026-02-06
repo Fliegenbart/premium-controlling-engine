@@ -135,7 +135,7 @@ const useControllingStore = create<ControllingState>()(
         entities: [
           {
             id: '1',
-            name: 'Ganzimmun Diagnostics',
+            name: '',
             prevFile: null,
             currFile: null,
             result: null,

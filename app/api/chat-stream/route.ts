@@ -145,7 +145,7 @@ ${wrapUntrusted('BUCHUNGEN', `${bookingsInfo}${newBookingsInfo ? `\n\n   Neue Bu
       )
       .join('\n');
 
-    const systemPrompt = `Du bist ein erfahrener Controlling-Experte bei einem Labordiagnostik-Unternehmen.
+    const systemPrompt = `Du bist ein erfahrener Controlling-Experte in einem mittelständischen Unternehmen.
 Du beantwortest Fragen zu Abweichungsanalysen präzise und mit konkreten Zahlen.
 
 WICHTIG: Nenne IMMER konkrete Belegnummern wenn du Buchungen erwähnst!

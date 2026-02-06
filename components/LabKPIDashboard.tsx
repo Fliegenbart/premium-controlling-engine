@@ -79,7 +79,7 @@ export function LabKPIDashboard({ kpis }: LabKPIDashboardProps) {
     <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-2xl border border-purple-500/20 p-6 mb-8">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
         <Activity className="w-5 h-5 text-purple-400" />
-        Labor-KPIs
+        Branchen-KPIs
       </h3>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -74,7 +74,7 @@ export default function DemoLoader({ onDemoLoaded }: DemoLoaderProps) {
         </div>
         <div>
           <h3 className="text-white font-semibold">Demo-Modus</h3>
-          <p className="text-gray-400 text-sm">Realistische Labordaten zum Ausprobieren</p>
+          <p className="text-gray-400 text-sm">Realistische Beispieldaten zum Ausprobieren</p>
         </div>
       </div>
 

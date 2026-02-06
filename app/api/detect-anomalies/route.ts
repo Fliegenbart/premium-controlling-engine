@@ -50,11 +50,11 @@ export async function POST(request: NextRequest) {
       )
       .join('\n');
 
-    const prompt = `Du bist ein Controlling-Experte für die Labor/Diagnostik-Branche. Analysiere diese Abweichungen auf Anomalien.
+    const prompt = `Du bist ein erfahrener Controlling-Experte. Analysiere diese Abweichungen auf Anomalien.
 ${INJECTION_GUARD}
 
 ${context?.quarter ? `Zeitraum: ${sanitizeForPrompt(context.quarter, 60)}` : ''}
-${context?.industry ? `Branche: ${sanitizeForPrompt(context.industry, 80)}` : 'Branche: Labor/Diagnostik'}
+${context?.industry ? `Branche: ${sanitizeForPrompt(context.industry, 80)}` : ''}
 
 Abweichungen:
 ${wrapUntrusted('ABWEICHUNGEN', deviationsList, 1600)}

@@ -101,18 +101,16 @@ interface KonzernResult {
 type WorkflowStatus = 'draft' | 'review' | 'approved';
 type AnalysisMode = 'single' | 'multi' | 'triple' | 'docs' | 'trends' | 'errors' | 'scenario' | 'forecast';
 
-const PREMIUM_ENTITIES = [
-  'Ganzimmun Diagnostics',
-  'MVZ Labor Frankfurt',
-  'MVZ Labor München',
-  'MVZ Labor Bonn',
-  'Premium Genetics',
-  'MVZ Medizinisches Labor Hannover',
-  'MVZ Labor Premium Erfurt',
-  'MVZ Labor Bremen',
-  'MVZ Labor Köln',
-  'MVZ Labor Berlin',
-  'Andere Gesellschaft',
+// Beispiel-Gesellschaften für Konzernanalyse (vom Nutzer anpassbar)
+const EXAMPLE_ENTITIES = [
+  'Hauptgesellschaft',
+  'Tochter Nord',
+  'Tochter Süd',
+  'Tochter West',
+  'Tochter Ost',
+  'Beteiligung A',
+  'Beteiligung B',
+  'Weitere Gesellschaft',
 ];
 
 const formatCurrency = (value: number) =>
@@ -165,7 +163,7 @@ export default function Home() {
   const [showApp, setShowApp] = useState(false);
   const [mode, setMode] = useState<AnalysisMode>('single');
   const [entities, setEntities] = useState<EntityUpload[]>([
-    { id: '1', name: 'Ganzimmun Diagnostics', prevFile: null, currFile: null, result: null, status: 'pending', expanded: true },
+    { id: '1', name: '', prevFile: null, currFile: null, result: null, status: 'pending', expanded: true },
   ]);
   const [konzernResult, setKonzernResult] = useState<KonzernResult | null>(null);
   const [tripleResult, setTripleResult] = useState<TripleAnalysisResult | null>(null);
@@ -424,7 +422,7 @@ export default function Home() {
               </div>
               <div>
                 <span className="text-xl font-bold">Controlling Copilot</span>
-                <span className="hidden sm:inline text-sm text-gray-500 ml-2">für Limbach Gruppe</span>
+                <span className="hidden sm:inline text-sm text-gray-500 ml-2">für den Mittelstand</span>
               </div>
             </div>
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
@@ -653,7 +651,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-green-500" />
-              <span>Entwickelt für die Limbach Gruppe</span>
+              <span>Entwickelt für den deutschen Mittelstand</span>
             </div>
             <div className="flex items-center gap-6">
               <span>100% Open Source fähig</span>
@@ -950,7 +948,7 @@ export default function Home() {
                         className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
                       >
                         <option value="">Gesellschaft wählen...</option>
-                        {PREMIUM_ENTITIES.map(name => (
+                        {EXAMPLE_ENTITIES.map(name => (
                           <option key={name} value={name}>{name}</option>
                         ))}
                       </select>

@@ -210,7 +210,7 @@ async function generateRAGComment(
       .join('\n');
   }
 
-  const systemPrompt = `Du bist ein erfahrener Controller bei einem Labordiagnostik-Unternehmen der Limbach Gruppe.
+  const systemPrompt = `Du bist ein erfahrener Controller in einem mittelständischen Unternehmen.
 Du analysierst Abweichungen zwischen Perioden und gibst präzise, faktenbasierte Kommentare.
 Beziehe dich auf konkrete Belegnummern aus den Buchungen.
 Schreibe auf Deutsch, professionell aber verständlich.`;

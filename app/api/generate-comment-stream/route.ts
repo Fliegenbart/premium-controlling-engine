@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const isExpense = dev.account >= 5000;
     const accountType = isExpense ? 'Aufwandskonto' : 'Erlöskonto';
 
-    const prompt = `Du bist ein erfahrener Controller bei einem Labordiagnostik-Unternehmen.
+    const prompt = `Du bist ein erfahrener Controller in einem mittelständischen Unternehmen.
 Analysiere diese Kostenabweichung und erstelle einen prüfungssicheren Kommentar.
 ${INJECTION_GUARD}
 

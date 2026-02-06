@@ -67,4 +67,4 @@ const response = await fetch('http://localhost:11434/api/generate', {
 
 ## Lizenz
 
-Internes Tool für Ganzimmun / Premium Gruppe.
+Open-Source Controlling-Tool für den deutschen Mittelstand.
