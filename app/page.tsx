@@ -63,6 +63,14 @@ import BookingErrorPanel from '@/components/BookingErrorPanel';
 import { ScenarioSimulator } from '@/components/ScenarioSimulator';
 import RollingForecastDashboard from '@/components/RollingForecastDashboard';
 import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
+import { NumberTicker } from '@/components/magicui/number-ticker';
+import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { Particles } from '@/components/magicui/particles';
+import { BorderBeam } from '@/components/magicui/border-beam';
+import { MagicCard } from '@/components/magicui/magic-card';
+import { BlurFade } from '@/components/magicui/blur-fade';
+import { Meteors } from '@/components/magicui/meteors';
 
 
 interface EntityUpload {
@@ -398,12 +406,14 @@ export default function Home() {
   if (!showApp) {
     return (
       <main className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
-        {/* Animated Background */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute top-1/2 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-          <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-500" />
-        </div>
+        {/* Animated Particle Background */}
+        <Particles
+          className="fixed inset-0"
+          quantity={80}
+          ease={80}
+          color="#22c55e"
+          size={0.5}
+        />
 
         {/* Header */}
         <header className="relative z-10 px-6 py-4">
@@ -445,15 +455,17 @@ export default function Home() {
               </div>
             </div>
 
+            <BlurFade delay={0.1} inView>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               <span className="bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
                 KI-Controlling
               </span>
               <br />
-              <span className="bg-gradient-to-r from-green-400 via-emerald-400 to-green-400 bg-clip-text text-transparent">
+              <AnimatedGradientText className="text-5xl md:text-7xl font-bold !bg-gradient-to-r !from-green-400 !via-emerald-300 !to-green-400">
                 ohne Cloud-Risiko
-              </span>
+              </AnimatedGradientText>
             </h1>
+            </BlurFade>
 
             <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
               Automatische Abweichungsanalyse mit KI-Kommentaren – komplett on-premise.
@@ -461,33 +473,50 @@ export default function Home() {
               <span className="text-white font-medium">Jede Aussage mit Evidence Link zur Buchung.</span>
             </p>
 
-            {/* Key Stats */}
-            <div className="flex flex-wrap justify-center gap-8 mb-12">
-              {[
-                { value: '100%', label: 'On-Premise', color: 'text-green-400' },
-                { value: '<5 Min', label: 'Setup Zeit', color: 'text-blue-400' },
-                { value: '50+', label: 'Gesellschaften', color: 'text-purple-400' },
-              ].map((stat, idx) => (
-                <div key={idx} className="text-center">
-                  <div className={`text-3xl font-bold ${stat.color}`}>{stat.value}</div>
-                  <div className="text-sm text-gray-500">{stat.label}</div>
+            {/* Key Stats with NumberTicker */}
+            <BlurFade delay={0.3} inView>
+            <div className="flex flex-wrap justify-center gap-12 mb-12">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-400">
+                  <NumberTicker value={100} suffix="%" />
                 </div>
-              ))}
+                <div className="text-sm text-gray-500">On-Premise</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-400">
+                  {'<'}<NumberTicker value={5} /> Min
+                </div>
+                <div className="text-sm text-gray-500">Setup Zeit</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-400">
+                  <NumberTicker value={50} suffix="+" />
+                </div>
+                <div className="text-sm text-gray-500">Gesellschaften</div>
+              </div>
             </div>
+            </BlurFade>
 
+            <BlurFade delay={0.5} inView>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
+              <ShimmerButton
                 onClick={() => setShowApp(true)}
-                className="group px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl font-semibold text-lg hover:from-green-500 hover:to-emerald-500 transition-all shadow-lg shadow-green-500/25 flex items-center gap-3"
+                shimmerColor="#22c55e"
+                shimmerSize="0.1em"
+                background="linear-gradient(135deg, #166534 0%, #059669 100%)"
+                className="shadow-lg shadow-green-500/25 text-lg font-semibold"
               >
-                Jetzt starten – kostenlos
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
+                <span className="flex items-center gap-3">
+                  Jetzt starten – kostenlos
+                  <ArrowRight className="w-5 h-5" />
+                </span>
+              </ShimmerButton>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
                 Keine Registrierung nötig
               </div>
             </div>
+            </BlurFade>
           </div>
         </section>
 
@@ -504,21 +533,24 @@ export default function Home() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {USPS.map((usp, idx) => (
+                <BlurFade key={idx} delay={0.1 * idx} inView>
                 <div
-                  key={idx}
-                  className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all relative overflow-hidden"
+                  className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all overflow-hidden"
                 >
+                  <BorderBeam size={120} duration={8 + idx * 2} delay={idx * 2} colorFrom="#22c55e" colorTo="#3b82f6" />
+
                   {/* Highlight Badge */}
-                  <div className={`absolute top-4 right-4 px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r ${usp.color} text-white`}>
+                  <div className={`absolute top-4 right-4 px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r ${usp.color} text-white z-20`}>
                     {usp.highlight}
                   </div>
 
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${usp.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${usp.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform relative z-20`}>
                     <usp.icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{usp.title}</h3>
-                  <p className="text-gray-400 text-sm">{usp.description}</p>
+                  <h3 className="text-lg font-semibold mb-2 relative z-20">{usp.title}</h3>
+                  <p className="text-gray-400 text-sm relative z-20">{usp.description}</p>
                 </div>
+                </BlurFade>
               ))}
             </div>
           </div>
@@ -585,25 +617,33 @@ export default function Home() {
 
         {/* CTA Section */}
         <section className="relative z-10 px-6 pb-20">
-          <div className="max-w-4xl mx-auto text-center p-12 rounded-3xl bg-gradient-to-br from-green-900/50 to-emerald-900/50 border border-green-500/20">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium mb-6">
-              <Lock className="w-4 h-4" />
-              Ihre Daten verlassen nie Ihr Netzwerk
-            </div>
-            <h2 className="text-3xl font-bold mb-4">Bereit für sicheres KI-Controlling?</h2>
-            <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-              Laden Sie Ihre erste Buchungsdatei hoch und erleben Sie, wie KI-gestützte
-              Abweichungsanalyse funktioniert – ohne Cloud-Risiko.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={() => setShowApp(true)}
-                className="px-8 py-4 bg-white text-gray-900 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all flex items-center gap-2"
-              >
-                <Sparkles className="w-5 h-5" />
-                Kostenlos starten
-              </button>
-              <span className="text-sm text-gray-500">Keine Registrierung • Keine Cloud</span>
+          <div className="relative max-w-4xl mx-auto text-center p-12 rounded-3xl bg-gradient-to-br from-green-900/50 to-emerald-900/50 border border-green-500/20 overflow-hidden">
+            <Meteors number={15} />
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-medium mb-6">
+                <Lock className="w-4 h-4" />
+                Ihre Daten verlassen nie Ihr Netzwerk
+              </div>
+              <h2 className="text-3xl font-bold mb-4">Bereit für sicheres KI-Controlling?</h2>
+              <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+                Laden Sie Ihre erste Buchungsdatei hoch und erleben Sie, wie KI-gestützte
+                Abweichungsanalyse funktioniert – ohne Cloud-Risiko.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <ShimmerButton
+                  onClick={() => setShowApp(true)}
+                  shimmerColor="#ffffff"
+                  shimmerSize="0.08em"
+                  background="rgba(255,255,255,0.95)"
+                  className="!text-gray-900 text-lg font-semibold"
+                >
+                  <span className="flex items-center gap-2 text-gray-900">
+                    <Sparkles className="w-5 h-5" />
+                    Kostenlos starten
+                  </span>
+                </ShimmerButton>
+                <span className="text-sm text-gray-500">Keine Registrierung • Keine Cloud</span>
+              </div>
             </div>
           </div>
         </section>
@@ -1132,36 +1172,53 @@ export default function Home() {
             {/* Labor KPIs Dashboard */}
             {labKPIs && <LabKPIDashboard kpis={labKPIs} />}
 
-            {/* KPI Cards */}
+            {/* KPI Cards with NumberTicker */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+              <BlurFade delay={0.05} inView>
+              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-4 overflow-hidden group hover:border-white/20 transition-colors">
+                <BorderBeam size={80} duration={12} colorFrom="#3b82f6" colorTo="#8b5cf6" />
                 <p className="text-sm text-gray-500 mb-1">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
                 <p className="text-2xl font-bold text-white">
-                  {mode === 'multi' ? konzernResult?.entities.length : currentResult.meta.bookings_prev}
+                  <NumberTicker value={mode === 'multi' ? (konzernResult?.entities.length ?? 0) : currentResult.meta.bookings_prev} />
                 </p>
               </div>
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+              </BlurFade>
+              <BlurFade delay={0.1} inView>
+              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-4 overflow-hidden group hover:border-white/20 transition-colors">
+                <BorderBeam size={80} duration={12} delay={3} colorFrom="#3b82f6" colorTo="#06b6d4" />
                 <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
-                <p className="text-2xl font-bold text-white">{formatCurrency(currentResult.meta.total_prev)}</p>
+                <p className="text-2xl font-bold text-white">
+                  <NumberTicker value={Math.round(currentResult.meta.total_prev)} prefix="" suffix=" €" />
+                </p>
               </div>
-              <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+              </BlurFade>
+              <BlurFade delay={0.15} inView>
+              <div className="relative bg-[#12121a] rounded-xl border border-white/10 p-4 overflow-hidden group hover:border-white/20 transition-colors">
+                <BorderBeam size={80} duration={12} delay={6} colorFrom="#06b6d4" colorTo="#22c55e" />
                 <p className="text-sm text-gray-500 mb-1">Aktuell</p>
-                <p className="text-2xl font-bold text-white">{formatCurrency(currentResult.meta.total_curr)}</p>
+                <p className="text-2xl font-bold text-white">
+                  <NumberTicker value={Math.round(currentResult.meta.total_curr)} prefix="" suffix=" €" />
+                </p>
               </div>
-              <div className={`rounded-xl border p-4 ${
+              </BlurFade>
+              <BlurFade delay={0.2} inView>
+              <div className={`relative rounded-xl border p-4 overflow-hidden ${
                 currentResult.summary.total_delta > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
+                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#06b6d4'} />
                 <p className="text-sm text-gray-500 mb-1">Abweichung</p>
                 <p className={`text-2xl font-bold flex items-center gap-2 ${
                   currentResult.summary.total_delta > 0 ? 'text-red-400' : 'text-green-400'
                 }`}>
                   {currentResult.summary.total_delta > 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
-                  {formatCurrency(currentResult.summary.total_delta)}
+                  <NumberTicker value={Math.round(Math.abs(currentResult.summary.total_delta))} prefix={currentResult.summary.total_delta > 0 ? '+' : '-'} suffix=" €" />
                 </p>
               </div>
+              </BlurFade>
             </div>
 
             {/* Charts */}
+            <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-[#12121a] rounded-xl border border-white/10 p-6">
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
@@ -1204,6 +1261,7 @@ export default function Home() {
                 </ResponsiveContainer>
               </div>
             </div>
+            </BlurFade>
 
             {/* Tabs */}
             <div className="bg-[#12121a] rounded-2xl border border-white/10 overflow-hidden">
