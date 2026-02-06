@@ -122,7 +122,7 @@ function initializeDemoUsers(): void {
 
   if (result.count === 0) {
     const insertStmt = database.prepare(
-      'INSERT INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
+      'INSERT OR IGNORE INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
     );
 
     const now = new Date().toISOString();
@@ -309,7 +309,7 @@ export async function createUser(
     const passwordHash = hashPassword(password);
 
     const insertStmt = database.prepare(
-      'INSERT INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
+      'INSERT OR IGNORE INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
     );
     insertStmt.run(userId, email, name, passwordHash, role, now);
 
@@ -430,5 +430,4 @@ export function hasPermission(user: Omit<User, 'passwordHash'>, action: string):
   return userPerms.includes('*') || userPerms.includes(action);
 }
 
-// Initialize database on module load
-getDb();
+// Lazy initialization: avoid touching the database at build time.
