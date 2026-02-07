@@ -725,56 +725,47 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
           <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
             Was kein anderes Tool kann.
           </h2>
-          <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-            Neun KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
+          <p className="mt-6 text-lg text-gray-200 max-w-2xl mx-auto">
+            Elf KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
           </p>
         </div>
 
-        {/* ── NEW: 13-Wochen Liquiditätsplanung Banner ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent rounded-2xl border border-blue-500/25 p-8 mb-8 overflow-hidden"
-        >
-          {/* Background glow */}
-          <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative flex flex-col md:flex-row items-start gap-8">
-            {/* Left: Content */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-2xl font-semibold text-white tracking-tight">13-Wochen Liquiditätsplanung</h3>
-                <span className="px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+        {/* ═══════════ BENTO GRID: 11 Features ═══════════ */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* 1. LIQUIDITÄT (Hero - col-span-2, row-span-2) */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-blue-500/[0.12] p-6 overflow-hidden group hover:border-blue-500/30 transition-colors bg-gradient-to-br from-blue-500/[0.06] to-cyan-500/[0.03] backdrop-blur-xl shadow-glow-md md:col-span-2 md:row-span-2 flex flex-col"
+          >
+            <BorderBeam size={250} duration={18} colorFrom="#3b82f6" colorTo="#06b6d4" />
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed max-w-xl">
-                Automatische Cashflow-Prognose aus Ihren Buchungsdaten. Wiederkehrende Zahlungen werden erkannt,
-                Engpässe vorhergesagt und Konfidenzintervalle berechnet — Woche für Woche, 13 Wochen voraus.
-              </p>
-              <div className="flex flex-wrap gap-3 mt-4">
-                {['Wiederkehrende Muster', 'Konfidenzintervalle', 'Alerts bei Engpass', 'KI-Empfehlungen'].map((tag) => (
-                  <span key={tag} className="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              <h3 className="text-lg font-bold text-white">Liquidität</h3>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
             </div>
-
-            {/* Right: Mini Chart Animation */}
-            <div className="w-full md:w-72 h-36 relative">
-              {/* Animated line chart preview */}
-              <svg viewBox="0 0 280 120" className="w-full h-full" preserveAspectRatio="none">
-                {/* Grid lines */}
+            <p className="text-sm text-gray-300 mb-4 leading-relaxed">
+              13-Wochen Cashflow-Prognose mit Konfidenzintervallen, Engpass-Alerts und KI-Empfehlungen.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {['Wiederkehrende Muster', 'Konfidenzintervalle', 'Alerts', 'KI-Empfehlungen'].map((tag) => (
+                <span key={tag} className="px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            {/* Full chart SVG from original banner */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3">
+              <svg viewBox="0 0 280 120" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
                 {[0, 30, 60, 90].map((y) => (
                   <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.05)" />
                 ))}
-                {/* Threshold line */}
                 <line x1="0" y1="75" x2="280" y2="75" stroke="#ef4444" strokeWidth="1" strokeDasharray="6 4" opacity="0.5" />
-                <text x="4" y="72" fill="#ef4444" fontSize="8" opacity="0.6">Schwelle</text>
-
-                {/* Confidence band */}
                 <motion.path
                   d="M0,20 L22,22 L44,25 L66,30 L88,28 L110,35 L132,45 L154,50 L176,55 L198,48 L220,42 L242,38 L264,35 L264,75 L242,68 L220,72 L198,78 L176,85 L154,80 L132,75 L110,65 L88,58 L66,60 L44,55 L22,52 L0,50 Z"
                   fill="rgba(59,130,246,0.08)"
@@ -783,8 +774,6 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   viewport={{ once: true }}
                   transition={{ duration: 1.2, delay: 0.3 }}
                 />
-
-                {/* Main balance line */}
                 <motion.path
                   d="M0,35 L22,37 L44,40 L66,45 L88,43 L110,50 L132,60 L154,65 L176,70 L198,63 L220,57 L242,53 L264,50"
                   fill="none"
@@ -796,31 +785,17 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   viewport={{ once: true }}
                   transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
                 />
-
-                {/* Pulsing dot at lowest point */}
                 <motion.circle
-                  cx="176"
-                  cy="70"
-                  r="4"
-                  fill="#ef4444"
+                  cx="176" cy="70" r="4" fill="#ef4444"
                   initial={{ opacity: 0, scale: 0 }}
                   whileInView={{ opacity: [0, 1, 0.6, 1], scale: [0, 1.5, 1, 1.2] }}
                   viewport={{ once: true }}
                   transition={{ duration: 2, delay: 1.2, repeat: Infinity, repeatDelay: 2 }}
                 />
-                <text x="160" y="90" fill="#ef4444" fontSize="7" fontWeight="600" opacity="0.8">KW 9: Min</text>
-
-                {/* Inflow bars */}
                 {[0, 44, 88, 132, 176, 220].map((x, i) => (
                   <motion.rect
                     key={`in-${i}`}
-                    x={x + 4}
-                    y={105}
-                    width="14"
-                    height={[12, 10, 14, 8, 15, 11][i]}
-                    rx="2"
-                    fill="#10b981"
-                    opacity="0.3"
+                    x={x + 4} y={105} width="14" height={[12, 10, 14, 8, 15, 11][i]} rx="2" fill="#10b981" opacity="0.3"
                     initial={{ scaleY: 0 }}
                     whileInView={{ scaleY: 1 }}
                     viewport={{ once: true }}
@@ -829,718 +804,393 @@ export default function LandingPage({ onStartApp }: LandingPageProps) {
                   />
                 ))}
               </svg>
-              {/* Labels */}
-              <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1">
-                {['KW 1', 'KW 4', 'KW 7', 'KW 10', 'KW 13'].map((kw) => (
-                  <span key={kw} className="text-[8px] text-gray-600">{kw}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ── NEW: KI-Abweichungskommentare Banner ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
-          whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-          className="relative rounded-2xl border border-white/[0.10] p-8 md:p-10 overflow-hidden bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-xl shadow-glow-md mb-6"
-        >
-          <BorderBeam size={250} duration={18} colorFrom="#f59e0b" colorTo="#ef4444" />
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
-            <div className="flex-shrink-0">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-2xl font-semibold text-white tracking-tight">KI-Abweichungskommentare</h3>
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-              </div>
-              <p className="text-gray-300 leading-relaxed max-w-2xl">
-                Statt nur &quot;Personalkosten +12%&quot; sagt die KI: &quot;Anstieg durch 3 Neueinstellungen IT (März-April) + Tariferhöhung 3.2%.
-                Größte Einzelbuchung: Entwickler-Team 45.200€.&quot; — <strong className="text-white">Jede Abweichung automatisch erklärt.</strong>
-              </p>
-            </div>
-            {/* Mini demo */}
-            <div className="hidden lg:block flex-shrink-0 w-72">
-              <div className="bg-white/[0.06] rounded-xl border border-white/[0.10] p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-1 h-4 rounded-full bg-gradient-to-b from-amber-400 to-red-400" />
-                  <span className="text-xs text-gray-400">KI-Analyse</span>
-                </div>
-                {[
-                  { label: 'Neueinstellungen IT', w: '75%', color: 'bg-red-400/60' },
-                  { label: 'Tariferhöhung', w: '40%', color: 'bg-red-400/40' },
-                  { label: 'Wegfall Zeitarbeit', w: '25%', color: 'bg-green-400/50' },
-                ].map((factor, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 + i * 0.15 }}
-                    className="mb-2"
-                  >
-                    <div className="text-[10px] text-gray-500 mb-0.5">{factor.label}</div>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: factor.w }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.5 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-                      className={`h-1.5 rounded-full ${factor.color}`}
-                    />
-                  </motion.div>
-                ))}
-                <div className="flex items-center gap-1.5 mt-3 text-[10px] text-amber-400/80">
-                  <Sparkles className="w-3 h-3" />
-                  <span>85% Konfidenz — Strukturelle Änderung</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* ── Tile 1: KI-Monatsberichte ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="var(--color-one)" colorTo="var(--color-two)" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-one)] to-[var(--color-two)] flex items-center justify-center">
-                <Brain className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">KI-Monatsberichte</h3>
-                <p className="text-xs text-gray-500">Ein Klick → fertig</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Generiert automatisch vollständige Word-Reports mit KI-Analyse aller Abweichungen, Trends und Anomalien.
-            </p>
-            {/* Mini Demo: Animated document lines */}
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/5">
-                <FileText className="w-4 h-4 text-[var(--color-one)]" />
-                <span className="text-xs text-gray-500 font-mono">Monatsbericht_Jan_2025.docx</span>
-              </div>
-              {[
-                { w: '85%', delay: 0.3, color: 'bg-white/10' },
-                { w: '92%', delay: 0.5, color: 'bg-white/8' },
-                { w: '65%', delay: 0.7, color: 'bg-[var(--color-one)]/20' },
-                { w: '78%', delay: 0.9, color: 'bg-white/10' },
-                { w: '55%', delay: 1.1, color: 'bg-white/8' },
-                { w: '88%', delay: 1.3, color: 'bg-[var(--color-two)]/20' },
-                { w: '70%', delay: 1.5, color: 'bg-white/10' },
-              ].map((line, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: line.delay, ease: 'easeOut' }}
-                  className={`h-2 rounded-full mb-2 ${line.color}`}
-                  style={{ width: line.w }}
-                />
-              ))}
             </div>
           </motion.div>
 
-          {/* ── Tile 2: Buchungsfehler-Erkennung ── */}
+          {/* 2. KI-KOMMENTARE (Amber, top right) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-amber-500/[0.12] p-6 overflow-hidden group hover:border-amber-500/30 transition-colors bg-gradient-to-br from-amber-500/[0.06] to-red-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={4} colorFrom="var(--color-two)" colorTo="var(--color-three)" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-two)] to-[var(--color-three)] flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-white" />
+            <BorderBeam size={180} duration={14} colorFrom="#f59e0b" colorTo="#ef4444" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Buchungsfehler-Erkennung</h3>
-                <p className="text-xs text-gray-500">Smart Detection</p>
-              </div>
+              <h3 className="text-lg font-bold text-white">KI-Kommentare</h3>
             </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Findet Duplikate, Rundlauf-Buchungen, Wochenend-Buchungen und verdächtige Muster automatisch.
-            </p>
-            {/* Mini Demo: Booking list with error highlight */}
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
+            {/* Mini demo: 3 animated bars */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3">
               {[
-                { text: '4711 Personalkosten', amount: '12.450,00', ok: true, delay: 0.4 },
-                { text: '6300 Reisekosten', amount: '3.200,50', ok: true, delay: 0.6 },
-                { text: '4711 Personalkosten', amount: '12.450,00', ok: false, delay: 0.8 },
-                { text: '7100 Abschreibungen', amount: '8.900,00', ok: true, delay: 1.0 },
-                { text: '6800 Sa/So Buchung', amount: '1.550,00', ok: false, delay: 1.2 },
-              ].map((row, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -15 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: row.delay, ease: 'easeOut' }}
-                  className={cn(
-                    'flex items-center justify-between py-2 px-3 rounded-lg mb-1.5 text-xs font-mono',
-                    row.ok
-                      ? 'bg-white/[0.02] text-gray-400'
-                      : 'bg-red-500/10 border border-red-500/20 text-red-400'
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    {!row.ok && (
-                      <motion.div
-                        animate={{ opacity: [1, 0.4, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      >
-                        <AlertTriangle className="w-3 h-3 text-red-400" />
-                      </motion.div>
-                    )}
-                    <span>{row.text}</span>
-                  </div>
-                  <span>{row.amount} €</span>
+                { label: 'Neueinstellungen IT', w: '75%' },
+                { label: 'Tariferhöhung', w: '40%' },
+                { label: 'Wegfall Zeitarbeit', w: '25%' },
+              ].map((factor, i) => (
+                <motion.div key={i} className="mb-2">
+                  <div className="text-[10px] text-gray-500 mb-0.5">{factor.label}</div>
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: factor.w }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.3 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="h-1.5 rounded-full bg-red-400"
+                  />
                 </motion.div>
               ))}
               <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: 1.6 }}
-                className="mt-2 text-xs text-red-400 flex items-center gap-1.5"
+                transition={{ delay: 0.8 }}
+                className="flex items-center gap-1 mt-2 text-[10px] text-amber-400/80"
               >
-                <AlertTriangle className="w-3 h-3" />
-                2 Fehler erkannt — Duplikat & Wochenend-Buchung
+                <span>85% Konfidenz</span>
               </motion.div>
             </div>
           </motion.div>
 
-          {/* ── Tile 3: Szenario-Simulation ── */}
+          {/* 3. FEHLER (Rose) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-rose-500/[0.12] p-6 overflow-hidden group hover:border-rose-500/30 transition-colors bg-gradient-to-br from-rose-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={7} colorFrom="var(--color-three)" colorTo="var(--color-one)" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-three)] to-[var(--color-one)] flex items-center justify-center">
-                <Target className="w-6 h-6 text-white" />
+            <BorderBeam size={180} duration={14} colorFrom="#f43f5e" colorTo="#ec4899" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Szenario-Simulation</h3>
-                <p className="text-xs text-gray-500">What-if Analyse</p>
-              </div>
+              <h3 className="text-lg font-bold text-white">Fehler</h3>
             </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Schieben Sie Regler und sehen Sie sofort die Auswirkungen auf Gewinn, Liquidität und Kosten.
-            </p>
-            {/* Mini Demo: Animated sliders + bar chart */}
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              {[
-                { label: 'Umsatz', value: 72, color: 'bg-emerald-500', delay: 0.5 },
-                { label: 'Personal', value: 45, color: 'bg-[var(--color-two)]', delay: 0.7 },
-                { label: 'Material', value: 58, color: 'bg-[var(--color-one)]', delay: 0.9 },
-              ].map((slider, i) => (
-                <div key={i} className="mb-4">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-                    <span>{slider.label}</span>
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: slider.delay + 0.3 }}
-                      className="text-white font-mono"
-                    >
-                      {slider.value}%
-                    </motion.span>
-                  </div>
-                  <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${slider.value}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1, delay: slider.delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-                      className={`h-full rounded-full ${slider.color}`}
-                    />
-                  </div>
-                </div>
-              ))}
-              {/* Impact bars */}
-              <div className="flex items-end gap-2 mt-4 h-16">
-                {[40, 65, 30, 80, 55, 70, 45].map((h, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ height: 0 }}
-                    whileInView={{ height: `${h}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 1.2 + i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
-                    className="flex-1 rounded-t bg-gradient-to-t from-[var(--color-three)]/40 to-[var(--color-one)]/40"
-                  />
-                ))}
-              </div>
+            {/* Mini demo: 3 rows with errors */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 space-y-1.5">
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-red-500/10 border border-red-500/20 rounded-lg px-2 py-1 text-[10px] text-red-400 flex items-center gap-1"
+              >
+                <AlertTriangle className="w-3 h-3" /> Duplikat
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-red-500/10 border border-red-500/20 rounded-lg px-2 py-1 text-[10px] text-red-400 flex items-center gap-1"
+              >
+                <AlertTriangle className="w-3 h-3" /> Sa/So Buchung
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="text-[10px] text-gray-500 mt-2"
+              >
+                2 Fehler erkannt
+              </motion.div>
             </div>
           </motion.div>
 
-          {/* ── Tile 4: Rollierender Forecast ── */}
+          {/* 4. BERICHTE (Indigo) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-indigo-500/[0.12] p-6 overflow-hidden group hover:border-indigo-500/30 transition-colors bg-gradient-to-br from-indigo-500/[0.06] to-cyan-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={10} colorFrom="#06b6d4" colorTo="#3b82f6" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-white" />
+            <BorderBeam size={180} duration={14} colorFrom="#6366f1" colorTo="#06b6d4" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Rollierender Forecast</h3>
-                <p className="text-xs text-gray-500">Automatische Prognose</p>
-              </div>
+              <h3 className="text-lg font-bold text-white">Berichte</h3>
             </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Automatische Forecasts basierend auf historischen Daten, Saisonalitäten und Trends.
-            </p>
-            {/* Mini Demo: Animated line chart */}
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              <div className="flex items-center gap-4 mb-3 text-xs text-gray-500">
-                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-cyan-400 rounded inline-block" /> Ist</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-400 rounded inline-block border border-dashed border-blue-400" /> Forecast</span>
-              </div>
-              <svg viewBox="0 0 280 100" className="w-full h-auto" fill="none">
-                {/* Grid lines */}
-                {[25, 50, 75].map((y) => (
-                  <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.05)" />
-                ))}
-                {/* Actual data line */}
-                <motion.path
-                  d="M 0 70 L 35 55 L 70 60 L 105 40 L 140 45 L 175 30"
-                  stroke="#06b6d4"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  whileInView={{ pathLength: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1.5, delay: 0.5, ease: 'easeOut' }}
-                />
-                {/* Forecast line (dashed) */}
-                <motion.path
-                  d="M 175 30 L 210 22 L 245 18 L 280 12"
-                  stroke="#3b82f6"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray="6 4"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  whileInView={{ pathLength: 1, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 2, ease: 'easeOut' }}
-                />
-                {/* Forecast area */}
-                <motion.path
-                  d="M 175 30 L 210 22 L 245 18 L 280 12 L 280 100 L 175 100 Z"
-                  fill="url(#forecastGrad)"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 0.3 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 2.5 }}
-                />
-                {/* Data points */}
-                {[[0, 70], [35, 55], [70, 60], [105, 40], [140, 45], [175, 30]].map(([x, y], i) => (
-                  <motion.circle
-                    key={i}
-                    cx={x}
-                    cy={y}
-                    r="3"
-                    fill="#06b6d4"
-                    initial={{ opacity: 0, scale: 0 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: 0.5 + i * 0.25 }}
-                  />
-                ))}
-                <defs>
-                  <linearGradient id="forecastGrad" x1="175" y1="12" x2="175" y2="100" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#3b82f6" stopOpacity="0.4" />
-                    <stop offset="1" stopColor="#3b82f6" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="flex justify-between text-[10px] text-gray-600 mt-1 px-1">
-                {['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep'].map((m) => (
-                  <span key={m}>{m}</span>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── Tile 5: Deckungsbeitragsrechnung ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-teal-500/[0.12] p-8 overflow-hidden group hover:border-teal-500/30 transition-colors bg-gradient-to-br from-teal-500/[0.06] to-emerald-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} delay={11} colorFrom="#14b8a6" colorTo="#10b981" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Deckungsbeitragsrechnung</h3>
-                <p className="text-xs text-gray-500">DB I → DB V</p>
-              </div>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-500/30 text-teal-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-            </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Mehrstufige Deckungsbeitragsrechnung nach SKR03/04. Von Rohertrag (DB I) bis Unternehmensergebnis (DB V) — mit Wasserfall-Chart und Kostenstellen-Vergleich.
-            </p>
-            {/* Mini Demo: Animated Waterfall Chart */}
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
-                <span className="flex items-center gap-1"><span className="w-3 h-1.5 bg-emerald-400 rounded inline-block" /> Erlöse/DB</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-1.5 bg-red-400/60 rounded inline-block" /> Kosten</span>
-              </div>
-              <svg viewBox="0 0 280 100" className="w-full h-auto" fill="none">
-                {/* Grid lines */}
-                {[25, 50, 75].map((y) => (
-                  <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.04)" />
-                ))}
-                {/* Waterfall bars — animated */}
-                {[
-                  { x: 10, y: 10, h: 70, color: '#10b981', label: 'Umsatz', delay: 0.4 },
-                  { x: 50, y: 10, h: 20, color: '#ef4444', label: '-Material', delay: 0.6 },
-                  { x: 90, y: 30, h: 50, color: '#0ea5e9', label: 'DB I', delay: 0.8 },
-                  { x: 130, y: 30, h: 15, color: '#ef4444', label: '-Personal', delay: 1.0 },
-                  { x: 170, y: 45, h: 35, color: '#3b82f6', label: 'DB II', delay: 1.2 },
-                  { x: 210, y: 45, h: 10, color: '#ef4444', label: '-GK', delay: 1.4 },
-                  { x: 250, y: 55, h: 25, color: '#8b5cf6', label: 'DB V', delay: 1.6 },
-                ].map((bar, i) => (
-                  <g key={i}>
-                    <motion.rect
-                      x={bar.x}
-                      y={bar.y}
-                      width="30"
-                      height={bar.h}
-                      rx="3"
-                      fill={bar.color}
-                      opacity={bar.color === '#ef4444' ? 0.5 : 0.7}
-                      initial={{ scaleY: 0 }}
-                      whileInView={{ scaleY: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: bar.delay, ease: [0.21, 0.47, 0.32, 0.98] }}
-                      style={{ transformOrigin: `${bar.x + 15}px ${bar.y + bar.h}px` }}
-                    />
-                    <motion.text
-                      x={bar.x + 15}
-                      y={95}
-                      textAnchor="middle"
-                      fill="rgba(255,255,255,0.4)"
-                      fontSize="7"
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: bar.delay + 0.3 }}
-                    >
-                      {bar.label}
-                    </motion.text>
-                  </g>
-                ))}
-                {/* Connector lines */}
-                {[
-                  { x1: 40, y1: 10, x2: 50, y2: 10 },
-                  { x1: 80, y1: 30, x2: 90, y2: 30 },
-                  { x1: 120, y1: 30, x2: 130, y2: 30 },
-                  { x1: 160, y1: 45, x2: 170, y2: 45 },
-                  { x1: 200, y1: 45, x2: 210, y2: 45 },
-                  { x1: 240, y1: 55, x2: 250, y2: 55 },
-                ].map((line, i) => (
-                  <motion.line
-                    key={`conn-${i}`}
-                    x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2}
-                    stroke="rgba(255,255,255,0.15)"
-                    strokeWidth="1"
-                    strokeDasharray="3 2"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.6 + i * 0.2 }}
-                  />
-                ))}
-              </svg>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {['DB I-V', 'Wasserfall', 'Kostenstellen', 'KI-Analyse'].map((tag, i) => (
-                  <motion.span
-                    key={tag}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 2.0 + i * 0.1 }}
-                    className="px-1.5 py-0.5 rounded text-[8px] bg-teal-500/10 text-teal-400/70 border border-teal-500/10"
-                  >
-                    {tag}
-                  </motion.span>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* ── Tile 6: Monatsabschluss-Workflow ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.75, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-white/[0.10] p-8 overflow-hidden group hover:border-white/20 transition-colors bg-white/[0.06] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} delay={14} colorFrom="#22c55e" colorTo="#10b981" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                <ClipboardCheck className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Monatsabschluss-Workflow</h3>
-                <p className="text-xs text-gray-500">Geführter Abschluss</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              12 automatische Prüfungen — von Kontenabstimmung bis Storno-Check. Mit Fortschrittsanzeige, Findings und digitaler Freigabe.
-            </p>
-            {/* Mini Demo: Animated checklist */}
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              <div className="flex items-center gap-3 mb-3">
-                {/* Progress ring mini */}
-                <svg viewBox="0 0 36 36" className="w-10 h-10">
-                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
-                  <motion.circle
-                    cx="18" cy="18" r="15.5" fill="none" stroke="#22c55e" strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeDasharray="97.4"
-                    initial={{ strokeDashoffset: 97.4 }}
-                    whileInView={{ strokeDashoffset: 14.6 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 2, delay: 0.5, ease: 'easeOut' }}
-                    transform="rotate(-90 18 18)"
-                  />
-                  <text x="18" y="20" textAnchor="middle" fill="white" fontSize="8" fontWeight="600">85%</text>
-                </svg>
-                <div>
-                  <p className="text-xs text-white font-medium">10 von 12 bestanden</p>
-                  <p className="text-[10px] text-gray-500">2 Warnungen</p>
-                </div>
-              </div>
-              {[
-                { name: 'Kontenabstimmung', status: 'passed', delay: 0.4 },
-                { name: 'Rückstellungen', status: 'passed', delay: 0.7 },
-                { name: 'Buchungsfehler-Scan', status: 'warning', delay: 1.0 },
-                { name: 'Storno-Check', status: 'passed', delay: 1.3 },
-                { name: 'Manuelle Freigabe', status: 'pending', delay: 1.6 },
-              ].map((item, i) => (
+            {/* Mini demo: Animated skeleton lines */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 space-y-2">
+              {[85, 92, 65, 78, 55].map((w, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -15 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: item.delay }}
-                  className="flex items-center gap-2.5 py-1.5"
-                >
-                  {item.status === 'passed' && <CheckCircle className="w-4 h-4 text-green-400" />}
-                  {item.status === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-400" />}
-                  {item.status === 'pending' && <Clock className="w-4 h-4 text-gray-500" />}
-                  <span className={`text-xs ${item.status === 'pending' ? 'text-gray-500' : 'text-gray-300'}`}>{item.name}</span>
+                  transition={{ duration: 0.3, delay: 0.2 + i * 0.1 }}
+                  className="h-2 rounded-full bg-indigo-500/20"
+                  style={{ width: `${w}%` }}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* 5. SZENARIO (Purple) */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-purple-500/[0.12] p-6 overflow-hidden group hover:border-purple-500/30 transition-colors bg-gradient-to-br from-purple-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} colorFrom="#a855f7" colorTo="#ec4899" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Target className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Szenario</h3>
+            </div>
+            {/* Mini demo: 3 sliders */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 space-y-2">
+              {[72, 45, 58].map((v, i) => (
+                <motion.div key={i} className="flex items-center gap-2">
+                  <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${v}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: 0.2 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+                      className="h-full rounded-full bg-purple-500"
+                    />
+                  </div>
+                  <span className="text-[9px] text-gray-500">{v}%</span>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* ── Tile 7: Kapitalflussrechnung ── */}
+          {/* 6. FORECAST (Cyan) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-cyan-500/[0.12] p-8 overflow-hidden group hover:border-cyan-500/30 transition-colors bg-gradient-to-br from-cyan-500/[0.06] to-blue-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-cyan-500/[0.12] p-6 overflow-hidden group hover:border-cyan-500/30 transition-colors bg-gradient-to-br from-cyan-500/[0.06] to-blue-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={16} colorFrom="#06b6d4" colorTo="#3b82f6" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-white" />
+            <BorderBeam size={180} duration={14} colorFrom="#06b6d4" colorTo="#3b82f6" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">Kapitalflussrechnung</h3>
-                <p className="text-xs text-gray-500">DRS 21</p>
-              </div>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+              <h3 className="text-lg font-bold text-white">Forecast</h3>
             </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Automatische Cashflow-Rechnung nach DRS 21 — operativ, investiv, Finanzierung. Mit Free Cashflow, CF-Marge und Monatsvergleich.
-            </p>
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              <svg viewBox="0 0 260 90" className="w-full h-auto" fill="none">
-                {/* Animated flow arrows */}
-                <motion.path d="M 30 45 Q 70 15, 130 45" stroke="#10b981" strokeWidth="2" fill="none" strokeLinecap="round"
+            {/* Mini chart SVG */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2">
+              <svg viewBox="0 0 120 50" className="w-full h-full">
+                <motion.path d="M 5 35 L 20 25 L 35 30 L 50 20 L 65 15" stroke="#06b6d4" strokeWidth="1.5" fill="none" strokeLinecap="round"
                   initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 0.5 }}
+                  transition={{ duration: 1, delay: 0.2 }}
                 />
-                <motion.path d="M 130 45 Q 170 75, 230 45" stroke="#3b82f6" strokeWidth="2" fill="none" strokeLinecap="round"
+                <motion.path d="M 65 15 L 80 10 L 95 8" stroke="#3b82f6" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeDasharray="3 2"
                   initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 1 }}
+                  transition={{ duration: 0.8, delay: 1 }}
                 />
-                <motion.circle cx="130" cy="45" r="8" fill="#080b16" stroke="#06b6d4" strokeWidth="1.5"
-                  initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 1.5 }}
-                />
-                <text x="30" y="38" fill="#10b981" fontSize="7" opacity="0.7">Operativ</text>
-                <text x="200" y="38" fill="#3b82f6" fontSize="7" opacity="0.7">Invest</text>
-                <text x="115" y="70" fill="#a855f7" fontSize="7" opacity="0.7">Finanz</text>
               </svg>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {['DRS 21', 'Free CF', 'CF-Marge', 'Monatstrend'].map((tag, i) => (
-                  <motion.span key={tag} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 2 + i * 0.1 }}
-                    className="px-1.5 py-0.5 rounded text-[8px] bg-cyan-500/10 text-cyan-400/70 border border-cyan-500/10"
-                  >{tag}</motion.span>
+            </div>
+          </motion.div>
+
+          {/* 7. DB-RECHNUNG (Teal, col-span-2) */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-teal-500/[0.12] p-6 overflow-hidden group hover:border-teal-500/30 transition-colors bg-gradient-to-br from-teal-500/[0.06] to-emerald-500/[0.03] backdrop-blur-xl shadow-glow-md md:col-span-2 flex flex-col"
+          >
+            <BorderBeam size={200} duration={14} colorFrom="#14b8a6" colorTo="#10b981" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-white">DB-Rechnung</h3>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-500/30 text-teal-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+            </div>
+            {/* Mini waterfall chart */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3">
+              <svg viewBox="0 0 140 60" className="w-full h-full">
+                {[
+                  { x: 5, y: 8, h: 35, color: '#10b981' },
+                  { x: 25, y: 8, h: 10, color: '#ef4444' },
+                  { x: 45, y: 18, h: 25, color: '#0ea5e9' },
+                  { x: 65, y: 18, h: 8, color: '#ef4444' },
+                  { x: 85, y: 26, h: 17, color: '#3b82f6' },
+                  { x: 105, y: 26, h: 5, color: '#ef4444' },
+                  { x: 125, y: 31, h: 12, color: '#8b5cf6' },
+                ].map((bar, i) => (
+                  <motion.rect
+                    key={i}
+                    x={bar.x} y={bar.y} width="12" height={bar.h} rx="1" fill={bar.color} opacity={bar.color === '#ef4444' ? 0.5 : 0.7}
+                    initial={{ scaleY: 0 }}
+                    whileInView={{ scaleY: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.1 + i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    style={{ transformOrigin: `${bar.x + 6}px ${bar.y + bar.h}px` }}
+                  />
                 ))}
+              </svg>
+            </div>
+          </motion.div>
+
+          {/* 8. ABSCHLUSS (Green) */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-green-500/[0.12] p-6 overflow-hidden group hover:border-green-500/30 transition-colors bg-gradient-to-br from-green-500/[0.06] to-emerald-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} colorFrom="#22c55e" colorTo="#10b981" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                <ClipboardCheck className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Abschluss</h3>
+            </div>
+            {/* Mini progress ring + checklist */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 flex items-center gap-2">
+              <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0">
+                <circle cx="12" cy="12" r="10.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
+                <motion.circle
+                  cx="12" cy="12" r="10.5" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round"
+                  strokeDasharray="65.97"
+                  initial={{ strokeDashoffset: 65.97 }}
+                  whileInView={{ strokeDashoffset: 10 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
+                  transform="rotate(-90 12 12)"
+                />
+                <text x="12" y="13.5" textAnchor="middle" fill="white" fontSize="6" fontWeight="600">85%</text>
+              </svg>
+              <div className="text-[10px] text-gray-300">
+                <p className="font-medium">10/12</p>
+                <p className="text-gray-500">bestanden</p>
               </div>
             </div>
           </motion.div>
 
-          {/* ── Tile 8: BWA ── */}
+          {/* 9. CASHFLOW (Cyan, NEU) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-orange-500/[0.12] p-8 overflow-hidden group hover:border-orange-500/30 transition-colors bg-gradient-to-br from-orange-500/[0.06] to-amber-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-cyan-500/[0.12] p-6 overflow-hidden group hover:border-cyan-500/30 transition-colors bg-gradient-to-br from-cyan-500/[0.06] to-blue-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={18} colorFrom="#f97316" colorTo="#f59e0b" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-white" />
+            <BorderBeam size={180} duration={14} colorFrom="#06b6d4" colorTo="#3b82f6" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">BWA-Automatik</h3>
-                <p className="text-xs text-gray-500">DATEV-Standard</p>
-              </div>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+              <h3 className="text-lg font-bold text-white">Cashflow</h3>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
             </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Betriebswirtschaftliche Auswertung nach DATEV — von Umsatz über EBITDA bis Netto-Ergebnis. Mit Kostenstruktur-Analyse und Margen-Trend.
-            </p>
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              <div className="space-y-2">
-                {[
-                  { label: 'Umsatzerlöse', pct: 100, color: '#10b981' },
-                  { label: 'Rohertrag', pct: 62, color: '#0ea5e9' },
-                  { label: 'EBITDA', pct: 28, color: '#6366f1' },
-                  { label: 'EBIT', pct: 18, color: '#8b5cf6' },
-                  { label: 'Netto', pct: 8, color: '#22c55e' },
-                ].map((item, i) => (
-                  <motion.div key={i} className="flex items-center gap-2"
-                    initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: 0.5 + i * 0.15 }}
-                  >
-                    <span className="text-[9px] text-gray-500 w-16 truncate">{item.label}</span>
-                    <div className="flex-1 h-3 bg-white/[0.08] rounded-full overflow-hidden">
-                      <motion.div className="h-full rounded-full" style={{ backgroundColor: item.color }}
-                        initial={{ width: 0 }} whileInView={{ width: `${item.pct}%` }} viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.6 + i * 0.15, ease: 'easeOut' }}
-                      />
-                    </div>
-                    <span className="text-[9px] text-gray-500 w-7 text-right">{item.pct}%</span>
-                  </motion.div>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {['GuV', 'Margen', 'Kostenstruktur', 'KI-Analyse'].map((tag, i) => (
-                  <motion.span key={tag} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 2 + i * 0.1 }}
-                    className="px-1.5 py-0.5 rounded text-[8px] bg-orange-500/10 text-orange-400/70 border border-orange-500/10"
-                  >{tag}</motion.span>
-                ))}
-              </div>
+            {/* Flow arrows */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2">
+              <svg viewBox="0 0 130 45" className="w-full h-full">
+                <motion.path d="M 15 23 Q 35 5, 65 23" stroke="#10b981" strokeWidth="1.5" fill="none" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                />
+                <motion.path d="M 65 23 Q 85 40, 115 23" stroke="#3b82f6" strokeWidth="1.5" fill="none" strokeLinecap="round"
+                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                />
+                <motion.circle cx="65" cy="23" r="3" fill="#06b6d4"
+                  initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }}
+                  transition={{ delay: 1, duration: 0.4 }}
+                />
+              </svg>
             </div>
           </motion.div>
 
-          {/* ── Tile 9: Betriebsabrechnungsbogen ── */}
+          {/* 10. BWA (Orange, NEU) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+            transition={{ duration: 0.7, delay: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
             whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-rose-500/[0.12] p-8 overflow-hidden group hover:border-rose-500/30 transition-colors bg-gradient-to-br from-rose-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md min-h-[340px] flex flex-col"
+            className="relative rounded-2xl border border-orange-500/[0.12] p-6 overflow-hidden group hover:border-orange-500/30 transition-colors bg-gradient-to-br from-orange-500/[0.06] to-amber-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
           >
-            <BorderBeam size={180} duration={14} delay={20} colorFrom="#f43f5e" colorTo="#ec4899" />
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-white" />
+            <BorderBeam size={180} duration={14} colorFrom="#f97316" colorTo="#f59e0b" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-white">BAB</h3>
-                <p className="text-xs text-gray-500">Betriebsabrechnungsbogen</p>
+              <h3 className="text-lg font-bold text-white">BWA</h3>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
+            </div>
+            {/* Stacked bars */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2 space-y-1">
+              {[100, 62, 28, 18].map((v, i) => (
+                <motion.div key={i} className="h-2 bg-white/5 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${v}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.2 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="h-full rounded-full bg-orange-500"
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* 11. BAB (Rose, NEU) */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.7, delay: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+            className="relative rounded-2xl border border-rose-500/[0.12] p-6 overflow-hidden group hover:border-rose-500/30 transition-colors bg-gradient-to-br from-rose-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
+          >
+            <BorderBeam size={180} duration={14} colorFrom="#f43f5e" colorTo="#ec4899" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-white" />
               </div>
+              <h3 className="text-lg font-bold text-white">BAB</h3>
               <span className="ml-auto px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
             </div>
-            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              Innerbetriebliche Leistungsverrechnung — Kostenarten auf Kostenstellen verteilen, Gemeinkostenzuschlagssätze berechnen. Mit Heatmap.
-            </p>
-            <div className="flex-1 relative bg-white/[0.06] rounded-xl border border-white/5 p-4 overflow-hidden">
-              {/* Mini Heatmap Grid */}
-              <div className="grid grid-cols-5 gap-1 mb-3">
-                {Array.from({ length: 20 }, (_, i) => {
+            {/* Mini heatmap */}
+            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2">
+              <div className="grid grid-cols-4 gap-0.5">
+                {Array.from({ length: 12 }, (_, i) => {
                   const intensity = Math.random();
                   return (
                     <motion.div key={i}
                       initial={{ opacity: 0, scale: 0.5 }}
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.2, delay: 0.4 + i * 0.05 }}
-                      className="h-5 rounded-sm"
+                      transition={{ duration: 0.2, delay: 0.1 + i * 0.03 }}
+                      className="h-3 rounded-sm"
                       style={{
                         backgroundColor: intensity > 0.7
-                          ? `rgba(244, 63, 94, ${0.3 + intensity * 0.4})`
+                          ? `rgba(244, 63, 94, ${0.4 + intensity * 0.3})`
                           : intensity > 0.3
-                          ? `rgba(251, 146, 60, ${0.2 + intensity * 0.3})`
-                          : `rgba(255, 255, 255, ${0.03 + intensity * 0.05})`,
+                          ? `rgba(251, 146, 60, ${0.2 + intensity * 0.2})`
+                          : `rgba(255, 255, 255, ${0.05})`,
                       }}
                     />
                   );
                 })}
               </div>
-              <div className="flex items-center gap-2 text-[8px] text-gray-500 mb-2">
-                <span className="w-3 h-1.5 bg-white/10 rounded" /> niedrig
-                <span className="w-3 h-1.5 bg-orange-500/40 rounded" /> mittel
-                <span className="w-3 h-1.5 bg-rose-500/60 rounded" /> hoch
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['Kostenstellen', 'GK-Zuschläge', 'Heatmap', 'Verteilung'].map((tag, i) => (
-                  <motion.span key={tag} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 2 + i * 0.1 }}
-                    className="px-1.5 py-0.5 rounded text-[8px] bg-rose-500/10 text-rose-400/70 border border-rose-500/10"
-                  >{tag}</motion.span>
-                ))}
-              </div>
             </div>
           </motion.div>
-
         </div>
       </section>
 
