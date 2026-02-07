@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { executeNaturalLanguageQuery } from '@/lib/nl-query-engine';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 import { initDatabase } from '@/lib/duckdb-engine';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
 
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     // Rate limiting: 20 requests per minute per IP
     const rateLimit = enforceRateLimit(request, {
       limit: 20,
@@ -110,18 +114,4 @@ export async function POST(request: NextRequest) {
       requestId
     );
   }
-}
-
-/**
- * OPTIONS handler for CORS
- */
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
 }

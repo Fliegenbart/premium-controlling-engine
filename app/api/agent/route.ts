@@ -11,6 +11,7 @@ import { getOllamaClient, RECOMMENDED_MODELS } from '@/lib/ollama-client';
 // Dynamic import — DuckDB native module may not be available at build time
 // import { initDatabase } from '@/lib/duckdb-engine';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 interface AgentRequest {
   question: string;
@@ -26,6 +27,9 @@ interface AgentRequest {
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 15, windowMs: 60_000 });
     if (rateLimit) return rateLimit as NextResponse;
 
@@ -73,7 +77,11 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/agent - Check Ollama status and available models
  */
-export async function GET(): Promise<NextResponse> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const requestId = getRequestId();
+  const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+  if (auth instanceof NextResponse) return auth;
+
   const ollama = getOllamaClient();
   const health = await ollama.healthCheck();
   

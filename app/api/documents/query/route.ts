@@ -7,14 +7,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchAllDocuments } from '@/lib/doc-index/document-store';
 import { documentsSearchSchema } from '@/lib/validation';
 import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 type SearchResultItem = ReturnType<typeof searchAllDocuments>[number];
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
-    const tokenError = requireDocumentToken(request);
-    if (tokenError) return tokenError;
+    const auth = await requireSessionUser(request, { permission: 'view', requestId });
+    if (auth instanceof NextResponse) {
+      if (process.env.DOCUMENT_ACCESS_TOKEN) {
+        const tokenError = requireDocumentToken(request);
+        if (tokenError) return tokenError;
+      } else {
+        return auth;
+      }
+    }
 
     const rateLimit = enforceRateLimit(request, { limit: 30, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
@@ -48,8 +56,15 @@ export async function POST(request: NextRequest) {
 // GET - Simple search endpoint
 export async function GET(request: NextRequest) {
   const requestId = getRequestId();
-  const tokenError = requireDocumentToken(request);
-  if (tokenError) return tokenError;
+  const auth = await requireSessionUser(request, { permission: 'view', requestId });
+  if (auth instanceof NextResponse) {
+    if (process.env.DOCUMENT_ACCESS_TOKEN) {
+      const tokenError = requireDocumentToken(request);
+      if (tokenError) return tokenError;
+    } else {
+      return auth;
+    }
+  }
 
   const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
   if (rateLimit) return rateLimit;

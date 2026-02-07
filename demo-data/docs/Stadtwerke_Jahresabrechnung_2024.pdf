@@ -1,0 +1,86 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 277 >>
+stream
+BT
+/F2 18 Tf
+50 800 Td
+(JAHRESABRECHNUNG ENERGIE 2024) Tj
+/F1 11 Tf
+14 TL
+T*
+T*
+(Kunde: Labor GmbH) Tj
+T*
+(Lieferstelle: Musterstrasse 12, 20095 Hamburg) Tj
+T*
+(Abrechnungszeitraum: 01.01.2024 - 31.12.2024) Tj
+T*
+() Tj
+T*
+(Strom: 185.000 kWh) Tj
+T*
+(Wasser: 1.240 m3) Tj
+T*
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 304 >>
+stream
+BT
+/F2 18 Tf
+50 800 Td
+(FAELLIGKEIT UND NACHZAHLUNG) Tj
+/F1 11 Tf
+14 TL
+T*
+T*
+(Monatlicher Abschlag 2024: 12.800 EUR) Tj
+T*
+(Gesamt gezahlt: 153.600 EUR) Tj
+T*
+(Abrechnungssumme: 158.900 EUR) Tj
+T*
+(Nachzahlung: 5.300 EUR faellig zum 15.02.2025) Tj
+T*
+(Neuer Abschlag ab 01.03.2025: 13.500 EUR) Tj
+T*
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000197 00000 n 
+0000000272 00000 n 
+0000000599 00000 n 
+0000000735 00000 n 
+0000001089 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+1225
+%%EOF

@@ -7,13 +7,35 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { detectBookingErrors } from '@/lib/booking-error-detection';
-import { executeSQL } from '@/lib/duckdb-engine';
+import { executeSQL, sanitizeQualifiedTableName } from '@/lib/duckdb-engine';
 import { Booking } from '@/lib/types';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000, keyPrefix: '/api/detect-errors' });
+    if (rateLimit) return rateLimit;
+
     const body = await request.json();
-    const { table = 'controlling.bookings_curr', prevTable = 'controlling.bookings_prev' } = body;
+    const requestedTable =
+      body && typeof body.table === 'string'
+        ? body.table
+        : 'controlling.bookings_curr';
+    const requestedPrevTable =
+      body && typeof body.prevTable === 'string'
+        ? body.prevTable
+        : 'controlling.bookings_prev';
+    const table = sanitizeQualifiedTableName(requestedTable, {
+      allowedSchemas: ['controlling', 'staging', 'analysis'],
+    });
+    const prevTable = sanitizeQualifiedTableName(requestedPrevTable, {
+      allowedSchemas: ['controlling', 'staging', 'analysis'],
+    });
 
     // Fetch current bookings from table
     let currentResult;
@@ -81,13 +103,7 @@ export async function POST(request: NextRequest) {
       ...detectionResult,
     });
   } catch (error) {
-    console.error('Error detection failed:', error);
-    return NextResponse.json(
-      {
-        error: 'Fehleranalyse fehlgeschlagen',
-        details: (error as Error).message,
-      },
-      { status: 500 }
-    );
+    console.error('Error detection failed:', requestId, sanitizeError(error));
+    return jsonError('Fehleranalyse fehlgeschlagen', 500, requestId);
   }
 }

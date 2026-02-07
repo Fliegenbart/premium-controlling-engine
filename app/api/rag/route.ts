@@ -6,9 +6,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getEnhancedKnowledgeService } from "@/lib/rag/enhanced-knowledge-service";
+import { getRequestId, jsonError, sanitizeError } from "@/lib/api-helpers";
+import { requireSessionUser } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: "analyze", requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("query");
     const limit = searchParams.get("limit");
@@ -16,10 +22,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get("type");
 
     if (!query) {
-      return NextResponse.json(
-        { error: "Missing required parameter: query" },
-        { status: 400 }
-      );
+      return jsonError("Missing required parameter: query", 400, requestId);
     }
 
     const ragService = getEnhancedKnowledgeService();
@@ -43,28 +46,24 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("RAG search error:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to search RAG store",
-        message: (error as Error).message,
-      },
-      { status: 500 }
-    );
+    console.error("RAG search error:", requestId, sanitizeError(error));
+    return jsonError("Failed to search RAG store", 500, requestId);
   }
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    // Admin-only: POST can mutate/export/clear the knowledge store.
+    const auth = await requireSessionUser(request, { permission: "*", requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const body = await request.json();
 
     const { action, ...params } = body;
 
     if (!action) {
-      return NextResponse.json(
-        { error: "Missing required parameter: action" },
-        { status: 400 }
-      );
+      return jsonError("Missing required parameter: action", 400, requestId);
     }
 
     const ragService = getEnhancedKnowledgeService();
@@ -132,18 +131,13 @@ export async function POST(request: NextRequest) {
             "export",
             "clear",
           ],
+          requestId,
         },
         { status: 400 }
       );
     }
   } catch (error) {
-    console.error("RAG POST error:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to process RAG request",
-        message: (error as Error).message,
-      },
-      { status: 500 }
-    );
+    console.error("RAG POST error:", requestId, sanitizeError(error));
+    return jsonError("Failed to process RAG request", 500, requestId);
   }
 }

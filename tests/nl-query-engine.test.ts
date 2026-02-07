@@ -5,8 +5,68 @@
  * These tests demonstrate the NL query engine functionality with examples
  */
 
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeAll } from 'vitest';
 import { executeNaturalLanguageQuery } from '@/lib/nl-query-engine';
+import { initDatabase, loadBookings } from '@/lib/duckdb-engine';
+
+beforeAll(async () => {
+  // Keep the dataset tiny: tests validate structure/guardrails, not exact analytics.
+  await initDatabase();
+  await loadBookings(
+    [
+      {
+        posting_date: '2024-07-05',
+        amount: -1200.5,
+        account: 4000,
+        account_name: 'Materialkosten',
+        cost_center: 'CC-100',
+        profit_center: 'PC-1',
+        vendor: 'Lieferant A',
+        customer: null,
+        document_no: 'D-1001',
+        text: 'Material Einkauf',
+      },
+      {
+        posting_date: '2024-08-12',
+        amount: -3000.0,
+        account: 5000,
+        account_name: 'Personalkosten',
+        cost_center: 'CC-200',
+        profit_center: 'PC-1',
+        vendor: null,
+        customer: null,
+        document_no: 'D-1002',
+        text: 'Lohn August',
+      },
+      {
+        posting_date: '2024-09-03',
+        amount: -875.75,
+        account: 4000,
+        account_name: 'Materialkosten',
+        cost_center: 'CC-100',
+        profit_center: 'PC-2',
+        vendor: 'Lieferant B',
+        customer: null,
+        document_no: 'D-1003',
+        text: 'Straßenverkäufe (Test ß)',
+      },
+      {
+        posting_date: '2024-09-18',
+        amount: 12000.0,
+        account: 8000,
+        account_name: 'Umsatzerlöse',
+        cost_center: 'CC-300',
+        profit_center: 'PC-2',
+        vendor: null,
+        customer: 'Kunde X',
+        document_no: 'D-1004',
+        text: 'Erlös September',
+      },
+    ],
+    'bookings',
+    'controlling'
+  );
+}, 60_000);
 
 /**
  * Example test cases for German natural language queries

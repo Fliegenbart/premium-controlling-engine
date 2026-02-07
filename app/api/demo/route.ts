@@ -5,8 +5,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateVarianceScenario, DEMO_SCENARIOS, getScenarioDescription } from '@/lib/demo-data';
 import { loadBookings } from '@/lib/duckdb-engine';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const requestId = getRequestId();
+  const auth = await requireSessionUser(request, { permission: 'view', requestId });
+  if (auth instanceof NextResponse) return auth;
+
   return NextResponse.json({
     success: true,
     scenarios: DEMO_SCENARIOS
@@ -14,7 +20,14 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'upload', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000, keyPrefix: '/api/demo' });
+    if (rateLimit) return rateLimit;
+
     const body = await request.json();
     const { scenario = 'mixed' } = body;
 
@@ -48,10 +61,7 @@ export async function POST(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Demo data error:', error);
-    return NextResponse.json(
-      { error: 'Demo-Daten konnten nicht geladen werden', details: (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Demo data error:', requestId, sanitizeError(error));
+    return jsonError('Demo-Daten konnten nicht geladen werden', 500, requestId);
   }
 }

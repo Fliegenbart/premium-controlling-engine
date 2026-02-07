@@ -22,6 +22,37 @@ npm run dev
 
 Dann öffne [http://localhost:3000](http://localhost:3000).
 
+## Security-Hinweise (Produktion)
+
+- Demo-User sind in Produktion standardmäßig deaktiviert (`ENABLE_DEMO_USERS=false`).
+- Für den ersten Admin-Account setze `ADMIN_BOOTSTRAP_EMAIL` und ein starkes `ADMIN_BOOTSTRAP_PASSWORD` (mind. 12 Zeichen).
+- Die direkte SQL-API ist standardmäßig deaktiviert. Aktiviere sie nur bei Bedarf mit:
+  - `QUERY_API_ENABLED=true`
+  - `QUERY_API_TOKEN=<starker-token>`
+- Dokumenten-Endpunkte können mit `DOCUMENT_ACCESS_TOKEN` geschützt werden.
+
+## Staging/Dev Parallel Zu Prod (Hetzner, On-Demand)
+
+Wenn die Prod-Instanz bereits genutzt wird, kannst du eine **separate Staging-Instanz** auf derselben Maschine starten (nur bei Bedarf).
+
+- Staging läuft auf `127.0.0.1:3001` (Zugriff per SSH-Tunnel)
+- Eigener Docker-Network/Container-Namen via `docker-compose.staging.yml`
+
+Start (im Staging-Checkout):
+```bash
+./staging-up.sh
+```
+
+Tunnel von deinem Rechner:
+```bash
+ssh -L 3001:127.0.0.1:3001 root@<server-ip>
+```
+
+Stop:
+```bash
+./staging-down.sh
+```
+
 ## Deployment auf Vercel
 
 1. Repository auf GitHub pushen
@@ -51,7 +82,7 @@ Die CSV-Dateien müssen folgende Spalten enthalten:
 Für lokale KI‑Kommentare:
 
 1. [Ollama](https://ollama.ai) installieren
-2. Modell laden: `ollama pull llama3.1`
+2. Modell laden: `ollama pull qwen2.5:14b`
 3. Ollama starten: `ollama serve`
 
 ```typescript
@@ -59,7 +90,7 @@ Für lokale KI‑Kommentare:
 const response = await fetch('http://localhost:11434/api/generate', {
   method: 'POST',
   body: JSON.stringify({
-    model: 'llama3.1:8b',
+    model: 'qwen2.5:14b',
     prompt: prompt,
   }),
 });

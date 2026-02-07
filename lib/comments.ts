@@ -157,6 +157,13 @@ export async function getCommentThread(commentId: string): Promise<CommentThread
 }
 
 /**
+ * Get single comment by ID
+ */
+export async function getCommentById(commentId: string): Promise<Comment | null> {
+  return comments.get(commentId) || null;
+}
+
+/**
  * Get all comments by user
  */
 export async function getUserComments(userId: string): Promise<Comment[]> {

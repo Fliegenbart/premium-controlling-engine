@@ -42,18 +42,17 @@ setup() {
         log "Docker already installed"
     fi
     
-    # Install Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
-        log "Installing Docker Compose..."
-        curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        chmod +x /usr/local/bin/docker-compose
+    # Ensure Docker Compose (plugin)
+    if ! docker compose version &> /dev/null; then
+        log "Installing Docker Compose plugin..."
+        apt-get install -y docker-compose-plugin
     else
-        log "Docker Compose already installed"
+        log "Docker Compose plugin already available"
     fi
     
     # Install useful tools
     log "Installing utilities..."
-    apt-get install -y htop ncdu fail2ban ufw curl wget git
+    apt-get install -y htop ncdu fail2ban ufw curl wget git jq
     
     # Configure firewall
     log "Configuring firewall..."
@@ -100,22 +99,22 @@ deploy() {
     
     # Build and start containers
     log "Building Docker images..."
-    docker-compose build --no-cache
+    docker compose build --no-cache
     
     log "Starting services..."
-    docker-compose up -d
+    docker compose up -d
     
     # Wait for health check
     log "Waiting for application to start..."
     sleep 10
     
     # Check status
-    if docker-compose ps | grep -q "Up"; then
+    if docker compose ps | grep -q "Up"; then
         log "✅ Deployment successful!"
         log "🌐 Access at: http://${DOMAIN}:3000"
-        docker-compose ps
+        docker compose ps
     else
-        error "Deployment failed! Check logs with: docker-compose logs"
+        error "Deployment failed! Check logs with: docker compose logs"
     fi
 }
 
@@ -131,9 +130,9 @@ update() {
     # git pull origin main
     
     # Rebuild and restart
-    docker-compose down
-    docker-compose build --no-cache
-    docker-compose up -d
+    docker compose down
+    docker compose build --no-cache
+    docker compose up -d
     
     log "✅ Update complete!"
 }
@@ -143,7 +142,7 @@ update() {
 # ============================================
 logs() {
     cd ${APP_DIR}
-    docker-compose logs -f --tail=100
+    docker compose logs -f --tail=100
 }
 
 # ============================================
@@ -157,7 +156,7 @@ status() {
     
     # Docker status
     echo -e "${BLUE}=== Docker Containers ===${NC}"
-    docker-compose ps
+    docker compose ps
     echo ""
     
     # Resource usage

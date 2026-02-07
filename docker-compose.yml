@@ -11,12 +11,21 @@ services:
     container_name: controlling-engine
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "${APP_BIND_ADDRESS:-0.0.0.0}:${APP_PORT:-3000}:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_PATH=/data/controlling.duckdb
+      - DB_PATH=${DB_PATH:-/data/controlling-auth.db}
       - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_MODEL=qwen2.5:14b
+      - ENABLE_DEMO_USERS=${ENABLE_DEMO_USERS:-false}
+      - ADMIN_BOOTSTRAP_EMAIL=${ADMIN_BOOTSTRAP_EMAIL:-}
+      - ADMIN_BOOTSTRAP_PASSWORD=${ADMIN_BOOTSTRAP_PASSWORD:-}
+      - ADMIN_BOOTSTRAP_NAME=${ADMIN_BOOTSTRAP_NAME:-Administrator}
+      - QUERY_API_ENABLED=${QUERY_API_ENABLED:-false}
+      - QUERY_API_TOKEN=${QUERY_API_TOKEN:-}
+      - DOCUMENT_ACCESS_TOKEN=${DOCUMENT_ACCESS_TOKEN:-}
+      - ALLOW_QUERY_TOKEN=${ALLOW_QUERY_TOKEN:-false}
     volumes:
       - ./data:/data
       - ./uploads:/app/uploads
@@ -34,6 +43,10 @@ services:
           memory: 8G
         reservations:
           memory: 2G
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.controlling.rule=Host(`controlling.${DOMAIN:-localhost}`)"
@@ -47,7 +60,7 @@ services:
     container_name: controlling-ollama
     restart: unless-stopped
     ports:
-      - "11434:11434"
+      - "${OLLAMA_BIND_ADDRESS:-127.0.0.1}:${OLLAMA_PORT:-11434}:11434"
     volumes:
       - ollama_data:/root/.ollama
     environment:

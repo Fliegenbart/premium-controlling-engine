@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual } from 'crypto';
 
 type RateLimitEntry = {
   count: number;
@@ -70,20 +71,88 @@ export function jsonError(message: string, status: number, requestId: string): N
   return NextResponse.json({ error: message, requestId }, { status });
 }
 
+export function getBearerToken(request: NextRequest): string | null {
+  const auth = request.headers.get('authorization');
+  if (!auth) return null;
+  const trimmed = auth.trim();
+  if (!trimmed.toLowerCase().startsWith('bearer ')) return null;
+  const token = trimmed.slice(7).trim();
+  return token || null;
+}
+
+function secureTokenEquals(expected: string, actual: string): boolean {
+  const expectedBuffer = Buffer.from(expected);
+  const actualBuffer = Buffer.from(actual);
+  if (expectedBuffer.length !== actualBuffer.length) {
+    return false;
+  }
+  return timingSafeEqual(expectedBuffer, actualBuffer);
+}
+
 export function requireDocumentToken(request: NextRequest): NextResponse | null {
   const required = process.env.DOCUMENT_ACCESS_TOKEN;
   if (!required) return null;
 
   const headerToken = request.headers.get('x-doc-token');
-  const auth = request.headers.get('authorization');
-  const bearer = auth?.toLowerCase().startsWith('bearer ')
-    ? auth.slice(7).trim()
+  const bearer = getBearerToken(request);
+  const queryToken = process.env.ALLOW_QUERY_TOKEN === 'true'
+    ? request.nextUrl.searchParams.get('token')
     : null;
-  const queryToken = request.nextUrl.searchParams.get('token');
 
   const token = headerToken || bearer || queryToken;
-  if (token !== required) {
+  if (!token || !secureTokenEquals(required, token)) {
     return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 });
+  }
+
+  return null;
+}
+
+export function requireApiToken(
+  request: NextRequest,
+  envName: string = 'API_ACCESS_TOKEN'
+): NextResponse | null {
+  const required = process.env[envName];
+  if (!required) {
+    return NextResponse.json(
+      { error: `Server-Konfiguration fehlt: ${envName}` },
+      { status: 503 }
+    );
+  }
+
+  const headerToken = request.headers.get('x-api-token');
+  const bearer = getBearerToken(request);
+  const token = headerToken || bearer;
+
+  if (!token || !secureTokenEquals(required, token)) {
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 });
+  }
+
+  return null;
+}
+
+export function validateUploadFile(
+  file: File | null | undefined,
+  options: { maxBytes: number; allowedExtensions: string[]; label?: string }
+): string | null {
+  const label = options.label || 'Datei';
+
+  if (!file) {
+    return `${label} fehlt`;
+  }
+
+  if (file.size <= 0) {
+    return `${label} ist leer`;
+  }
+
+  if (file.size > options.maxBytes) {
+    const maxMb = Math.round((options.maxBytes / (1024 * 1024)) * 10) / 10;
+    return `${label} zu groß (max. ${maxMb}MB)`;
+  }
+
+  const lowerName = file.name.toLowerCase();
+  const allowed = options.allowedExtensions.some((ext) => lowerName.endsWith(ext.toLowerCase()));
+  if (!allowed) {
+    return `${label} hat ein nicht unterstütztes Format (${options.allowedExtensions.join(', ')})`;
   }
 
   return null;

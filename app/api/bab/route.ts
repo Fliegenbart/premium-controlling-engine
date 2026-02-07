@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Booking } from '@/lib/types';
 import { calculateBAB } from '@/lib/bab-engine';
 import {
@@ -7,9 +7,13 @@ import {
   jsonError,
   sanitizeError,
 } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
+  const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+  if (auth instanceof NextResponse) return auth;
+
   const rateLimitError = enforceRateLimit(request, {
     limit: 10,
     windowMs: 60_000,

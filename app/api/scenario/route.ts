@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AnalysisResult } from '@/lib/types';
 import { simulateScenario, ScenarioParameter, ScenarioResult } from '@/lib/scenario-engine';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export interface ScenarioRequest {
   data: AnalysisResult;
@@ -12,6 +13,9 @@ export async function POST(request: NextRequest) {
   const requestId = getRequestId();
 
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     // Rate limiting
     const rateLimit = enforceRateLimit(request, { limit: 50, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
@@ -99,16 +103,4 @@ export async function POST(request: NextRequest) {
       requestId,
     );
   }
-}
-
-// OPTIONS for CORS
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
 }

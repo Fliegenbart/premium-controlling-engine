@@ -27,7 +27,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { AccountDeviation, Booking } from '@/lib/types';
-import { jsonError, getRequestId, sanitizeError } from '@/lib/api-helpers';
+import { enforceRateLimit, jsonError, getRequestId, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 interface ExplanationResponse {
   summary: string;
@@ -360,6 +361,12 @@ export async function POST(request: NextRequest) {
   const requestId = getRequestId();
 
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 30, windowMs: 60_000, keyPrefix: '/api/explain-deviation' });
+    if (rateLimit) return rateLimit;
+
     const body = await request.json();
     const { deviation, prevBookings, currBookings } = body as {
       deviation: AccountDeviation;
@@ -388,14 +395,4 @@ export async function POST(request: NextRequest) {
     console.error('Explain deviation error:', requestId, sanitizeError(error));
     return jsonError('Abweichungserklärung fehlgeschlagen', 500, requestId);
   }
-}
-
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
 }

@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateReport } from '@/lib/report-generator';
 import { AnalysisResult } from '@/lib/types';
+import { getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'export', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const data: AnalysisResult = await request.json();
 
     if (!data || !data.meta || !data.by_account) {
-      return NextResponse.json(
-        { error: 'Ungültige Analysedaten' },
-        { status: 400 }
-      );
+      return jsonError('Ungültige Analysedaten', 400, requestId);
     }
 
     const buffer = await generateReport(data);
@@ -23,10 +26,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Report generation error:', error);
-    return NextResponse.json(
-      { error: 'Fehler bei der Report-Generierung: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Report generation error:', requestId, sanitizeError(error));
+    return jsonError('Fehler bei der Report-Generierung', 500, requestId);
   }
 }

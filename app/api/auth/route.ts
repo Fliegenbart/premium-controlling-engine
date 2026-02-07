@@ -4,6 +4,49 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate, logout, validateSession, getUsers, createUser, hasPermission } from '@/lib/auth';
+import { enforceRateLimit, getBearerToken } from '@/lib/api-helpers';
+
+const SESSION_COOKIE = 'ce_session';
+
+function resolveToken(request: NextRequest, fallback?: string): string | null {
+  return getBearerToken(request) || request.cookies.get(SESSION_COOKIE)?.value || fallback || null;
+}
+
+function resolveCookieSecure(request: NextRequest): boolean {
+  const forced = process.env.COOKIE_SECURE;
+  if (forced === 'true') return true;
+  if (forced === 'false') return false;
+
+  // Prefer forwarded proto when behind a reverse proxy (Traefik/Nginx/Cloudflare).
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  if (forwardedProto) return forwardedProto.split(',')[0]?.trim() === 'https';
+
+  return request.nextUrl.protocol === 'https:';
+}
+
+function setSessionCookie(request: NextRequest, response: NextResponse, token: string) {
+  response.cookies.set({
+    name: SESSION_COOKIE,
+    value: token,
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: resolveCookieSecure(request),
+    path: '/',
+    maxAge: 60 * 60 * 24, // 24h
+  });
+}
+
+function clearSessionCookie(request: NextRequest, response: NextResponse) {
+  response.cookies.set({
+    name: SESSION_COOKIE,
+    value: '',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: resolveCookieSecure(request),
+    path: '/',
+    maxAge: 0,
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +55,13 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'login': {
+        const loginRateLimit = enforceRateLimit(request, {
+          limit: 8,
+          windowMs: 60_000,
+          keyPrefix: '/api/auth/login'
+        });
+        if (loginRateLimit) return loginRateLimit;
+
         if (!email || !password) {
           return NextResponse.json({ error: 'Email und Passwort erforderlich' }, { status: 400 });
         }
@@ -19,40 +69,50 @@ export async function POST(request: NextRequest) {
         if (!result.success) {
           return NextResponse.json({ error: result.error }, { status: 401 });
         }
-        return NextResponse.json({
+        const response = NextResponse.json({
           success: true,
           user: result.user,
           token: result.token
         });
+        if (result.token) setSessionCookie(request, response, result.token);
+        return response;
       }
 
       case 'logout': {
-        if (token) {
-          await logout(token);
+        const sessionToken = resolveToken(request, token);
+        if (sessionToken) {
+          await logout(sessionToken);
         }
-        return NextResponse.json({ success: true });
+        const response = NextResponse.json({ success: true });
+        clearSessionCookie(request, response);
+        return response;
       }
 
       case 'validate': {
-        if (!token) {
+        const sessionToken = resolveToken(request, token);
+        if (!sessionToken) {
           return NextResponse.json({ valid: false }, { status: 401 });
         }
-        const result = await validateSession(token);
-        return NextResponse.json(result);
+        const result = await validateSession(sessionToken);
+        return NextResponse.json(result, { headers: { 'Cache-Control': 'no-store' } });
       }
 
       case 'register': {
         // Only admins can register new users
-        if (!token) {
+        const sessionToken = resolveToken(request, token);
+        if (!sessionToken) {
           return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 });
         }
-        const session = await validateSession(token);
+        const session = await validateSession(sessionToken);
         if (!session.valid || !session.user || !hasPermission(session.user, '*')) {
           return NextResponse.json({ error: 'Nur Administratoren können Benutzer anlegen' }, { status: 403 });
         }
 
         if (!email || !password || !name || !role) {
           return NextResponse.json({ error: 'Alle Felder erforderlich' }, { status: 400 });
+        }
+        if (!['admin', 'controller', 'viewer'].includes(role)) {
+          return NextResponse.json({ error: 'Ungültige Rolle' }, { status: 400 });
         }
 
         const result = await createUser(email, name, password, role);
@@ -76,7 +136,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    const token = resolveToken(request);
 
     if (!token) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 });

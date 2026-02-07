@@ -1,0 +1,15 @@
+Belegdatum;Konto;Konto-Bezeichnung;Soll/Haben-Kennzeichen;Umsatz (ohne Soll/Haben-Kz);Kost1;Kost2;Belegfeld 1;Buchungstext
+31.01.2023;6000;Loehne und Gehaelter;H;125.000,00;KST100;;RE-2023-0001;Gehaltsabrechnung Januar
+31.01.2023;6100;Soziale Abgaben;H;24.375,00;KST100;;RE-2023-0002;AG-Anteile SV Januar
+05.01.2023;6310;Nebenkosten Strom/Wasser;H;8.500,00;KST100;;RE-2023-0010;Stadtwerke Abschlag
+20.01.2023;6300;Miete und Nebenkosten;H;12.500,00;KST100;;RE-2023-0020;Miete Labor Februar
+10.01.2023;5100;Reagenzien und Labormaterial;H;45.000,00;KST200;;RE-2023-0015;Diagnostika Lieferung Q1
+15.01.2023;4400;Erloese Labordiagnostik;S;185.000,00;KST200;;AR-2023-0001;Laborleistungen Krankenhaeuser
+28.02.2023;6000;Loehne und Gehaelter;H;125.000,00;KST100;;RE-2023-0050;Gehaltsabrechnung Februar
+28.02.2023;6100;Soziale Abgaben;H;24.375,00;KST100;;RE-2023-0051;AG-Anteile SV Februar
+05.02.2023;6310;Nebenkosten Strom/Wasser;H;8.500,00;KST100;;RE-2023-0055;Stadtwerke Abschlag
+20.02.2023;6300;Miete und Nebenkosten;H;12.500,00;KST100;;RE-2023-0065;Miete Labor Maerz
+10.02.2023;5100;Reagenzien und Labormaterial;H;38.000,00;KST200;;RE-2023-0060;Testkits Lieferung
+15.02.2023;4400;Erloese Labordiagnostik;S;195.000,00;KST200;;AR-2023-0010;Laborleistungen Praxen
+31.03.2023;6815;Software und Lizenzen;H;8.500,00;KST100;;RE-2023-0118;LIS Jahreslizenz
+31.03.2023;6500;Reparaturen und Instandhaltung;H;15.000,00;KST200;;RE-2023-0070;Wartung Analysegeraet

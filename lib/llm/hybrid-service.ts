@@ -21,7 +21,8 @@ export interface HybridLLMConfig {
 
 const DEFAULT_CONFIG: HybridLLMConfig = {
   ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-  ollamaModel: process.env.OLLAMA_MODEL || 'llama3.1:8b',
+  // Align defaults with docker-compose.yml (Qwen performs well for DE + tool calling).
+  ollamaModel: process.env.OLLAMA_MODEL || 'qwen2.5:14b',
 };
 
 export class HybridLLMService {
@@ -86,7 +87,7 @@ export class HybridLLMService {
       return {
         text,
         provider: 'ollama',
-        model: this.config.ollamaModel || 'llama3.1:8b',
+        model: this.config.ollamaModel || 'qwen2.5:14b',
         latencyMs: Date.now() - startTime,
       };
     } catch (error) {

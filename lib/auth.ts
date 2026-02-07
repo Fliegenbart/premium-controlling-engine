@@ -111,25 +111,51 @@ function getDb(): Database.Database {
 // Initialize demo users on first run
 function initializeDemoUsers(): void {
   const database = getDb();
+  const shouldCreateDemoUsers =
+    process.env.ENABLE_DEMO_USERS === 'true' || process.env.NODE_ENV !== 'production';
+
+  const stmt = database.prepare('SELECT COUNT(*) as count FROM users');
+  const result = stmt.get() as { count: number };
+
+  if (result.count > 0) {
+    return;
+  }
+
+  if (!shouldCreateDemoUsers) {
+    const bootstrapEmail = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
+    const bootstrapPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
+    const bootstrapName = process.env.ADMIN_BOOTSTRAP_NAME?.trim() || 'Administrator';
+
+    if (!bootstrapEmail || !bootstrapPassword || bootstrapPassword.length < 12) {
+      console.warn(
+        'No initial users exist. Set ADMIN_BOOTSTRAP_EMAIL and ADMIN_BOOTSTRAP_PASSWORD (>=12 chars) or ENABLE_DEMO_USERS=true.'
+      );
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const passwordHash = bcryptjs.hashSync(bootstrapPassword, 12);
+    const insertStmt = database.prepare(
+      'INSERT OR IGNORE INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
+    );
+    insertStmt.run('admin-bootstrap', bootstrapEmail, bootstrapName, passwordHash, 'admin', now);
+    console.log('Bootstrap admin user created from environment configuration');
+    return;
+  }
+
   const demoUsers = [
     { id: 'admin-1', email: 'admin@controlling.local', name: 'Administrator', role: 'admin' },
     { id: 'controller-1', email: 'controller@controlling.local', name: 'Max Mustermann', role: 'controller' },
     { id: 'viewer-1', email: 'viewer@controlling.local', name: 'Leser Zugang', role: 'viewer' },
   ];
+  const insertStmt = database.prepare(
+    'INSERT OR IGNORE INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
+  );
 
-  const stmt = database.prepare('SELECT COUNT(*) as count FROM users');
-  const result = stmt.get() as { count: number };
-
-  if (result.count === 0) {
-    const insertStmt = database.prepare(
-      'INSERT OR IGNORE INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
-    );
-
-    const now = new Date().toISOString();
-    for (const user of demoUsers) {
-      const passwordHash = bcryptjs.hashSync('demo123', 12);
-      insertStmt.run(user.id, user.email, user.name, passwordHash, user.role, now);
-    }
+  const now = new Date().toISOString();
+  for (const user of demoUsers) {
+    const passwordHash = bcryptjs.hashSync('demo123', 12);
+    insertStmt.run(user.id, user.email, user.name, passwordHash, user.role, now);
   }
 }
 
@@ -172,15 +198,16 @@ export async function authenticate(
 ): Promise<{ success: boolean; user?: Omit<User, 'passwordHash'>; token?: string; error?: string }> {
   try {
     const database = getDb();
+    const normalizedEmail = email.trim().toLowerCase();
     const stmt = database.prepare('SELECT * FROM users WHERE email = ?');
-    const user = stmt.get(email) as User | undefined;
+    const user = stmt.get(normalizedEmail) as User | undefined;
 
     if (!user) {
-      return { success: false, error: 'Benutzer nicht gefunden' };
+      return { success: false, error: 'Ungültige Anmeldedaten' };
     }
 
     if (!verifyPassword(password, user.passwordHash)) {
-      return { success: false, error: 'Falsches Passwort' };
+      return { success: false, error: 'Ungültige Anmeldedaten' };
     }
 
     // Create session
@@ -198,7 +225,7 @@ export async function authenticate(
     updateStmt.run(new Date().toISOString(), user.id);
 
     // Audit
-    await logAudit(user.id, user.name, 'LOGIN', 'auth', { email });
+    await logAudit(user.id, user.name, 'LOGIN', 'auth', { email: normalizedEmail });
 
     const { passwordHash, ...safeUser } = user;
     return { success: true, user: safeUser, token };
@@ -295,10 +322,22 @@ export async function createUser(
 ): Promise<{ success: boolean; user?: Omit<User, 'passwordHash'>; error?: string }> {
   try {
     const database = getDb();
+    const normalizedEmail = email.trim().toLowerCase();
+    const trimmedName = name.trim();
+
+    if (!normalizedEmail.includes('@')) {
+      return { success: false, error: 'Ungültige E-Mail-Adresse' };
+    }
+    if (password.length < 12) {
+      return { success: false, error: 'Passwort muss mindestens 12 Zeichen lang sein' };
+    }
+    if (trimmedName.length < 2) {
+      return { success: false, error: 'Name ist zu kurz' };
+    }
 
     // Check if email already exists
     const checkStmt = database.prepare('SELECT COUNT(*) as count FROM users WHERE email = ?');
-    const result = checkStmt.get(email) as { count: number };
+    const result = checkStmt.get(normalizedEmail) as { count: number };
 
     if (result.count > 0) {
       return { success: false, error: 'Email bereits vergeben' };
@@ -311,12 +350,12 @@ export async function createUser(
     const insertStmt = database.prepare(
       'INSERT OR IGNORE INTO users (id, email, name, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?, ?)'
     );
-    insertStmt.run(userId, email, name, passwordHash, role, now);
+    insertStmt.run(userId, normalizedEmail, trimmedName, passwordHash, role, now);
 
     const user: Omit<User, 'passwordHash'> = {
       id: userId,
-      email,
-      name,
+      email: normalizedEmail,
+      name: trimmedName,
       role,
       createdAt: now,
     };

@@ -4,9 +4,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { exportVarianceAnalysis, exportTripleAnalysis } from '@/lib/export-excel';
+import { getRequestId, jsonError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'export', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const body = await request.json();
     const { type, data, filename } = body;
 
@@ -20,7 +26,7 @@ export async function POST(request: NextRequest) {
         buffer = await exportTripleAnalysis(data);
         break;
       default:
-        return NextResponse.json({ error: 'Unbekannter Export-Typ' }, { status: 400 });
+        return jsonError('Unbekannter Export-Typ', 400, requestId);
     }
 
     return new NextResponse(new Uint8Array(buffer), {
@@ -31,9 +37,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Excel export error:', error);
-    return NextResponse.json(
-      { error: 'Export fehlgeschlagen', details: (error as Error).message },
-      { status: 500 }
-    );
+    return jsonError('Export fehlgeschlagen', 500, requestId);
   }
 }

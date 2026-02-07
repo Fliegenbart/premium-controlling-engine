@@ -10,10 +10,14 @@ import { generateAIReportSections } from '@/lib/ai-report-generator';
 import { generateEnhancedReport } from '@/lib/enhanced-report-generator';
 import { AnalysisResult } from '@/lib/types';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'export', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     // Rate limiting
     const rateLimit = enforceRateLimit(request, { limit: 5, windowMs: 60_000 });
     if (rateLimit) return rateLimit;

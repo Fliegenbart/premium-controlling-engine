@@ -30,11 +30,15 @@ import {
   jsonError,
   sanitizeError,
 } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
 
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     // Enforce rate limiting: 10 requests per minute
     const rateLimit = enforceRateLimit(request, {
       limit: 10,
@@ -182,17 +186,4 @@ export async function POST(request: NextRequest) {
       requestId
     );
   }
-}
-
-/**
- * OPTIONS handler for CORS preflight
- */
-export async function OPTIONS(request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
 }

@@ -4,12 +4,27 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { runQualityChecks } from '@/lib/quality-checks';
-import { executeSQL } from '@/lib/duckdb-engine';
+import { executeSQL, sanitizeQualifiedTableName } from '@/lib/duckdb-engine';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000, keyPrefix: '/api/quality' });
+    if (rateLimit) return rateLimit;
+
     const body = await request.json();
-    const { table = 'controlling.bookings_curr' } = body;
+    const requestedTable =
+      body && typeof body.table === 'string'
+        ? body.table
+        : 'controlling.bookings_curr';
+    const table = sanitizeQualifiedTableName(requestedTable, {
+      allowedSchemas: ['controlling', 'staging', 'analysis'],
+    });
 
     // Fetch all bookings from table
     const result = await executeSQL(`SELECT * FROM ${table}`);
@@ -44,10 +59,7 @@ export async function POST(request: NextRequest) {
       ...report
     });
   } catch (error) {
-    console.error('Quality check error:', error);
-    return NextResponse.json(
-      { error: 'Qualitätsprüfung fehlgeschlagen', details: (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Quality check error:', requestId, sanitizeError(error));
+    return jsonError('Qualitätsprüfung fehlgeschlagen', 500, requestId);
   }
 }

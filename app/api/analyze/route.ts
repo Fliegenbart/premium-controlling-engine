@@ -3,11 +3,15 @@ import { analyzeBookings, parseCSV } from '@/lib/analysis';
 import { AnalysisResult } from '@/lib/types';
 import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
-import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError, validateUploadFile } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
 
@@ -23,8 +27,25 @@ export async function POST(request: NextRequest) {
       return jsonError('Beide CSV-Dateien sind erforderlich', 400, requestId);
     }
 
-    if (prevFile.size > 50 * 1024 * 1024 || currFile.size > 50 * 1024 * 1024) {
-      return jsonError('CSV-Datei zu groß (max. 50MB)', 400, requestId);
+    const prevFileError = validateUploadFile(prevFile, {
+      maxBytes: 50 * 1024 * 1024,
+      allowedExtensions: ['.csv'],
+      label: 'Vorjahr-Datei',
+    });
+    if (prevFileError) return jsonError(prevFileError, 400, requestId);
+
+    const currFileError = validateUploadFile(currFile, {
+      maxBytes: 50 * 1024 * 1024,
+      allowedExtensions: ['.csv'],
+      label: 'Aktuelle Datei',
+    });
+    if (currFileError) return jsonError(currFileError, 400, requestId);
+
+    if (wesentlichkeitAbs < 0 || wesentlichkeitAbs > 10_000_000) {
+      return jsonError('Wesentlichkeit (absolut) außerhalb des erlaubten Bereichs', 400, requestId);
+    }
+    if (wesentlichkeitPct < 0 || wesentlichkeitPct > 100) {
+      return jsonError('Wesentlichkeit (%) außerhalb des erlaubten Bereichs', 400, requestId);
     }
 
     // Parse CSV files

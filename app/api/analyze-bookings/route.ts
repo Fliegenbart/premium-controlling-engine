@@ -10,10 +10,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { analyzeBookings } from '@/lib/analysis';
 import { analyzeBookingsSchema } from '@/lib/validation';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 15, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
 

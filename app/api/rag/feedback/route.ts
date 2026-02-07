@@ -8,42 +8,36 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getEnhancedKnowledgeService } from "@/lib/rag/enhanced-knowledge-service";
+import { getRequestId, jsonError, sanitizeError } from "@/lib/api-helpers";
+import { requireSessionUser } from "@/lib/api-auth";
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: "comment", requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const body = await request.json();
 
     const { account, originalComment, correctedComment, context } = body;
 
     // Validate required fields
     if (account === undefined || account === null) {
-      return NextResponse.json(
-        { error: "Missing required parameter: account" },
-        { status: 400 }
-      );
+      return jsonError("Missing required parameter: account", 400, requestId);
     }
 
     if (!originalComment || typeof originalComment !== "string") {
-      return NextResponse.json(
-        { error: "Missing required parameter: originalComment (string)" },
-        { status: 400 }
-      );
+      return jsonError("Missing required parameter: originalComment (string)", 400, requestId);
     }
 
     if (!correctedComment || typeof correctedComment !== "string") {
-      return NextResponse.json(
-        { error: "Missing required parameter: correctedComment (string)" },
-        { status: 400 }
-      );
+      return jsonError("Missing required parameter: correctedComment (string)", 400, requestId);
     }
 
     // Validate account number
     const accountNum = parseInt(String(account), 10);
     if (isNaN(accountNum) || accountNum < 0) {
-      return NextResponse.json(
-        { error: "Invalid account number" },
-        { status: 400 }
-      );
+      return jsonError("Invalid account number", 400, requestId);
     }
 
     const ragService = getEnhancedKnowledgeService();
@@ -72,19 +66,17 @@ export async function POST(request: NextRequest) {
       stats: ragService.getStats(),
     });
   } catch (error) {
-    console.error("Feedback API error:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to store controller feedback",
-        message: (error as Error).message,
-      },
-      { status: 500 }
-    );
+    console.error("Feedback API error:", requestId, sanitizeError(error));
+    return jsonError("Failed to store controller feedback", 500, requestId);
   }
 }
 
 export async function GET(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: "analyze", requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const searchParams = request.nextUrl.searchParams;
     const account = searchParams.get("account");
 
@@ -129,13 +121,7 @@ export async function GET(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Feedback GET error:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to retrieve feedback",
-        message: (error as Error).message,
-      },
-      { status: 500 }
-    );
+    console.error("Feedback GET error:", requestId, sanitizeError(error));
+    return jsonError("Failed to retrieve feedback", 500, requestId);
   }
 }

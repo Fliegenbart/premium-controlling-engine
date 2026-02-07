@@ -2,6 +2,12 @@
   "name": "patrick-controlling",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "node-gyp": "^12.2.0",
+    "tar": "^7.5.7",
+    "make-fetch-happen": "^15.0.3",
+    "cacache": "^20.0.3"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -21,7 +27,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^12.33.0",
     "lucide-react": "^0.469.0",
-    "next": "14.2.21",
+    "next": "15.5.10",
     "papaparse": "^5.4.1",
     "pdf-parse": "^1.1.1",
     "pdfkit": "^0.15.0",
@@ -46,7 +52,7 @@
     "@types/uuid": "^9.0.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.21",
+    "eslint-config-next": "15.5.10",
     "ignore-loader": "^0.1.2",
     "jsdom": "^28.0.0",
     "postcss": "^8.4.49",

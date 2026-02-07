@@ -97,46 +97,26 @@ ORDER BY material_costs DESC
 function buildSystemPrompt(availableTables: string[]): string {
   const tableSchemas = buildTableSchemas(availableTables);
 
-  return `Du bist ein DuckDB SQL-Experte und Controlling-Spezialist.
-Deine Aufgabe ist es, Fragen in Deutsch in valides DuckDB SQL zu übersetzen.
+  // Keep this prompt compact; large prompts slow down local inference significantly.
+  return `Du bist ein DuckDB SQL-Experte. Übersetze deutsche Controlling-Fragen in valides DuckDB SQL.
 
-VERFÜGBARE TABELLEN:
+TABELLEN:
 ${tableSchemas}
 
-SCHEMA DER HAUPTTABELLE (controlling.bookings):
-- id (INTEGER): Eindeutige Buchungs-ID
-- posting_date (DATE): Buchungsdatum
-- amount (DECIMAL(18,2)): Betrag (negativ = Ausgaben, positiv = Einnahmen)
-- account (INTEGER): Kontonummer
-- account_name (VARCHAR): Kontoname (z.B. "Materialkosten", "Personalkosten")
-- cost_center (VARCHAR): Kostenstelle
-- profit_center (VARCHAR): Profitcenter
-- vendor (VARCHAR): Lieferant/Kreditor
-- customer (VARCHAR): Kunde/Debitor
-- document_no (VARCHAR): Belegnummer
-- text (VARCHAR): Buchungstext/Beschreibung
+controlling.bookings Spalten:
+id, posting_date, amount, account, account_name, cost_center, profit_center, vendor, customer, document_no, text
 
-WICHTIGE REGELN:
-1. Verwende immer die vollständige Tabellenname (schema.table)
-2. Negative Beträge = Ausgaben, positive Beträge = Einnahmen
-3. Setze Grenzwerte (LIMIT) für Performance
-4. Nutze ILIKE für flexible Textsuche (case-insensitive)
-5. Verwende DATE_TRUNC() für Zeitliche Aggregation
-6. Gib nur das SQL zurück, keine Erklärung in der SQL
-7. Optimiere für Performance: Filtere early, aggregiere am Schluss
+REGELN:
+1) Gib NUR das SQL zurück (kein Markdown, keine Erklärungen).
+2) Das SQL MUSS mit SELECT beginnen (kein WITH).
+3) Verwende immer vollqualifizierte Tabellennamen (schema.table).
+4) Negative amount = Ausgaben/Kosten, positive amount = Einnahmen.
+5) Nutze ILIKE für Textsuche.
+6) Nutze DATE_TRUNC('month'|'quarter'|'year') für zeitliche Aggregation.
+7) Keine destruktiven Operationen: DROP, DELETE, INSERT, UPDATE, CREATE, ALTER, TRUNCATE, ...
 
-BEISPIELE:
-${EXAMPLE_QUESTIONS.map((ex, idx) => `
-BEISPIEL ${idx + 1}:
-Frage: "${ex.question}"
-SQL: ${ex.sql}
-Erklärung: ${ex.explanation}
-`).join('\n')}
-
-WICHTIG - SICHERHEIT:
-${INJECTION_GUARD}
-Blockiere alle destruktiven Operationen (DROP, DELETE, INSERT, UPDATE, CREATE, ALTER)
-Antworte mit SQL, der nur SELECT-Statements enthält.`;
+SICHERHEIT:
+${INJECTION_GUARD}`;
 }
 
 /**
@@ -281,6 +261,9 @@ export async function executeNaturalLanguageQuery(
   const maxRows = options?.maxRows || 1000;
 
   // Validate input
+  if (question.length > 1000) {
+    throw new Error('Frage ist zu lang (max. 1000 Zeichen)');
+  }
   const sanitizedQuestion = sanitizeForPrompt(question, 500);
   if (!sanitizedQuestion) {
     throw new Error('Frage ist leer oder ungültig');
@@ -302,11 +285,11 @@ export async function executeNaturalLanguageQuery(
 Antworte NUR mit dem SQL-Code, keine weiteren Erklärungen.
 Nutze die verfügbaren Tabellen und Spalten.`;
 
-    const response = await llm.generate(userPrompt, {
-      systemPrompt,
-      temperature: 0.2, // Low temperature for consistency
-      maxTokens: 500,
-    });
+	    const response = await llm.generate(userPrompt, {
+	      systemPrompt,
+	      temperature: 0.0, // Deterministic SQL generation
+	      maxTokens: 250,
+	    });
 
     let generatedSQL = extractSQL(response.text);
 

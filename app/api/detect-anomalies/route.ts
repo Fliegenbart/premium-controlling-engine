@@ -5,6 +5,7 @@ import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
 import { anomalyRequestSchema } from '@/lib/validation';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
@@ -13,6 +14,9 @@ export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   let deviations: AccountDeviation[] = [];
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 25, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
 

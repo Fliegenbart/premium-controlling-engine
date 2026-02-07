@@ -6,13 +6,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { indexDocument, listDocuments } from '@/lib/doc-index';
-import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
+import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError, validateUploadFile } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function GET(request: NextRequest) {
   const requestId = getRequestId();
   try {
-    const tokenError = requireDocumentToken(request);
-    if (tokenError) return tokenError;
+    const auth = await requireSessionUser(request, { permission: 'view', requestId });
+    if (auth instanceof NextResponse) {
+      if (process.env.DOCUMENT_ACCESS_TOKEN) {
+        const tokenError = requireDocumentToken(request);
+        if (tokenError) return tokenError;
+      } else {
+        return auth;
+      }
+    }
 
     const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
@@ -28,8 +36,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
-    const tokenError = requireDocumentToken(request);
-    if (tokenError) return tokenError;
+    const auth = await requireSessionUser(request, { permission: 'upload', requestId });
+    if (auth instanceof NextResponse) {
+      if (process.env.DOCUMENT_ACCESS_TOKEN) {
+        const tokenError = requireDocumentToken(request);
+        if (tokenError) return tokenError;
+      } else {
+        return auth;
+      }
+    }
 
     const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
@@ -37,27 +52,13 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'Keine Datei hochgeladen' },
-        { status: 400 }
-      );
-    }
-
-    // Check file type
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
-      return NextResponse.json(
-        { error: 'Nur PDF-Dateien werden unterstützt' },
-        { status: 400 }
-      );
-    }
-
-    // Check file size (max 20MB)
-    if (file.size > 20 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'Datei zu groß (max. 20MB)' },
-        { status: 400 }
-      );
+    const fileError = validateUploadFile(file, {
+      maxBytes: 20 * 1024 * 1024,
+      allowedExtensions: ['.pdf'],
+      label: 'Dokument',
+    });
+    if (fileError) {
+      return jsonError(fileError, 400, requestId);
     }
 
     // Read file as buffer

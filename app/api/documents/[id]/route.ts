@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDocument, getDocumentTree, deleteDocument } from '@/lib/doc-index';
 import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function GET(
   request: NextRequest,
@@ -14,8 +15,15 @@ export async function GET(
 ) {
   const requestId = getRequestId();
   try {
-    const tokenError = requireDocumentToken(request);
-    if (tokenError) return tokenError;
+    const auth = await requireSessionUser(request, { permission: 'view', requestId });
+    if (auth instanceof NextResponse) {
+      if (process.env.DOCUMENT_ACCESS_TOKEN) {
+        const tokenError = requireDocumentToken(request);
+        if (tokenError) return tokenError;
+      } else {
+        return auth;
+      }
+    }
 
     const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
@@ -54,8 +62,15 @@ export async function DELETE(
 ) {
   const requestId = getRequestId();
   try {
-    const tokenError = requireDocumentToken(request);
-    if (tokenError) return tokenError;
+    const auth = await requireSessionUser(request, { permission: 'upload', requestId });
+    if (auth instanceof NextResponse) {
+      if (process.env.DOCUMENT_ACCESS_TOKEN) {
+        const tokenError = requireDocumentToken(request);
+        if (tokenError) return tokenError;
+      } else {
+        return auth;
+      }
+    }
 
     const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000 });
     if (rateLimit) return rateLimit;

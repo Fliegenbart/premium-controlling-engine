@@ -1,0 +1,23 @@
+# Premium Controlling Engine - staging overlay (run alongside production)
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d --build
+#
+# Binds the app to 127.0.0.1:3001 (access via SSH tunnel).
+
+services:
+  app:
+    container_name: controlling-engine-staging
+
+  ollama:
+    container_name: controlling-ollama-staging
+
+  ollama-init:
+    container_name: controlling-ollama-init-staging
+
+  traefik:
+    profiles: ["prod-only"]
+
+networks:
+  default:
+    name: controlling-staging-network

@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
 import { projectWeeklyCashflow } from '@/lib/liquidity-engine';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
 
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     // Rate limiting: 10 requests per 60 seconds
     const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
@@ -37,15 +41,4 @@ export async function POST(request: NextRequest) {
     console.error(`[${requestId}] Liquidity forecast error:`, error);
     return jsonError(`Liquiditätsprognose fehlgeschlagen: ${errorMessage}`, 500, requestId);
   }
-}
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
 }

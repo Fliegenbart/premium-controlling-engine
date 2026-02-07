@@ -1,0 +1,16 @@
+Belegdatum;Konto;Konto-Bezeichnung;Soll/Haben-Kennzeichen;Umsatz (ohne Soll/Haben-Kz);Kost1;Kost2;Belegfeld 1;Buchungstext
+31.01.2024;6000;Loehne und Gehaelter;H;138.000,00;KST100;;RE-2024-0001;Gehaltsabrechnung Januar (Neueinstellung)
+31.01.2024;6100;Soziale Abgaben;H;26.910,00;KST100;;RE-2024-0002;AG-Anteile SV Januar
+05.01.2024;6310;Nebenkosten Strom/Wasser;H;12.800,00;KST100;;RE-2024-0010;Stadtwerke Abschlag erhoeht
+20.01.2024;6300;Miete und Nebenkosten;H;14.500,00;KST100;;RE-2024-0020;Miete Labor Februar (Indexerhoehung)
+10.01.2024;5100;Reagenzien und Labormaterial;H;65.000,00;KST200;;RE-2024-0015;Diagnostika Q1 + Sonderbestellung
+15.01.2024;4400;Erloese Labordiagnostik;S;225.000,00;KST200;;AR-2024-0001;Laborleistungen + Neuvertrag
+28.02.2024;6000;Loehne und Gehaelter;H;138.000,00;KST100;;RE-2024-0050;Gehaltsabrechnung Februar
+28.02.2024;6100;Soziale Abgaben;H;26.910,00;KST100;;RE-2024-0051;AG-Anteile SV Februar
+05.02.2024;6310;Nebenkosten Strom/Wasser;H;12.800,00;KST100;;RE-2024-0055;Stadtwerke Abschlag
+20.02.2024;6300;Miete und Nebenkosten;H;14.500,00;KST100;;RE-2024-0065;Miete Labor Maerz
+10.02.2024;5100;Reagenzien und Labormaterial;H;58.000,00;KST200;;RE-2024-0060;Testkits Lieferung erhoeht
+15.02.2024;4400;Erloese Labordiagnostik;S;235.000,00;KST200;;AR-2024-0010;Laborleistungen + Neuakquise
+31.03.2024;6815;Software und Lizenzen;H;12.500,00;KST100;;RE-2024-0118;LIS Jahreslizenz + KI-Modul
+31.03.2024;6500;Reparaturen und Instandhaltung;H;8.500,00;KST200;;RE-2024-0070;Kleine Reparatur Zentrifuge
+31.03.2024;6220;Abschreibungen Laborgeraete;H;35.000,00;KST200;;RE-2024-0028;AfA neues PCR-Geraet

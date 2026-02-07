@@ -5,9 +5,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { autoForecast, linearForecast, movingAverageForecast, exponentialForecast } from '@/lib/forecast';
 import { getTimeSeries } from '@/lib/duckdb-engine';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000 });
+    if (rateLimit) return rateLimit;
+
     const body = await request.json();
     const {
       table = 'controlling.bookings_curr',
@@ -21,10 +30,7 @@ export async function POST(request: NextRequest) {
     const timeSeries = await getTimeSeries(table, metric, groupBy);
 
     if (timeSeries.length < 3) {
-      return NextResponse.json(
-        { error: 'Mindestens 3 Perioden für Forecast erforderlich' },
-        { status: 400 }
-      );
+      return jsonError('Mindestens 3 Perioden für Forecast erforderlich', 400, requestId);
     }
 
     // Run forecast
@@ -49,10 +55,7 @@ export async function POST(request: NextRequest) {
       ...result
     });
   } catch (error) {
-    console.error('Forecast error:', error);
-    return NextResponse.json(
-      { error: 'Forecast fehlgeschlagen', details: (error as Error).message },
-      { status: 500 }
-    );
+    console.error('Forecast error:', requestId, sanitizeError(error));
+    return jsonError('Forecast fehlgeschlagen', 500, requestId);
   }
 }

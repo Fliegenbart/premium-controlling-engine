@@ -4,6 +4,7 @@ import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
 import { summaryRequestSchema } from '@/lib/validation';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
@@ -29,6 +30,9 @@ export async function POST(request: NextRequest) {
   let analysisResult: AnalysisResult | null = null;
   let entityName: string | undefined;
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 30, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
 

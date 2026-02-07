@@ -1,0 +1,7 @@
+Buchungsdatum;Sachkonto;Kontobezeichnung;Kostenstelle;Profit Center;Betrag in Hauswaehrung;Belegnummer;Buchungstext;Lieferant
+20230131;6000;Loehne und Gehaelter;KST100;PC10;-125000,00;190000001;Gehaltsabrechnung Januar;
+20230131;6100;Soziale Abgaben;KST100;PC10;-24375,00;190000002;AG-Anteile SV Januar;
+20230105;6310;Nebenkosten Strom/Wasser;KST100;PC10;-8500,00;190000010;Stadtwerke Abschlag;Stadtwerke Hamburg
+20230120;6300;Miete und Nebenkosten;KST100;PC10;-12500,00;190000020;Miete Labor Februar;Immobilien GmbH
+20230110;5100;Reagenzien und Labormaterial;KST200;PC20;-45000,00;190000015;Diagnostika Lieferung Q1;Siemens Healthineers
+20230115;4400;Erloese Labordiagnostik;KST200;PC20;185000,00;180000001;Laborleistungen Krankenhaeuser;

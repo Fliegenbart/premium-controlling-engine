@@ -1,1400 +1,237 @@
-'use client';
-
-import { useState, useEffect, useRef, useId } from 'react';
-import { motion, AnimatePresence, useAnimation, useInView } from 'framer-motion';
+import Link from 'next/link';
 import {
-  BarChart3,
-  Shield,
-  Zap,
-  FileText,
-  CheckCircle2,
   ArrowRight,
-  Brain,
+  BarChart3,
+  CheckCircle2,
+  FileSpreadsheet,
   Lock,
-  TrendingUp,
-  AlertTriangle,
-  Target,
-  ChevronRight,
-  AlignJustify,
-  XIcon,
+  Shield,
   Sparkles,
-  ClipboardCheck,
-  CheckCircle,
-  Clock,
 } from 'lucide-react';
-import TextShimmer from '@/components/magicui/text-shimmer';
-import { BorderBeam } from '@/components/magicui/border-beam';
-import { Particles } from '@/components/magicui/particles';
-import { SphereMask } from '@/components/magicui/sphere-mask';
-import Marquee from '@/components/magicui/marquee';
-import { cn } from '@/lib/utils';
 
-interface LandingPageProps {
-  onStartApp: () => void;
-}
-
-/* ───────── Pricing Data ───────── */
-type Interval = 'month' | 'year';
-
-const pricingPlans = [
+const features = [
   {
-    id: 'starter',
-    name: 'Starter',
-    description: 'Perfekt zum Ausprobieren und für kleine Teams',
-    features: [
-      'Bis zu 5 Analysen/Monat',
-      'Einzelentity-Analyse',
-      'CSV-Upload',
-      'Basis-Reports',
-      'Community Support',
-    ],
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    isMostPopular: false,
+    title: 'Import, der in der Praxis funktioniert',
+    desc: 'CSV/XLSX und gängige Exporte. Magic Upload erkennt Formate und normalisiert Felder.',
+    icon: FileSpreadsheet,
   },
   {
-    id: 'professional',
-    name: 'Professional',
-    description: 'Für ernsthafte Controlling-Teams im Mittelstand',
-    features: [
-      'Unbegrenzte Analysen',
-      'Multi-Entity & Konzern',
-      'KI-Reports (Word)',
-      'Szenario-Simulation',
-      'Root-Cause Analyse',
-      'Email Support',
-    ],
-    monthlyPrice: 4900,
-    yearlyPrice: 49000,
-    isMostPopular: true,
+    title: 'Abweichungen, die du sofort verstehst',
+    desc: 'Konten, Kostenstellen und Treiberanalyse. Evidence bis auf Beleg-Ebene.',
+    icon: BarChart3,
   },
   {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'On-Premise Deployment für große Organisationen',
-    features: [
-      'Alles aus Professional',
-      'Dedizierter Support',
-      'Custom Integration',
-      'On-Premise Deployment',
-      'SLA Garantie',
-      'Training & Onboarding',
-      'Compliance Features',
-    ],
-    monthlyPrice: 14900,
-    yearlyPrice: 149000,
-    isMostPopular: false,
+    title: 'KI-Unterstuetzung, aber lokal',
+    desc: 'Kommentare und Zusammenfassungen via Ollama. Optional, ohne Datenabfluss.',
+    icon: Sparkles,
+  },
+  {
+    title: 'Produktionstaugliche Sicherheit',
+    desc: 'Login, Rollen, Rate Limits, optionaler Dokumenten-Token, SQL-API standardmaessig aus.',
+    icon: Shield,
   },
 ];
 
-const toHumanPrice = (price: number, decimals: number = 0) => {
-  return new Intl.NumberFormat('de-DE', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(price / 100);
-};
-
-/* ───────── CTA Tiles ───────── */
-const tiles = [
+const steps = [
   {
-    icon: <BarChart3 className="size-full" />,
-    bg: (
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-orange-600 via-rose-600 to-violet-600 opacity-70 blur-[20px] filter"></div>
-    ),
+    title: '1. Anmelden',
+    desc: 'Rollenbasierter Zugriff (Admin/Controller/Viewer). Demo-User in Produktion aus.',
+    icon: Lock,
   },
   {
-    icon: <Shield className="size-full" />,
-    bg: (
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 opacity-70 blur-[20px] filter"></div>
-    ),
+    title: '2. Daten laden',
+    desc: 'Vorjahr und aktuelles Jahr (oder Plan/Ist). Sofortige Profilierung und Plausibilitaet.',
+    icon: FileSpreadsheet,
   },
   {
-    icon: <Brain className="size-full" />,
-    bg: (
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-green-500 via-teal-500 to-emerald-600 opacity-70 blur-[20px] filter"></div>
-    ),
-  },
-  {
-    icon: <Target className="size-full" />,
-    bg: (
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600 opacity-70 blur-[20px] filter"></div>
-    ),
-  },
-  {
-    icon: <TrendingUp className="size-full" />,
-    bg: (
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 opacity-70 blur-[20px] filter"></div>
-    ),
-  },
-  {
-    icon: <Zap className="size-full" />,
-    bg: (
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 overflow-visible rounded-full bg-gradient-to-r from-gray-600 via-gray-500 to-gray-400 opacity-70 blur-[20px] filter"></div>
-    ),
+    title: '3. Analyse und Report',
+    desc: 'Abweichungen, Root-Cause, Trends. Export als PDF/XLSX und Reports fuer das Management.',
+    icon: CheckCircle2,
   },
 ];
 
-const shuffleArray = (array: any[]) => {
-  const arr = [...array];
-  let currentIndex = arr.length, randomIndex;
-  while (currentIndex !== 0) {
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
-  }
-  return arr;
-};
-
-/* ───────── CTA Card ───────── */
-const CTACard = (card: { icon: JSX.Element; bg: JSX.Element }) => {
-  const id = useId();
-  const controls = useAnimation();
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (inView) {
-      controls.start({
-        opacity: 1,
-        transition: { delay: Math.random() * 2, ease: 'easeOut', duration: 1 },
-      });
-    }
-  }, [controls, inView]);
-
+export default function LandingPage() {
   return (
-    <motion.div
-      key={id}
-      ref={ref}
-      initial={{ opacity: 0 }}
-      animate={controls}
-      className={cn(
-        'relative size-20 cursor-pointer overflow-hidden rounded-2xl border p-4',
-        'bg-white/5 [box-shadow:0_0_0_1px_rgba(255,255,255,.05),0_2px_4px_rgba(0,0,0,.2),0_12px_24px_rgba(0,0,0,.2)]',
-        'transform-gpu [border:1px_solid_rgba(255,255,255,.1)] [box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]'
-      )}
-    >
-      {card.icon}
-      {card.bg}
-    </motion.div>
-  );
-};
-
-/* ───────── Nav Items ───────── */
-const menuItems = [
-  { id: 1, label: 'Features', href: '#features' },
-  { id: 2, label: 'Preise', href: '#pricing' },
-  { id: 3, label: 'FAQ', href: '#faq' },
-  { id: 4, label: 'Kontakt', href: '#contact' },
-];
-
-/* ───────── Footer ───────── */
-const footerNavs = [
-  {
-    label: 'Produkt',
-    items: [
-      { href: '#features', name: 'Features' },
-      { href: '#pricing', name: 'Preise' },
-      { href: '#faq', name: 'FAQ' },
-    ],
-  },
-  {
-    label: 'Ressourcen',
-    items: [
-      { href: '#', name: 'Dokumentation' },
-      { href: '#', name: 'API Docs' },
-      { href: '#', name: 'Support' },
-    ],
-  },
-  {
-    label: 'Rechtliches',
-    items: [
-      { href: '#', name: 'Datenschutz' },
-      { href: '#', name: 'Impressum' },
-      { href: '#', name: 'AGB' },
-    ],
-  },
-];
-
-/* ═══════════════════ MAIN COMPONENT ═══════════════════ */
-export default function LandingPage({ onStartApp }: LandingPageProps) {
-  const heroRef = useRef(null);
-  const heroInView = useInView(heroRef, { once: true, margin: '-100px' });
-  const [hamburgerMenuIsOpen, setHamburgerMenuIsOpen] = useState(false);
-  const [interval, setInterval] = useState<Interval>('month');
-  const [randomTiles1, setRandomTiles1] = useState<typeof tiles>([]);
-  const [randomTiles2, setRandomTiles2] = useState<typeof tiles>([]);
-  const [randomTiles3, setRandomTiles3] = useState<typeof tiles>([]);
-  const [randomTiles4, setRandomTiles4] = useState<typeof tiles>([]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setRandomTiles1(shuffleArray(tiles));
-      setRandomTiles2(shuffleArray(tiles));
-      setRandomTiles3(shuffleArray(tiles));
-      setRandomTiles4(shuffleArray(tiles));
-    }
-  }, []);
-
-  useEffect(() => {
-    const html = document.querySelector('html');
-    if (html) html.classList.toggle('overflow-hidden', hamburgerMenuIsOpen);
-  }, [hamburgerMenuIsOpen]);
-
-  useEffect(() => {
-    const closeNav = () => setHamburgerMenuIsOpen(false);
-    window.addEventListener('orientationchange', closeNav);
-    window.addEventListener('resize', closeNav);
-    return () => {
-      window.removeEventListener('orientationchange', closeNav);
-      window.removeEventListener('resize', closeNav);
-    };
-  }, []);
-
-  return (
-    <main className="min-h-screen bg-[#0c1222] mesh-gradient noise-overlay text-white overflow-hidden relative">
-      {/* ─── Global Particles ─── */}
-      <Particles
-        className="absolute inset-0 -z-10"
-        quantity={30}
-        ease={70}
-        size={0.5}
-        color="#818cf8"
-      />
-
-      {/* ─── Animated Gradient Orbs ─── */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[10%] left-[15%] w-[500px] h-[500px] rounded-full bg-indigo-500/[0.14] blur-[120px] animate-float-orb" />
-        <div className="absolute top-[60%] right-[10%] w-[400px] h-[400px] rounded-full bg-cyan-500/[0.12] blur-[100px] animate-float-orb-2" />
-        <div className="absolute top-[30%] right-[30%] w-[300px] h-[300px] rounded-full bg-purple-500/[0.10] blur-[80px] animate-float-orb" style={{ animationDelay: '-7s' }} />
+    <main className="min-h-screen bg-[#0b1220] text-white">
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_10%,rgba(34,211,238,0.18),transparent_60%),radial-gradient(45%_35%_at_85%_20%,rgba(59,130,246,0.14),transparent_55%),radial-gradient(40%_40%_at_50%_95%,rgba(20,184,166,0.10),transparent_55%)]" />
+        <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:64px_64px]" />
       </div>
 
-      {/* ═══════════ HEADER ═══════════ */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="fixed left-0 top-0 z-50 w-full px-4 border-b border-white/[0.08] backdrop-blur-2xl bg-[#0c1222]/60"
-      >
-        <div className="max-w-7xl mx-auto flex h-[3.5rem] w-full items-center justify-between">
-          {/* Logo */}
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-md flex items-center gap-2 font-semibold">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-one)] to-[var(--color-two)] flex items-center justify-center">
-              <BarChart3 className="w-4 h-4 text-white" />
-            </div>
-            Premium Controlling
-          </button>
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#0b1220]/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
+              <BarChart3 className="h-5 w-5 text-cyan-300" />
+            </span>
+            <span className="text-sm font-semibold tracking-tight text-white">
+              Premium Controlling Engine
+            </span>
+          </Link>
 
-          {/* Desktop Nav */}
-          <div className="ml-auto flex h-full items-center">
-            <div className="hidden md:flex items-center gap-6 mr-6">
-              {menuItems.map((item) => (
-                <a key={item.id} href={item.href} className="text-sm text-gray-400 hover:text-white transition-colors">
-                  {item.label}
-                </a>
-              ))}
-            </div>
-            <button
-              onClick={onStartApp}
-              className="mr-2 rounded-lg bg-white text-black px-4 py-1.5 text-sm font-medium hover:bg-gray-200 transition-colors"
+          <nav className="hidden items-center gap-6 text-sm text-gray-300 md:flex">
+            <a href="#features" className="hover:text-white">Features</a>
+            <a href="#how" className="hover:text-white">Workflow</a>
+            <a href="#security" className="hover:text-white">Sicherheit</a>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <Link
+              href="/app"
+              className="inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2 text-sm font-semibold text-[#041014] hover:bg-cyan-300"
             >
-              App starten
-            </button>
-          </div>
-
-          {/* Mobile Hamburger */}
-          <button
-            className="ml-4 md:hidden"
-            onClick={() => setHamburgerMenuIsOpen((o) => !o)}
-          >
-            <span className="sr-only">Toggle menu</span>
-            {hamburgerMenuIsOpen ? <XIcon /> : <AlignJustify />}
-          </button>
-        </div>
-      </motion.header>
-
-      {/* Mobile Nav */}
-      <AnimatePresence>
-        {hamburgerMenuIsOpen && (
-          <motion.nav
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed left-0 top-0 z-50 h-screen w-full bg-[#0c1222]/95 backdrop-blur-[12px]"
-          >
-            <div className="max-w-7xl mx-auto flex h-[3.5rem] items-center justify-between px-4">
-              <span className="text-md font-semibold">Premium Controlling</span>
-              <button onClick={() => setHamburgerMenuIsOpen(false)}>
-                <XIcon />
-              </button>
-            </div>
-            <motion.ul
-              className="flex flex-col px-6 pt-4"
-              initial="initial"
-              animate="open"
-              variants={{ open: { transition: { staggerChildren: 0.06 } } }}
-            >
-              {menuItems.map((item) => (
-                <motion.li
-                  key={item.id}
-                  variants={{
-                    initial: { y: '-20px', opacity: 0 },
-                    open: { y: 0, opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } },
-                  }}
-                  className="border-b border-white/10 py-3"
-                >
-                  <a
-                    href={item.href}
-                    onClick={() => setHamburgerMenuIsOpen(false)}
-                    className="text-xl text-white"
-                  >
-                    {item.label}
-                  </a>
-                </motion.li>
-              ))}
-            </motion.ul>
-          </motion.nav>
-        )}
-      </AnimatePresence>
-
-      {/* ═══════════ HERO SECTION ═══════════ */}
-      <section
-        id="hero"
-        className="relative mx-auto mt-32 max-w-[80rem] px-6 text-center md:px-8"
-      >
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="backdrop-filter-[12px] inline-flex h-7 items-center justify-between rounded-full border border-white/10 bg-white/10 px-3 text-xs text-white transition-all ease-in hover:cursor-pointer hover:bg-white/20 group gap-1"
-        >
-          <TextShimmer className="inline-flex items-center justify-center">
-            <span>✨ KI-Controlling für den Mittelstand</span>{' '}
-            <ArrowRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-          </TextShimmer>
-        </motion.div>
-
-        {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="bg-gradient-to-br from-white via-white/90 to-white/60 bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tight text-transparent text-balance sm:text-6xl md:text-7xl lg:text-8xl"
-        >
-          Controlling-KI die
-          <br className="hidden md:block" /> Ihre Daten schützt.
-        </motion.h1>
-
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="mb-12 text-lg tracking-tight text-gray-200 md:text-xl text-balance"
-        >
-          DATEV, SAP, BMD, Lexware — egal welches System, wir analysieren es.
-          <br className="hidden md:block" /> 13-Wochen Liquiditätsplanung, KI-Abweichungskommentare & 100% on-premise.
-        </motion.p>
-
-        {/* CTA Button */}
-        <motion.button
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0, ease: [0.21, 0.47, 0.32, 0.98] }}
-          onClick={onStartApp}
-          className="inline-flex items-center gap-2 rounded-lg bg-white text-black px-6 py-3 font-medium hover:bg-gray-200 transition-all ease-in-out"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <span>Kostenlos starten</span>
-          <ArrowRight className="ml-1 size-4" />
-        </motion.button>
-
-        {/* Hero Image — Bento Grid Tool Preview */}
-        <motion.div
-          ref={heroRef}
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 1.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative mt-[8rem] [perspective:2000px]"
-        >
-          <div
-            className={`relative rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-xl p-1 before:absolute before:bottom-1/2 before:left-0 before:top-0 before:h-full before:w-full before:opacity-0 before:[filter:blur(180px)] before:[background-image:linear-gradient(to_bottom,var(--color-one),var(--color-one),transparent_40%)] ${
-              heroInView ? 'before:animate-image-glow' : ''
-            }`}
-          >
-            <BorderBeam
-              size={250}
-              duration={12}
-              delay={11}
-              colorFrom="var(--color-one)"
-              colorTo="var(--color-two)"
-            />
-
-            {/* Bento Grid */}
-            <div className="grid grid-cols-6 grid-rows-3 gap-1.5 sm:gap-2 p-2 sm:p-3 rounded-xl bg-[#0c0f1a]/80">
-
-              {/* ── Top-Left: Liquiditäts-Chart (3 cols, 2 rows) ── */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={heroInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.6, delay: 1.5 }}
-                className="col-span-4 row-span-2 rounded-xl bg-gradient-to-br from-blue-500/[0.08] to-cyan-500/[0.04] border border-blue-500/[0.12] p-3 sm:p-4 overflow-hidden relative"
-              >
-                <div className="flex items-center justify-between mb-2 sm:mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                      <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs font-semibold text-white/80">13-Wochen Liquiditätsplanung</span>
-                  </div>
-                  <span className="px-1.5 py-0.5 rounded text-[8px] bg-blue-500/20 text-blue-400 font-medium">LIVE</span>
-                </div>
-                {/* Animated Area Chart */}
-                <svg viewBox="0 0 400 140" className="w-full h-auto" preserveAspectRatio="none">
-                  {/* Grid */}
-                  {[35, 70, 105].map(y => (
-                    <line key={y} x1="0" y1={y} x2="400" y2={y} stroke="rgba(255,255,255,0.04)" />
-                  ))}
-                  {/* Confidence band */}
-                  <motion.path
-                    d="M0,30 C40,28 80,35 120,45 C160,55 200,50 240,65 C280,75 320,72 360,68 L400,65 L400,120 L360,108 L320,112 L280,115 L240,105 L200,90 L160,95 L120,85 L80,75 L40,68 L0,70 Z"
-                    fill="url(#heroConfBand)"
-                    initial={{ opacity: 0 }}
-                    animate={heroInView ? { opacity: 0.4 } : {}}
-                    transition={{ duration: 1.5, delay: 2 }}
-                  />
-                  {/* Inflow bars */}
-                  {[20, 70, 120, 170, 220, 270, 320, 370].map((x, i) => (
-                    <motion.rect
-                      key={`bar-${i}`}
-                      x={x}
-                      y={125 - [18, 14, 20, 12, 22, 16, 18, 14][i]}
-                      width="22"
-                      height={[18, 14, 20, 12, 22, 16, 18, 14][i]}
-                      rx="3"
-                      fill={i < 4 ? 'rgba(34,197,94,0.25)' : 'rgba(34,197,94,0.12)'}
-                      initial={{ scaleY: 0 }}
-                      animate={heroInView ? { scaleY: 1 } : {}}
-                      transition={{ duration: 0.5, delay: 1.8 + i * 0.08 }}
-                      style={{ transformOrigin: `${x + 11}px 125px` }}
-                    />
-                  ))}
-                  {/* Main balance line */}
-                  <motion.path
-                    d="M0,50 C40,48 80,55 120,65 C160,72 200,68 240,82 C280,90 320,88 360,85 L400,82"
-                    fill="none"
-                    stroke="url(#heroLineGrad)"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={heroInView ? { pathLength: 1, opacity: 1 } : {}}
-                    transition={{ duration: 2, delay: 1.8, ease: 'easeOut' }}
-                  />
-                  {/* Threshold line */}
-                  <line x1="0" y1="95" x2="400" y2="95" stroke="#ef4444" strokeWidth="1" strokeDasharray="8 6" opacity="0.4" />
-                  <text x="6" y="92" fill="#ef4444" fontSize="8" opacity="0.5">Schwelle</text>
-                  {/* Pulsing alert dot */}
-                  <motion.circle
-                    cx="280"
-                    cy="90"
-                    r="5"
-                    fill="#ef4444"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={heroInView ? { opacity: [0, 1, 0.5, 1], scale: [0, 1.6, 1, 1.3] } : {}}
-                    transition={{ duration: 2.5, delay: 3.2, repeat: Infinity, repeatDelay: 3 }}
-                  />
-                  <defs>
-                    <linearGradient id="heroConfBand" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="#3b82f6" stopOpacity="0.15" />
-                      <stop offset="1" stopColor="#3b82f6" stopOpacity="0" />
-                    </linearGradient>
-                    <linearGradient id="heroLineGrad" x1="0" y1="0" x2="400" y2="0" gradientUnits="userSpaceOnUse">
-                      <stop offset="0" stopColor="#3b82f6" />
-                      <stop offset="0.5" stopColor="#06b6d4" />
-                      <stop offset="1" stopColor="#3b82f6" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="flex justify-between mt-1 px-1">
-                  {['KW 1', 'KW 3', 'KW 5', 'KW 7', 'KW 9', 'KW 11', 'KW 13'].map(kw => (
-                    <span key={kw} className="text-[7px] sm:text-[8px] text-gray-600">{kw}</span>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* ── Top-Right: KPI Cards Stack (2 cols, 2 rows) ── */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={heroInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.6, delay: 1.7 }}
-                className="col-span-2 row-span-2 flex flex-col gap-1.5 sm:gap-2"
-              >
-                {[
-                  { label: 'Kontostand', value: '847.293 €', color: 'text-white', icon: '💰', bg: 'from-white/[0.08] to-white/[0.04]', border: 'border-white/[0.10]' },
-                  { label: 'Burn Rate', value: '-42.100 €/W', color: 'text-red-400', icon: '🔥', bg: 'from-red-500/[0.06] to-red-500/[0.02]', border: 'border-red-500/[0.1]' },
-                  { label: 'Reichweite', value: '18 Wochen', color: 'text-emerald-400', icon: '📊', bg: 'from-emerald-500/[0.06] to-emerald-500/[0.02]', border: 'border-emerald-500/[0.1]' },
-                  { label: 'Prüfungen', value: '10/12 ✓', color: 'text-green-400', icon: '✅', bg: 'from-green-500/[0.06] to-green-500/[0.02]', border: 'border-green-500/[0.1]' },
-                ].map((kpi, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={heroInView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 2.0 + i * 0.15 }}
-                    className={`flex-1 rounded-lg bg-gradient-to-br ${kpi.bg} border ${kpi.border} p-2 sm:p-2.5 flex items-center gap-2`}
-                  >
-                    <span className="text-sm sm:text-base">{kpi.icon}</span>
-                    <div className="min-w-0">
-                      <div className="text-[7px] sm:text-[9px] text-gray-500 truncate">{kpi.label}</div>
-                      <div className={`text-[10px] sm:text-xs font-bold font-mono ${kpi.color} truncate`}>{kpi.value}</div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {/* ── Bottom-Left: KI-Kommentar (3 cols, 1 row) ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 2.2 }}
-                className="col-span-3 rounded-xl bg-gradient-to-br from-amber-500/[0.06] to-orange-500/[0.03] border border-amber-500/[0.12] p-3 overflow-hidden"
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
-                  <span className="text-[9px] sm:text-[10px] font-semibold text-amber-400/80">KI-Abweichungskommentar</span>
-                </div>
-                <motion.p
-                  className="text-[8px] sm:text-[10px] text-gray-400 leading-relaxed"
-                  initial={{ opacity: 0 }}
-                  animate={heroInView ? { opacity: 1 } : {}}
-                  transition={{ duration: 1, delay: 2.8 }}
-                >
-                  &quot;Personalkosten +12,3% durch 3 Neueinstellungen IT (Mär-Apr) + Tariferhöhung 3,2%.
-                  Größter Einzelposten: Dev-Team 45.200€.&quot;
-                </motion.p>
-                <div className="flex gap-2 mt-1.5">
-                  {['Strukturell', '85% Konfidenz'].map((tag, i) => (
-                    <motion.span
-                      key={tag}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={heroInView ? { opacity: 1, scale: 1 } : {}}
-                      transition={{ delay: 3.2 + i * 0.15 }}
-                      className="px-1.5 py-0.5 rounded text-[7px] sm:text-[8px] bg-amber-500/10 text-amber-400/70 border border-amber-500/10"
-                    >
-                      {tag}
-                    </motion.span>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* ── Bottom-Right: Fehler-Scanner (3 cols, 1 row) ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 2.4 }}
-                className="col-span-3 rounded-xl bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.10] p-3 overflow-hidden"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-400" />
-                    <span className="text-[9px] sm:text-[10px] font-semibold text-white/70">Buchungsfehler-Scan</span>
-                  </div>
-                  <span className="text-[8px] text-green-400">2 gefunden</span>
-                </div>
-                <div className="space-y-1">
-                  {[
-                    { text: '4711 Personalkosten — Duplikat', ok: false },
-                    { text: '6800 IT-Kosten — Sa/So', ok: false },
-                    { text: '3842 Buchungen geprüft', ok: true },
-                  ].map((row, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={heroInView ? { opacity: 1, x: 0 } : {}}
-                      transition={{ duration: 0.3, delay: 2.8 + i * 0.12 }}
-                      className={`flex items-center gap-1.5 text-[8px] sm:text-[9px] px-2 py-1 rounded ${
-                        row.ok ? 'text-green-400/70' : 'text-rose-400/80 bg-rose-500/[0.06]'
-                      }`}
-                    >
-                      {row.ok ? <CheckCircle2 className="w-2.5 h-2.5" /> : <AlertTriangle className="w-2.5 h-2.5" />}
-                      <span>{row.text}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Fade overlay at bottom */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0c1222] to-transparent pointer-events-none" />
-        </motion.div>
-      </section>
-
-      {/* ═══════════ CLIENT / TRUST SECTION ═══════════ */}
-      <section id="clients" className="text-center mx-auto max-w-[80rem] px-6 md:px-8">
-        <div className="py-14">
-          <div className="mx-auto max-w-screen-xl px-4 md:px-8">
-            <h2 className="text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">
-              Vertraut von Controlling-Teams im DACH-Raum
-            </h2>
-            <div className="mt-6">
-              <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 md:gap-x-16">
-                {[
-                  { icon: Shield, label: '100% Lokal' },
-                  { icon: Lock, label: 'DSGVO-konform' },
-                  { icon: Brain, label: 'On-Premise KI' },
-                  { icon: FileText, label: 'Evidence Links' },
-                  { icon: Zap, label: 'Real-Time' },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-gray-500">
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+              App oeffnen <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* ═══════════ INTEGRATIONEN / DATENVIELFALT ═══════════ */}
-      <section id="integrations" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="text-center mb-14"
-        >
-          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-[0.08em] mb-3">Integrationen</h4>
-          <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
-            Ihre Daten. Jedes Format.
-          </h2>
-          <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-            Egal ob DATEV, SAP, BMD oder einfaches CSV — unser Magic-Upload erkennt das Format automatisch und startet die Analyse sofort.
-          </p>
-        </motion.div>
-
-        {/* Integration Logos Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {[
-            { name: 'DATEV', sub: 'Kanzlei-Rechnungswesen', color: 'from-green-500/25 to-emerald-500/25', border: 'border-green-500/25', text: 'text-green-400' },
-            { name: 'SAP', sub: 'FI / CO Export', color: 'from-blue-500/25 to-sky-500/25', border: 'border-blue-500/25', text: 'text-blue-400' },
-            { name: 'BMD', sub: 'NTCS Export', color: 'from-purple-500/25 to-violet-500/25', border: 'border-purple-500/25', text: 'text-purple-400' },
-            { name: 'Addison', sub: 'Wolters Kluwer', color: 'from-orange-500/25 to-amber-500/25', border: 'border-orange-500/25', text: 'text-orange-400' },
-            { name: 'Lexware', sub: 'buchhaltung', color: 'from-cyan-500/25 to-teal-500/25', border: 'border-cyan-500/25', text: 'text-cyan-400' },
-            { name: 'Agenda', sub: 'Finanzbuchhaltung', color: 'from-pink-500/25 to-rose-500/25', border: 'border-pink-500/25', text: 'text-pink-400' },
-            { name: 'CSV', sub: 'Universalformat', color: 'from-gray-400/25 to-gray-500/25', border: 'border-gray-400/25', text: 'text-gray-300' },
-            { name: 'Excel', sub: '.xlsx / .xls', color: 'from-emerald-500/25 to-green-500/25', border: 'border-emerald-500/25', text: 'text-emerald-400' },
-          ].map((integration, idx) => (
-            <motion.div
-              key={integration.name}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.06, ease: [0.21, 0.47, 0.32, 0.98] }}
-              whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}
-              className={`relative bg-gradient-to-br ${integration.color} rounded-xl border ${integration.border} p-5 text-center backdrop-blur-xl group cursor-default`}
-            >
-              <div className={`text-2xl font-bold ${integration.text} tracking-tight mb-1`}>{integration.name}</div>
-              <div className="text-[11px] text-gray-500 tracking-wide">{integration.sub}</div>
-              <div className="absolute inset-0 rounded-xl bg-white/[0.04] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Auto-detect badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-10 text-center"
-        >
-          <div className="inline-flex items-center gap-2 bg-white/[0.08] border border-white/[0.10] rounded-full px-5 py-2.5">
-            <Zap className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-gray-300">Magic Upload — Format wird <strong className="text-white">automatisch erkannt</strong></span>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* ═══════════ SPHERE MASK ═══════════ */}
-      <SphereMask />
-
-      {/* ═══════════ 4 KILLER FEATURE TILES ═══════════ */}
-      <section id="features" className="mx-auto max-w-[80rem] px-6 md:px-8 py-20">
-        <div className="text-center mb-16">
-          <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-[0.08em] mb-3">KI-Features</h4>
-          <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white">
-            Was kein anderes Tool kann.
-          </h2>
-          <p className="mt-6 text-lg text-gray-200 max-w-2xl mx-auto">
-            Elf KI-Features die echte Controlling-Probleme lösen — nicht nur Dashboards, sondern Antworten.
-          </p>
-        </div>
-
-        {/* ═══════════ BENTO GRID: 11 Features ═══════════ */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* 1. LIQUIDITÄT (Hero - col-span-2, row-span-2) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-blue-500/[0.12] p-6 overflow-hidden group hover:border-blue-500/30 transition-colors bg-gradient-to-br from-blue-500/[0.06] to-cyan-500/[0.03] backdrop-blur-xl shadow-glow-md md:col-span-2 md:row-span-2 flex flex-col"
-          >
-            <BorderBeam size={250} duration={18} colorFrom="#3b82f6" colorTo="#06b6d4" />
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Liquidität</h3>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-            </div>
-            <p className="text-sm text-gray-300 mb-4 leading-relaxed">
-              13-Wochen Cashflow-Prognose mit Konfidenzintervallen, Engpass-Alerts und KI-Empfehlungen.
+      <section className="mx-auto max-w-6xl px-6 pb-16 pt-12">
+        <div className="grid gap-10 md:grid-cols-2 md:items-center">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-300">
+              <Shield className="h-3.5 w-3.5 text-cyan-300" />
+              Lokal. Pruefbar. Schnell einsatzbereit.
             </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {['Wiederkehrende Muster', 'Konfidenzintervalle', 'Alerts', 'KI-Empfehlungen'].map((tag) => (
-                <span key={tag} className="px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            {/* Full chart SVG from original banner */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3">
-              <svg viewBox="0 0 280 120" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-                {[0, 30, 60, 90].map((y) => (
-                  <line key={y} x1="0" y1={y} x2="280" y2={y} stroke="rgba(255,255,255,0.05)" />
-                ))}
-                <line x1="0" y1="75" x2="280" y2="75" stroke="#ef4444" strokeWidth="1" strokeDasharray="6 4" opacity="0.5" />
-                <motion.path
-                  d="M0,20 L22,22 L44,25 L66,30 L88,28 L110,35 L132,45 L154,50 L176,55 L198,48 L220,42 L242,38 L264,35 L264,75 L242,68 L220,72 L198,78 L176,85 L154,80 L132,75 L110,65 L88,58 L66,60 L44,55 L22,52 L0,50 Z"
-                  fill="rgba(59,130,246,0.08)"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1.2, delay: 0.3 }}
-                />
-                <motion.path
-                  d="M0,35 L22,37 L44,40 L66,45 L88,43 L110,50 L132,60 L154,65 L176,70 L198,63 L220,57 L242,53 L264,50"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  whileInView={{ pathLength: 1, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
-                />
-                <motion.circle
-                  cx="176" cy="70" r="4" fill="#ef4444"
-                  initial={{ opacity: 0, scale: 0 }}
-                  whileInView={{ opacity: [0, 1, 0.6, 1], scale: [0, 1.5, 1, 1.2] }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 2, delay: 1.2, repeat: Infinity, repeatDelay: 2 }}
-                />
-                {[0, 44, 88, 132, 176, 220].map((x, i) => (
-                  <motion.rect
-                    key={`in-${i}`}
-                    x={x + 4} y={105} width="14" height={[12, 10, 14, 8, 15, 11][i]} rx="2" fill="#10b981" opacity="0.3"
-                    initial={{ scaleY: 0 }}
-                    whileInView={{ scaleY: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
-                    style={{ transformOrigin: `${x + 11}px 117px` }}
-                  />
-                ))}
-              </svg>
-            </div>
-          </motion.div>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white md:text-5xl">
+              Abweichungen verstehen, ohne Excel-Pain.
+            </h1>
+            <p className="mt-4 text-base leading-relaxed text-gray-300">
+              Importiere Buchungen, erkenne wesentliche Treiber und exportiere Reports fuer Review und Management.
+              Alle Daten bleiben in deiner Umgebung.
+            </p>
 
-          {/* 2. KI-KOMMENTARE (Amber, top right) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-amber-500/[0.12] p-6 overflow-hidden group hover:border-amber-500/30 transition-colors bg-gradient-to-br from-amber-500/[0.06] to-red-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#f59e0b" colorTo="#ef4444" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">KI-Kommentare</h3>
-            </div>
-            {/* Mini demo: 3 animated bars */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3">
-              {[
-                { label: 'Neueinstellungen IT', w: '75%' },
-                { label: 'Tariferhöhung', w: '40%' },
-                { label: 'Wegfall Zeitarbeit', w: '25%' },
-              ].map((factor, i) => (
-                <motion.div key={i} className="mb-2">
-                  <div className="text-[10px] text-gray-500 mb-0.5">{factor.label}</div>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: factor.w }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.3 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-                    className="h-1.5 rounded-full bg-red-400"
-                  />
-                </motion.div>
-              ))}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.8 }}
-                className="flex items-center gap-1 mt-2 text-[10px] text-amber-400/80"
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/app"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-[#041014] hover:bg-cyan-300"
               >
-                <span>85% Konfidenz</span>
-              </motion.div>
+                Zur App <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="#how"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.06]"
+              >
+                So funktioniert es
+              </a>
             </div>
-          </motion.div>
 
-          {/* 3. FEHLER (Rose) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-rose-500/[0.12] p-6 overflow-hidden group hover:border-rose-500/30 transition-colors bg-gradient-to-br from-rose-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#f43f5e" colorTo="#ec4899" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Fehler</h3>
-            </div>
-            {/* Mini demo: 3 rows with errors */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 space-y-1.5">
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="bg-red-500/10 border border-red-500/20 rounded-lg px-2 py-1 text-[10px] text-red-400 flex items-center gap-1"
-              >
-                <AlertTriangle className="w-3 h-3" /> Duplikat
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-                className="bg-red-500/10 border border-red-500/20 rounded-lg px-2 py-1 text-[10px] text-red-400 flex items-center gap-1"
-              >
-                <AlertTriangle className="w-3 h-3" /> Sa/So Buchung
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6 }}
-                className="text-[10px] text-gray-500 mt-2"
-              >
-                2 Fehler erkannt
-              </motion.div>
-            </div>
-          </motion.div>
+            <p className="mt-4 text-xs text-gray-500">
+              Hinweis: Fuer den ersten Admin setze <span className="font-mono">ADMIN_BOOTSTRAP_EMAIL</span> und{' '}
+              <span className="font-mono">ADMIN_BOOTSTRAP_PASSWORD</span> (mind. 12 Zeichen) oder aktiviere Demo-User im Dev.
+            </p>
+          </div>
 
-          {/* 4. BERICHTE (Indigo) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-indigo-500/[0.12] p-6 overflow-hidden group hover:border-indigo-500/30 transition-colors bg-gradient-to-br from-indigo-500/[0.06] to-cyan-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#6366f1" colorTo="#06b6d4" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Berichte</h3>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_30px_120px_-80px_rgba(34,211,238,0.35)]">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-white">Quickstart Workflow</p>
+              <span className="text-xs text-gray-500">3 Schritte</span>
             </div>
-            {/* Mini demo: Animated skeleton lines */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 space-y-2">
-              {[85, 92, 65, 78, 55].map((w, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -15 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.3, delay: 0.2 + i * 0.1 }}
-                  className="h-2 rounded-full bg-indigo-500/20"
-                  style={{ width: `${w}%` }}
-                />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* 5. SZENARIO (Purple) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-purple-500/[0.12] p-6 overflow-hidden group hover:border-purple-500/30 transition-colors bg-gradient-to-br from-purple-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#a855f7" colorTo="#ec4899" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Target className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Szenario</h3>
-            </div>
-            {/* Mini demo: 3 sliders */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 space-y-2">
-              {[72, 45, 58].map((v, i) => (
-                <motion.div key={i} className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${v}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.2 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-                      className="h-full rounded-full bg-purple-500"
-                    />
+            <div className="mt-4 space-y-3">
+              {steps.map((s) => (
+                <div key={s.title} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
+                      <s.icon className="h-5 w-5 text-cyan-300" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{s.title}</p>
+                      <p className="mt-0.5 text-sm text-gray-400">{s.desc}</p>
+                    </div>
                   </div>
-                  <span className="text-[9px] text-gray-500">{v}%</span>
-                </motion.div>
+                </div>
               ))}
             </div>
-          </motion.div>
-
-          {/* 6. FORECAST (Cyan) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-cyan-500/[0.12] p-6 overflow-hidden group hover:border-cyan-500/30 transition-colors bg-gradient-to-br from-cyan-500/[0.06] to-blue-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#06b6d4" colorTo="#3b82f6" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Forecast</h3>
-            </div>
-            {/* Mini chart SVG */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2">
-              <svg viewBox="0 0 120 50" className="w-full h-full">
-                <motion.path d="M 5 35 L 20 25 L 35 30 L 50 20 L 65 15" stroke="#06b6d4" strokeWidth="1.5" fill="none" strokeLinecap="round"
-                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 1, delay: 0.2 }}
-                />
-                <motion.path d="M 65 15 L 80 10 L 95 8" stroke="#3b82f6" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeDasharray="3 2"
-                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 1 }}
-                />
-              </svg>
-            </div>
-          </motion.div>
-
-          {/* 7. DB-RECHNUNG (Teal, col-span-2) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-teal-500/[0.12] p-6 overflow-hidden group hover:border-teal-500/30 transition-colors bg-gradient-to-br from-teal-500/[0.06] to-emerald-500/[0.03] backdrop-blur-xl shadow-glow-md md:col-span-2 flex flex-col"
-          >
-            <BorderBeam size={200} duration={14} colorFrom="#14b8a6" colorTo="#10b981" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">DB-Rechnung</h3>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-500/30 text-teal-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-            </div>
-            {/* Mini waterfall chart */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3">
-              <svg viewBox="0 0 140 60" className="w-full h-full">
-                {[
-                  { x: 5, y: 8, h: 35, color: '#10b981' },
-                  { x: 25, y: 8, h: 10, color: '#ef4444' },
-                  { x: 45, y: 18, h: 25, color: '#0ea5e9' },
-                  { x: 65, y: 18, h: 8, color: '#ef4444' },
-                  { x: 85, y: 26, h: 17, color: '#3b82f6' },
-                  { x: 105, y: 26, h: 5, color: '#ef4444' },
-                  { x: 125, y: 31, h: 12, color: '#8b5cf6' },
-                ].map((bar, i) => (
-                  <motion.rect
-                    key={i}
-                    x={bar.x} y={bar.y} width="12" height={bar.h} rx="1" fill={bar.color} opacity={bar.color === '#ef4444' ? 0.5 : 0.7}
-                    initial={{ scaleY: 0 }}
-                    whileInView={{ scaleY: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: 0.1 + i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
-                    style={{ transformOrigin: `${bar.x + 6}px ${bar.y + bar.h}px` }}
-                  />
-                ))}
-              </svg>
-            </div>
-          </motion.div>
-
-          {/* 8. ABSCHLUSS (Green) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-green-500/[0.12] p-6 overflow-hidden group hover:border-green-500/30 transition-colors bg-gradient-to-br from-green-500/[0.06] to-emerald-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#22c55e" colorTo="#10b981" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                <ClipboardCheck className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Abschluss</h3>
-            </div>
-            {/* Mini progress ring + checklist */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-3 flex items-center gap-2">
-              <svg viewBox="0 0 24 24" className="w-8 h-8 flex-shrink-0">
-                <circle cx="12" cy="12" r="10.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
-                <motion.circle
-                  cx="12" cy="12" r="10.5" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round"
-                  strokeDasharray="65.97"
-                  initial={{ strokeDashoffset: 65.97 }}
-                  whileInView={{ strokeDashoffset: 10 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1.5, delay: 0.2, ease: 'easeOut' }}
-                  transform="rotate(-90 12 12)"
-                />
-                <text x="12" y="13.5" textAnchor="middle" fill="white" fontSize="6" fontWeight="600">85%</text>
-              </svg>
-              <div className="text-[10px] text-gray-300">
-                <p className="font-medium">10/12</p>
-                <p className="text-gray-500">bestanden</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 9. CASHFLOW (Cyan, NEU) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-cyan-500/[0.12] p-6 overflow-hidden group hover:border-cyan-500/30 transition-colors bg-gradient-to-br from-cyan-500/[0.06] to-blue-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#06b6d4" colorTo="#3b82f6" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Cashflow</h3>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-            </div>
-            {/* Flow arrows */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2">
-              <svg viewBox="0 0 130 45" className="w-full h-full">
-                <motion.path d="M 15 23 Q 35 5, 65 23" stroke="#10b981" strokeWidth="1.5" fill="none" strokeLinecap="round"
-                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                />
-                <motion.path d="M 65 23 Q 85 40, 115 23" stroke="#3b82f6" strokeWidth="1.5" fill="none" strokeLinecap="round"
-                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: 0.6 }}
-                />
-                <motion.circle cx="65" cy="23" r="3" fill="#06b6d4"
-                  initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }}
-                  transition={{ delay: 1, duration: 0.4 }}
-                />
-              </svg>
-            </div>
-          </motion.div>
-
-          {/* 10. BWA (Orange, NEU) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-orange-500/[0.12] p-6 overflow-hidden group hover:border-orange-500/30 transition-colors bg-gradient-to-br from-orange-500/[0.06] to-amber-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#f97316" colorTo="#f59e0b" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">BWA</h3>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-            </div>
-            {/* Stacked bars */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2 space-y-1">
-              {[100, 62, 28, 18].map((v, i) => (
-                <motion.div key={i} className="h-2 bg-white/5 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${v}%` }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 + i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-                    className="h-full rounded-full bg-orange-500"
-                  />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* 11. BAB (Rose, NEU) */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, delay: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-            className="relative rounded-2xl border border-rose-500/[0.12] p-6 overflow-hidden group hover:border-rose-500/30 transition-colors bg-gradient-to-br from-rose-500/[0.06] to-pink-500/[0.03] backdrop-blur-xl shadow-glow-md flex flex-col"
-          >
-            <BorderBeam size={180} duration={14} colorFrom="#f43f5e" colorTo="#ec4899" />
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-lg font-bold text-white">BAB</h3>
-              <span className="ml-auto px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-semibold uppercase tracking-wider">NEU</span>
-            </div>
-            {/* Mini heatmap */}
-            <div className="flex-1 relative bg-white/[0.04] rounded-xl border border-white/5 p-2">
-              <div className="grid grid-cols-4 gap-0.5">
-                {Array.from({ length: 12 }, (_, i) => {
-                  const intensity = Math.random();
-                  return (
-                    <motion.div key={i}
-                      initial={{ opacity: 0, scale: 0.5 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.2, delay: 0.1 + i * 0.03 }}
-                      className="h-3 rounded-sm"
-                      style={{
-                        backgroundColor: intensity > 0.7
-                          ? `rgba(244, 63, 94, ${0.4 + intensity * 0.3})`
-                          : intensity > 0.3
-                          ? `rgba(251, 146, 60, ${0.2 + intensity * 0.2})`
-                          : `rgba(255, 255, 255, ${0.05})`,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ═══════════ PRICING SECTION ═══════════ */}
-      <section id="pricing" className="mx-auto max-w-screen-xl px-4 py-20 md:px-8">
-        <div className="mx-auto max-w-5xl text-center mb-12">
-          <h4 className="text-xl font-semibold tracking-tight text-white">
-            Preise
-          </h4>
-          <h2 className="text-4xl sm:text-5xl font-semibold tracking-tight text-white mt-2">
-            Einfache Preise für jeden.
-          </h2>
-          <p className="mt-6 text-lg text-gray-300">
-            Wählen Sie ein <strong className="text-white">passendes Paket</strong> mit den besten Features für Ihr Controlling-Team.
+      <section id="features" className="mx-auto max-w-6xl px-6 py-14">
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold tracking-tight text-white">Features, die Controlling wirklich nutzt</h2>
+          <p className="mt-2 text-sm text-gray-400">
+            Fokus auf Klarheit, Nachvollziehbarkeit und einen Workflow, der auch unter Zeitdruck funktioniert.
           </p>
         </div>
 
-        {/* Interval Toggle */}
-        <div className="flex w-full items-center justify-center space-x-3 mb-10">
-          <button
-            onClick={() => setInterval(interval === 'month' ? 'year' : 'month')}
-            className={`relative w-12 h-6 rounded-full transition-colors ${
-              interval === 'year' ? 'bg-white' : 'bg-white/20'
-            }`}
-          >
-            <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-[#0c1222] transition-transform ${
-              interval === 'year' ? 'translate-x-6' : 'translate-x-0.5'
-            }`} />
-          </button>
-          <span className="text-sm text-gray-400">Jährlich</span>
-          <span className="inline-block whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase leading-5 tracking-wide text-black">
-            2 MONATE GRATIS ✨
-          </span>
-        </div>
-
-        {/* Cards */}
-        <div className="mx-auto grid w-full justify-center sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pricingPlans.map((price, idx) => (
-            <div
-              key={price.id}
-              className={cn(
-                'relative flex max-w-[400px] flex-col gap-8 rounded-2xl border p-6 text-white overflow-hidden bg-white/[0.06] backdrop-blur-xl',
-                {
-                  'border-2 border-blue-500/60 bg-white/[0.08]': price.isMostPopular,
-                  'border-white/[0.10]': !price.isMostPopular,
-                }
-              )}
-            >
-              <div className="flex items-center">
-                <div className="ml-2">
-                  <h2 className="text-base font-semibold leading-7">{price.name}</h2>
-                  <p className="h-12 text-sm leading-5 text-gray-300">{price.description}</p>
+        <div className="grid gap-4 md:grid-cols-2">
+          {features.map((f) => (
+            <div key={f.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.05]">
+              <div className="flex items-start gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
+                  <f.icon className="h-5 w-5 text-cyan-300" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-white">{f.title}</p>
+                  <p className="mt-1 text-sm text-gray-400">{f.desc}</p>
                 </div>
               </div>
-
-              <motion.div
-                key={`${price.id}-${interval}`}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.4,
-                  delay: 0.1 + idx * 0.05,
-                  ease: [0.21, 0.47, 0.32, 0.98],
-                }}
-                className="flex flex-row gap-1"
-              >
-                <span className="text-4xl font-bold text-white">
-                  {price.monthlyPrice === 0 ? 'Kostenlos' : (
-                    <>
-                      {toHumanPrice(interval === 'year' ? price.yearlyPrice : price.monthlyPrice)}€
-                      <span className="text-xs text-gray-400"> / {interval === 'year' ? 'Jahr' : 'Monat'}</span>
-                    </>
-                  )}
-                </span>
-              </motion.div>
-
-              <button
-                onClick={onStartApp}
-                className={cn(
-                  'group relative w-full gap-2 overflow-hidden rounded-lg py-3 text-base font-semibold tracking-tight transition-all duration-300',
-                  price.isMostPopular
-                    ? 'bg-white text-black hover:bg-gray-200'
-                    : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
-                )}
-              >
-                <span className="absolute right-0 -mt-12 h-32 w-8 translate-x-12 rotate-12 transform-gpu bg-white opacity-10 transition-all duration-1000 ease-out group-hover:-translate-x-96" />
-                {price.monthlyPrice === 0 ? 'Kostenlos starten' : 'Jetzt upgraden'}
-              </button>
-
-              <hr className="m-0 h-px w-full border-none bg-gradient-to-r from-neutral-800/0 via-neutral-500/30 to-neutral-800/0" />
-
-              {price.features.length > 0 && (
-                <ul className="flex flex-col gap-2 font-normal">
-                  {price.features.map((feature, fidx) => (
-                    <li key={fidx} className="flex items-center gap-3 text-xs font-medium text-white">
-                      <CheckCircle2 className="h-5 w-5 shrink-0 rounded-full bg-green-500/20 text-green-400 p-[2px]" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* ═══════════ CTA SECTION ═══════════ */}
-      <section id="cta" className="py-14">
-        <div className="flex w-full flex-col items-center justify-center">
-          <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
-            <Marquee reverse className="-delay-[200ms] [--duration:20s]" repeat={5}>
-              {randomTiles1.map((tile, idx) => (
-                <CTACard key={idx} {...tile} />
-              ))}
-            </Marquee>
-            <Marquee reverse className="[--duration:30s]" repeat={5}>
-              {randomTiles2.map((tile, idx) => (
-                <CTACard key={idx} {...tile} />
-              ))}
-            </Marquee>
-            <Marquee reverse className="-delay-[200ms] [--duration:20s]" repeat={5}>
-              {randomTiles3.map((tile, idx) => (
-                <CTACard key={idx} {...tile} />
-              ))}
-            </Marquee>
-            <Marquee reverse className="[--duration:30s]" repeat={5}>
-              {randomTiles4.map((tile, idx) => (
-                <CTACard key={idx} {...tile} />
-              ))}
-            </Marquee>
+      <section id="how" className="mx-auto max-w-6xl px-6 py-14">
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold tracking-tight text-white">Intuitive Nutzendenfuehrung</h2>
+          <p className="mt-2 text-sm text-gray-400">
+            Die App ist als klarer Prozess gedacht: importieren, verstehen, dokumentieren.
+          </p>
+        </div>
 
-            {/* Center CTA Overlay */}
-            <div className="absolute z-10">
-              <div className="mx-auto size-24 rounded-[2rem] border border-white/10 bg-[#0c1222]/80 p-3 shadow-2xl backdrop-blur-md lg:size-32">
-                <BarChart3 className="mx-auto size-16 text-white lg:size-24" />
+        <div className="grid gap-4 md:grid-cols-3">
+          {steps.map((s) => (
+            <div key={s.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
+                  <s.icon className="h-5 w-5 text-cyan-300" />
+                </span>
+                <p className="text-sm font-semibold text-white">{s.title}</p>
               </div>
-              <div className="z-10 mt-4 flex flex-col items-center text-center text-white">
-                <h1 className="text-3xl font-semibold lg:text-4xl">
-                  Bereit für smartes Controlling?
-                </h1>
-                <p className="mt-2 text-gray-300">
-                  Starten Sie jetzt kostenlos. Keine Kreditkarte nötig.
-                </p>
-                <button
-                  onClick={onStartApp}
-                  className="group mt-4 inline-flex items-center gap-2 rounded-[2rem] border border-white/20 bg-white/10 px-6 py-2.5 text-sm font-medium text-white hover:bg-white/20 transition-all"
-                >
-                  Jetzt starten
-                  <ChevronRight className="ml-1 size-4 transition-all duration-300 ease-out group-hover:translate-x-1" />
-                </button>
-              </div>
-              <div className="absolute inset-0 -z-10 rounded-full bg-[#0c1222] opacity-40 blur-xl" />
+              <p className="mt-3 text-sm text-gray-400">{s.desc}</p>
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-b from-transparent to-[#0c1222] to-70%" />
+          ))}
+        </div>
+      </section>
+
+      <section id="security" className="mx-auto max-w-6xl px-6 py-14">
+        <div className="grid gap-8 md:grid-cols-2 md:items-start">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-white">Sicherheit und Betrieb</h2>
+            <p className="mt-2 text-sm text-gray-400">
+              Default-secure: sensible Endpunkte sind geschuetzt, und fuer Produktion gibt es klare Schalter.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <ul className="space-y-3 text-sm text-gray-300">
+              <li className="flex gap-2">
+                <span className="mt-0.5 text-cyan-300">•</span>
+                Demo-User in Produktion deaktiviert (<span className="font-mono">ENABLE_DEMO_USERS=false</span>).
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-0.5 text-cyan-300">•</span>
+                Bootstrap-Admin ueber <span className="font-mono">ADMIN_BOOTSTRAP_*</span> wenn User-DB leer ist.
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-0.5 text-cyan-300">•</span>
+                SQL-API ist aus; optional per <span className="font-mono">QUERY_API_ENABLED</span> + Token.
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-0.5 text-cyan-300">•</span>
+                Dokumente optional per <span className="font-mono">DOCUMENT_ACCESS_TOKEN</span> schuetzbar.
+              </li>
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* ═══════════ FOOTER ═══════════ */}
-      <footer id="contact" className="bg-[#06080f]">
-        <div className="mx-auto w-full max-w-screen-xl xl:pb-2">
-          <div className="md:flex md:justify-between px-8 p-4 py-16 sm:pb-16 gap-4">
-            <div className="mb-12 flex-col flex gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-one)] to-[var(--color-two)] flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4 text-white" />
-                </div>
-                <span className="text-2xl font-semibold text-white">
-                  Premium Controlling
-                </span>
-              </div>
-              <p className="max-w-xs text-gray-400 text-sm">KI-Controlling-Suite für den deutschen Mittelstand</p>
-            </div>
-            <div className="grid grid-cols-1 gap-8 sm:gap-10 sm:grid-cols-3">
-              {footerNavs.map((nav) => (
-                <div key={nav.label}>
-                  <h2 className="mb-6 text-sm tracking-tighter font-medium text-white uppercase">
-                    {nav.label}
-                  </h2>
-                  <ul className="gap-2 grid">
-                    {nav.items.map((item) => (
-                      <li key={item.name}>
-                        <a
-                          href={item.href}
-                          className="cursor-pointer text-gray-400 hover:text-gray-200 duration-200 font-[450] text-sm"
-                        >
-                          {item.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border-t border-white/[0.10] py-4 px-8 gap-2">
-            <span className="text-sm text-gray-500">
-              Copyright © {new Date().getFullYear()}{' '}
-              <span className="cursor-pointer">Premium Controlling</span>. Alle Rechte vorbehalten.
-            </span>
-            <span className="text-sm text-gray-500">
-              Entwickelt für den deutschen Mittelstand
-            </span>
+      <footer className="border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-10 text-sm text-gray-400 md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Premium Controlling Engine</p>
+          <div className="flex items-center gap-6">
+            <Link href="/app" className="text-gray-300 hover:text-white">App</Link>
+            <a href="#security" className="text-gray-300 hover:text-white">Security</a>
+            <a href="#features" className="text-gray-300 hover:text-white">Features</a>
           </div>
         </div>
       </footer>

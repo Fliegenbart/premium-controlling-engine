@@ -8,6 +8,7 @@ import { getDocument, searchDocument, quickSearch } from '@/lib/doc-index';
 import { documentQuerySchema } from '@/lib/validation';
 import { enforceRateLimit, getRequestId, jsonError, requireDocumentToken, sanitizeError } from '@/lib/api-helpers';
 import { getHybridLLMService } from '@/lib/llm/hybrid-service';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(
   request: NextRequest,
@@ -15,8 +16,15 @@ export async function POST(
 ) {
   const requestId = getRequestId();
   try {
-    const tokenError = requireDocumentToken(request);
-    if (tokenError) return tokenError;
+    const auth = await requireSessionUser(request, { permission: 'view', requestId });
+    if (auth instanceof NextResponse) {
+      if (process.env.DOCUMENT_ACCESS_TOKEN) {
+        const tokenError = requireDocumentToken(request);
+        if (tokenError) return tokenError;
+      } else {
+        return auth;
+      }
+    }
 
     const rateLimit = enforceRateLimit(request, { limit: 20, windowMs: 60_000 });
     if (rateLimit) return rateLimit;

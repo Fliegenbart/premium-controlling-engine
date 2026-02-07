@@ -4,9 +4,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { generateVarianceReport, generateTripleReport } from '@/lib/export-pdf';
+import { getRequestId, jsonError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'export', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const body = await request.json();
     const { type, data, options, filename } = body;
 
@@ -20,7 +26,7 @@ export async function POST(request: NextRequest) {
         buffer = await generateTripleReport(data, options);
         break;
       default:
-        return NextResponse.json({ error: 'Unbekannter Export-Typ' }, { status: 400 });
+        return jsonError('Unbekannter Export-Typ', 400, requestId);
     }
 
     return new NextResponse(new Uint8Array(buffer), {
@@ -31,9 +37,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('PDF export error:', error);
-    return NextResponse.json(
-      { error: 'PDF-Export fehlgeschlagen', details: (error as Error).message },
-      { status: 500 }
-    );
+    return jsonError('PDF-Export fehlgeschlagen', 500, requestId);
   }
 }

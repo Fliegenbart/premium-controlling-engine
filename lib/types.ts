@@ -368,6 +368,7 @@ export interface SQLQueryResponse {
   rowCount: number;
   executionTimeMs: number;
   error?: string;
+  requestId?: string;
 }
 
 export interface VarianceResult {

@@ -15,7 +15,8 @@ import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 import { getKnowledgeService } from '@/lib/rag/knowledge-service';
 import { TripleAnalysisResult } from '@/lib/types';
 import { INJECTION_GUARD, sanitizeForPrompt, wrapUntrusted } from '@/lib/prompt-utils';
-import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError, validateUploadFile } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('de-DE', {
@@ -28,6 +29,9 @@ const formatCurrency = (value: number) =>
 export async function POST(request: NextRequest) {
   const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
 
@@ -50,10 +54,40 @@ export async function POST(request: NextRequest) {
     if (!istFile) {
       return jsonError('Mindestens die Ist-Daten (aktuelle Buchungen) sind erforderlich', 400, requestId);
     }
-    const sizeLimit = 50 * 1024 * 1024;
-    const filesToCheck = [istFile, vjFile, planFile].filter(Boolean) as File[];
-    if (filesToCheck.some(file => file.size > sizeLimit)) {
-      return jsonError('Datei zu groß (max. 50MB)', 400, requestId);
+
+    const istError = validateUploadFile(istFile, {
+      maxBytes: 50 * 1024 * 1024,
+      allowedExtensions: ['.csv'],
+      label: 'Ist-Datei',
+    });
+    if (istError) return jsonError(istError, 400, requestId);
+
+    if (vjFile) {
+      const vjError = validateUploadFile(vjFile, {
+        maxBytes: 50 * 1024 * 1024,
+        allowedExtensions: ['.csv'],
+        label: 'Vorjahr-Datei',
+      });
+      if (vjError) return jsonError(vjError, 400, requestId);
+    }
+
+    if (planFile) {
+      const planError = validateUploadFile(planFile, {
+        maxBytes: 50 * 1024 * 1024,
+        allowedExtensions: ['.csv'],
+        label: 'Plan-Datei',
+      });
+      if (planError) return jsonError(planError, 400, requestId);
+    }
+
+    if (wesentlichkeitAbs < 0 || wesentlichkeitAbs > 10_000_000) {
+      return jsonError('Wesentlichkeit (absolut) außerhalb des erlaubten Bereichs', 400, requestId);
+    }
+    if (wesentlichkeitPct < 0 || wesentlichkeitPct > 100) {
+      return jsonError('Wesentlichkeit (%) außerhalb des erlaubten Bereichs', 400, requestId);
+    }
+    if (thresholdYellow < 0 || thresholdYellow > 100 || thresholdRed < 0 || thresholdRed > 100) {
+      return jsonError('Schwellenwerte (%) außerhalb des erlaubten Bereichs', 400, requestId);
     }
 
     // Parse files

@@ -12,50 +12,60 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadBookings, initDatabase, exportToParquet } from '@/lib/duckdb-engine';
 import { parseCSV, parseXLSX, detectFormat } from '@/lib/parsers';
-import { Booking, UploadResponse } from '@/lib/types';
+import { Booking } from '@/lib/types';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError, validateUploadFile } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
-export async function POST(request: NextRequest): Promise<NextResponse<UploadResponse | { error: string }>> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'upload', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 10, windowMs: 60_000, keyPrefix: '/api/upload' });
+    if (rateLimit) return rateLimit;
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const period = formData.get('period') as 'prev' | 'curr';
-    const tableName = formData.get('tableName') as string || `bookings_${period}`;
-    
-    if (!file) {
-      return NextResponse.json(
-        { error: 'Keine Datei hochgeladen' },
-        { status: 400 }
-      );
+
+    const fileError = validateUploadFile(file, {
+      maxBytes: 25 * 1024 * 1024,
+      allowedExtensions: ['.csv', '.xls', '.xlsx'],
+      label: 'Upload-Datei',
+    });
+    if (fileError) {
+      return jsonError(fileError, 400, requestId);
     }
-    
+
     if (!period || !['prev', 'curr'].includes(period)) {
-      return NextResponse.json(
-        { error: 'Period muss "prev" oder "curr" sein' },
-        { status: 400 }
-      );
+      return jsonError('Period muss "prev" oder "curr" sein', 400, requestId);
     }
-    
+
     // Initialize DuckDB
     await initDatabase(process.env.DATABASE_PATH);
-    
+
     // Detect file format and parse with confidence scoring
-    const content = await file.text();
-    const detection = detectFormat(content, file.name);
-
+    const lowerName = file.name.toLowerCase();
     let bookings: Booking[];
+    let detection: { format: string; confidence: number };
 
-    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+    if (lowerName.endsWith('.xlsx') || lowerName.endsWith('.xls')) {
       const buffer = await file.arrayBuffer();
       bookings = await parseXLSX(Buffer.from(buffer));
+      detection = { format: 'excel', confidence: 1 };
     } else {
-      bookings = parseCSV(content, detection.format);
+      const content = await file.text();
+      const detected = detectFormat(content, file.name);
+      detection = {
+        format: detected.format,
+        confidence: detected.confidence,
+      };
+      bookings = parseCSV(content, detected.format);
     }
     
     if (bookings.length === 0) {
-      return NextResponse.json(
-        { error: 'Keine gültigen Buchungen gefunden. Bitte Format prüfen.' },
-        { status: 400 }
-      );
+      return jsonError('Keine gültigen Buchungen gefunden. Bitte Format prüfen.', 400, requestId);
     }
     
     // Load into DuckDB
@@ -78,13 +88,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<UploadRes
       rowCount,
       detection
     });
-    
+
   } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json(
-      { error: `Upload fehlgeschlagen: ${(error as Error).message}` },
-      { status: 500 }
-    );
+    console.error('Upload error:', requestId, sanitizeError(error));
+    return jsonError('Upload fehlgeschlagen', 500, requestId);
   }
 }
 

@@ -5,10 +5,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHybridLLMService } from '@/lib/llm/hybrid-service';
 import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   const requestId = getRequestId();
   try {
+    const auth = await requireSessionUser(request, { permission: 'analyze', requestId });
+    if (auth instanceof NextResponse) return auth;
+
     const rateLimit = enforceRateLimit(request, { limit: 60, windowMs: 60_000 });
     if (rateLimit) return rateLimit;
 

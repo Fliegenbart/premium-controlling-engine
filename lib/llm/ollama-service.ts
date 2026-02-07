@@ -21,7 +21,8 @@ export interface OllamaResponse {
 
 const DEFAULT_CONFIG: OllamaConfig = {
   baseUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
-  model: process.env.OLLAMA_MODEL || 'llama3.1:8b',
+  // Align defaults with docker-compose + demo.sh (qwen2.5 works well for DE + tool calling).
+  model: process.env.OLLAMA_MODEL || 'qwen2.5:14b',
   timeout: 60000, // 60 seconds
 };
 

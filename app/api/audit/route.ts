@@ -4,32 +4,32 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuditLog, logAudit } from '@/lib/auth';
-import { validateSession, hasPermission } from '@/lib/auth';
-
-async function getUser(request: NextRequest) {
-  const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-  if (!token) return null;
-  const session = await validateSession(token);
-  return session.valid ? session.user : null;
-}
+import { hasPermission } from '@/lib/auth';
+import { enforceRateLimit, getRequestId, jsonError, sanitizeError } from '@/lib/api-helpers';
+import { requireSessionUser } from '@/lib/api-auth';
 
 export async function GET(request: NextRequest) {
+  const requestId = getRequestId();
   try {
-    const user = await getUser(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Nicht angemeldet' }, { status: 401 });
-    }
+    const auth = await requireSessionUser(request, { permission: 'view', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 30, windowMs: 60_000, keyPrefix: '/api/audit/get' });
+    if (rateLimit) return rateLimit;
+    const user = auth.user;
 
     // Only admins and controllers can view audit log
     if (!hasPermission(user, 'view')) {
-      return NextResponse.json({ error: 'Keine Berechtigung' }, { status: 403 });
+      return jsonError('Keine Berechtigung', 403, requestId);
     }
 
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') || undefined;
     const action = searchParams.get('action') || undefined;
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const rawLimit = parseInt(searchParams.get('limit') || '50');
+    const rawOffset = parseInt(searchParams.get('offset') || '0');
+    const limit = Number.isFinite(rawLimit) ? Math.max(1, Math.min(200, rawLimit)) : 50;
+    const offset = Number.isFinite(rawOffset) ? Math.max(0, rawOffset) : 0;
 
     // Non-admins can only see their own audit log
     const filterUserId = hasPermission(user, '*') ? userId : user.id;
@@ -52,23 +52,29 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Audit GET error:', error);
-    return NextResponse.json({ error: 'Fehler beim Laden des Audit-Logs' }, { status: 500 });
+    console.error('Audit GET error:', requestId, sanitizeError(error));
+    return jsonError('Fehler beim Laden des Audit-Logs', 500, requestId);
   }
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId();
   try {
-    const user = await getUser(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Nicht angemeldet' }, { status: 401 });
-    }
+    const auth = await requireSessionUser(request, { permission: 'view', requestId });
+    if (auth instanceof NextResponse) return auth;
+
+    const rateLimit = enforceRateLimit(request, { limit: 40, windowMs: 60_000, keyPrefix: '/api/audit/post' });
+    if (rateLimit) return rateLimit;
+    const user = auth.user;
 
     const body = await request.json();
     const { action, resource, details } = body;
 
     if (!action || !resource) {
-      return NextResponse.json({ error: 'action und resource erforderlich' }, { status: 400 });
+      return jsonError('action und resource erforderlich', 400, requestId);
+    }
+    if (typeof action !== 'string' || action.length > 100 || typeof resource !== 'string' || resource.length > 200) {
+      return jsonError('Ungültige action/resource Werte', 400, requestId);
     }
 
     // Get IP from request
@@ -80,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Audit POST error:', error);
-    return NextResponse.json({ error: 'Audit-Eintrag konnte nicht erstellt werden' }, { status: 500 });
+    console.error('Audit POST error:', requestId, sanitizeError(error));
+    return jsonError('Audit-Eintrag konnte nicht erstellt werden', 500, requestId);
   }
 }

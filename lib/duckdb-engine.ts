@@ -26,6 +26,46 @@ import { Booking, DataProfile, VarianceResult, TimeSeriesPoint } from './types';
 
 // Singleton DuckDB instance
 let db: any = null;
+const SQL_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+function sanitizeIdentifier(identifier: string, label: string): string {
+  const value = identifier.trim();
+  if (!SQL_IDENTIFIER.test(value)) {
+    throw new Error(`Ungültiger ${label}`);
+  }
+  return value;
+}
+
+export function sanitizeQualifiedTableName(
+  tableName: string,
+  options: { defaultSchema?: string; allowedSchemas?: string[] } = {}
+): string {
+  const trimmed = tableName.trim();
+  const parts = trimmed.split('.');
+  if (parts.length > 2 || parts.length === 0) {
+    throw new Error('Ungültiger Tabellenname');
+  }
+
+  const defaultSchema = options.defaultSchema || 'controlling';
+  const schema = parts.length === 2 ? parts[0] : defaultSchema;
+  const table = parts.length === 2 ? parts[1] : parts[0];
+  const safeSchema = sanitizeIdentifier(schema, 'Schema');
+  const safeTable = sanitizeIdentifier(table, 'Tabellenname');
+
+  if (options.allowedSchemas && !options.allowedSchemas.includes(safeSchema)) {
+    throw new Error(`Schema nicht erlaubt: ${safeSchema}`);
+  }
+
+  return `${safeSchema}.${safeTable}`;
+}
+
+function stripSqlCommentsAndLiterals(sql: string): string {
+  return sql
+    .replace(/--.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/'([^']|'')*'/g, "''")
+    .replace(/"([^"]|"")*"/g, '""');
+}
 
 /**
  * Initialize DuckDB with in-memory database
@@ -81,14 +121,16 @@ export async function executeSQL(sql: string): Promise<{
   const database = await getDatabase();
   const start = Date.now();
 
-  // Basic SQL injection prevention
-  const sanitized = sql.trim().toLowerCase();
-  if (
-    sanitized.includes('drop') ||
-    sanitized.includes('delete') ||
-    sanitized.includes('truncate')
-  ) {
+  // Enforce read-only queries for this helper.
+  const normalized = stripSqlCommentsAndLiterals(sql).trim();
+  if (!/^(SELECT|WITH|EXPLAIN)\b/i.test(normalized)) {
+    throw new Error('Only read-only queries are allowed');
+  }
+  if (/\b(INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|CREATE|REPLACE|GRANT|REVOKE|COPY)\b/i.test(normalized)) {
     throw new Error('Destructive operations not allowed');
+  }
+  if (/;[\s\S]+\S/.test(normalized)) {
+    throw new Error('Multiple statements are not allowed');
   }
 
   return new Promise((resolve, reject) => {
@@ -130,7 +172,9 @@ export async function loadBookings(
   tableName: string,
   schema: string = 'controlling'
 ): Promise<{ rowCount: number; profile: DataProfile }> {
-  const fullTableName = `${schema}.${tableName}`;
+  const fullTableName = sanitizeQualifiedTableName(`${schema}.${tableName}`, {
+    allowedSchemas: ['controlling', 'staging', 'analysis'],
+  });
 
   // Drop existing table
   await runSQL(`DROP TABLE IF EXISTS ${fullTableName}`);
@@ -194,6 +238,10 @@ function escape(str: string): string {
  * Profile a table for data quality
  */
 export async function profileTable(tableName: string): Promise<DataProfile> {
+  const safeTableName = sanitizeQualifiedTableName(tableName, {
+    allowedSchemas: ['controlling', 'staging', 'analysis'],
+  });
+
   const statsResult = await executeSQL(`
     SELECT
       COUNT(*) as row_count,
@@ -208,7 +256,7 @@ export async function profileTable(tableName: string): Promise<DataProfile> {
       COUNT(CASE WHEN amount IS NULL THEN 1 END) as null_amounts,
       COUNT(CASE WHEN posting_date IS NULL THEN 1 END) as null_dates,
       COUNT(CASE WHEN account IS NULL THEN 1 END) as null_accounts
-    FROM ${tableName}
+    FROM ${safeTableName}
   `);
 
   const s = statsResult.rows[0] as Record<string, unknown>;
@@ -216,7 +264,7 @@ export async function profileTable(tableName: string): Promise<DataProfile> {
   // Duplicate check
   const dupResult = await executeSQL(`
     SELECT document_no, COUNT(*) as cnt
-    FROM ${tableName}
+    FROM ${safeTableName}
     GROUP BY document_no
     HAVING COUNT(*) > 1
     LIMIT 10
@@ -225,8 +273,8 @@ export async function profileTable(tableName: string): Promise<DataProfile> {
   // Outlier detection (simplified)
   const outlierResult = await executeSQL(`
     SELECT COUNT(*) as outlier_count
-    FROM ${tableName}
-    WHERE ABS(amount) > (SELECT AVG(ABS(amount)) + 3 * STDDEV(ABS(amount)) FROM ${tableName})
+    FROM ${safeTableName}
+    WHERE ABS(amount) > (SELECT AVG(ABS(amount)) + 3 * STDDEV(ABS(amount)) FROM ${safeTableName})
   `);
 
   const warnings: string[] = [];
@@ -273,15 +321,18 @@ export async function analyzeVariance(
   tablePrev: string,
   tableCurr: string
 ): Promise<VarianceResult[]> {
+  const safePrev = sanitizeQualifiedTableName(tablePrev, { allowedSchemas: ['controlling', 'staging', 'analysis'] });
+  const safeCurr = sanitizeQualifiedTableName(tableCurr, { allowedSchemas: ['controlling', 'staging', 'analysis'] });
+
   const result = await executeSQL(`
     WITH prev AS (
       SELECT account, account_name, SUM(amount) as amount_prev, COUNT(*) as count_prev
-      FROM ${tablePrev}
+      FROM ${safePrev}
       GROUP BY account, account_name
     ),
     curr AS (
       SELECT account, account_name, SUM(amount) as amount_curr, COUNT(*) as count_curr
-      FROM ${tableCurr}
+      FROM ${safeCurr}
       GROUP BY account, account_name
     )
     SELECT
@@ -322,12 +373,16 @@ export async function getTopBookings(
   account: number,
   limit: number = 10
 ): Promise<Booking[]> {
+  const safeTable = sanitizeQualifiedTableName(tableName, { allowedSchemas: ['controlling', 'staging', 'analysis'] });
+  const safeAccount = Number.isFinite(account) ? Math.trunc(account) : 0;
+  const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(500, Math.trunc(limit))) : 10;
+
   const result = await executeSQL(`
     SELECT *
-    FROM ${tableName}
-    WHERE account = ${account}
+    FROM ${safeTable}
+    WHERE account = ${safeAccount}
     ORDER BY ABS(amount) DESC
-    LIMIT ${limit}
+    LIMIT ${safeLimit}
   `);
 
   return result.rows.map((r) => ({
@@ -361,10 +416,17 @@ export async function decomposeVariance(
     contributionPct: number;
   }>;
 }> {
+  const safePrev = sanitizeQualifiedTableName(tablePrev, { allowedSchemas: ['controlling', 'staging', 'analysis'] });
+  const safeCurr = sanitizeQualifiedTableName(tableCurr, { allowedSchemas: ['controlling', 'staging', 'analysis'] });
+  const safeAccount = Number.isFinite(targetAccount) ? Math.trunc(targetAccount) : 0;
+  const allowedDimensions = new Set(['vendor', 'cost_center', 'text', 'profit_center', 'customer', 'account_name']);
+  const safeDimensions = dimensions.filter((d) => allowedDimensions.has(d));
+  const dimsToUse = safeDimensions.length > 0 ? safeDimensions : ['vendor', 'cost_center', 'text'];
+
   // Get total variance first
   const totalResult = await executeSQL(`
-    WITH prev AS (SELECT SUM(amount) as total FROM ${tablePrev} WHERE account = ${targetAccount}),
-         curr AS (SELECT SUM(amount) as total FROM ${tableCurr} WHERE account = ${targetAccount})
+    WITH prev AS (SELECT SUM(amount) as total FROM ${safePrev} WHERE account = ${safeAccount}),
+         curr AS (SELECT SUM(amount) as total FROM ${safeCurr} WHERE account = ${safeAccount})
     SELECT COALESCE(curr.total, 0) - COALESCE(prev.total, 0) as variance
     FROM prev, curr
   `);
@@ -378,18 +440,18 @@ export async function decomposeVariance(
   }> = [];
 
   // Analyze each dimension
-  for (const dim of dimensions) {
+  for (const dim of dimsToUse) {
     const dimResult = await executeSQL(`
       WITH prev AS (
         SELECT ${dim} as key, SUM(amount) as amount
-        FROM ${tablePrev}
-        WHERE account = ${targetAccount}
+        FROM ${safePrev}
+        WHERE account = ${safeAccount}
         GROUP BY ${dim}
       ),
       curr AS (
         SELECT ${dim} as key, SUM(amount) as amount
-        FROM ${tableCurr}
-        WHERE account = ${targetAccount}
+        FROM ${safeCurr}
+        WHERE account = ${safeAccount}
         GROUP BY ${dim}
       )
       SELECT
@@ -430,6 +492,8 @@ export async function getTimeSeries(
   metric: 'amount' | 'count' = 'amount',
   groupBy: 'month' | 'quarter' = 'month'
 ): Promise<TimeSeriesPoint[]> {
+  const safeTable = sanitizeQualifiedTableName(tableName, { allowedSchemas: ['controlling', 'staging', 'analysis'] });
+
   const dateGroup =
     groupBy === 'month'
       ? "DATE_TRUNC('month', posting_date)"
@@ -443,7 +507,7 @@ export async function getTimeSeries(
       ${metricExpr} as value,
       COUNT(*) as transaction_count,
       COUNT(DISTINCT account) as unique_accounts
-    FROM ${tableName}
+    FROM ${safeTable}
     GROUP BY ${dateGroup}
     ORDER BY period
   `);
@@ -467,9 +531,12 @@ export async function getConnection(): Promise<any> {
  * Export table to Parquet file
  */
 export async function exportToParquet(tableName: string, filePath: string): Promise<void> {
+  const safeTable = sanitizeQualifiedTableName(tableName, {
+    allowedSchemas: ['controlling', 'staging', 'analysis'],
+  });
   const database = await getDatabase();
   return new Promise((resolve, reject) => {
-    database.run(`COPY ${tableName} TO '${filePath}' (FORMAT PARQUET)`, (err: any) => {
+    database.run(`COPY ${safeTable} TO '${filePath}' (FORMAT PARQUET)`, (err: any) => {
       if (err) reject(err);
       else resolve();
     });

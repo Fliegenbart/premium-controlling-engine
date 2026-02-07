@@ -6,6 +6,9 @@ import {
   enforceRateLimit,
   jsonError,
   requireDocumentToken,
+  getBearerToken,
+  requireApiToken,
+  validateUploadFile,
 } from '../lib/api-helpers';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -508,6 +511,7 @@ describe('api-helpers - API-Hilfsfunktionen', () => {
     beforeEach(() => {
       // Reset env before each test
       delete process.env.DOCUMENT_ACCESS_TOKEN;
+      delete process.env.ALLOW_QUERY_TOKEN;
     });
 
     it('sollte null zurückgeben wenn kein Token erforderlich', () => {
@@ -546,8 +550,23 @@ describe('api-helpers - API-Hilfsfunktionen', () => {
       expect(result).toBeNull();
     });
 
-    it('sollte Token in Query-Parameter akzeptieren', () => {
+    it('sollte Query-Token standardmäßig NICHT akzeptieren', async () => {
       process.env.DOCUMENT_ACCESS_TOKEN = 'secret-token-789';
+
+      const request = createMockRequest({
+        query: { token: 'secret-token-789' },
+      });
+
+      const result = requireDocumentToken(request);
+
+      expect(result?.status).toBe(401);
+      const json = await result?.json();
+      expect(json?.error).toContain('autorisiert');
+    });
+
+    it('sollte Query-Token akzeptieren wenn explizit aktiviert', () => {
+      process.env.DOCUMENT_ACCESS_TOKEN = 'secret-token-789';
+      process.env.ALLOW_QUERY_TOKEN = 'true';
 
       const request = createMockRequest({
         query: { token: 'secret-token-789' },
@@ -612,6 +631,7 @@ describe('api-helpers - API-Hilfsfunktionen', () => {
 
     it('sollte Bearer vor Query-Token bevorzugen', () => {
       process.env.DOCUMENT_ACCESS_TOKEN = 'correct-token';
+      process.env.ALLOW_QUERY_TOKEN = 'true';
 
       const request = createMockRequest({
         headers: { 'authorization': 'Bearer correct-token' },
@@ -633,6 +653,63 @@ describe('api-helpers - API-Hilfsfunktionen', () => {
       expect(result?.status).toBe(401);
       const json = await result?.json();
       expect(json?.error).toContain('autorisiert');
+    });
+  });
+
+  describe('getBearerToken', () => {
+    it('sollte gültigen Bearer-Token extrahieren', () => {
+      const request = createMockRequest({
+        headers: { authorization: 'Bearer abc123' },
+      });
+      expect(getBearerToken(request)).toBe('abc123');
+    });
+
+    it('sollte bei ungültigem Header null liefern', () => {
+      const request = createMockRequest({
+        headers: { authorization: 'Basic xyz' },
+      });
+      expect(getBearerToken(request)).toBeNull();
+    });
+  });
+
+  describe('requireApiToken', () => {
+    beforeEach(() => {
+      delete process.env.API_ACCESS_TOKEN;
+    });
+
+    it('sollte 503 liefern wenn API Token nicht konfiguriert ist', () => {
+      const request = createMockRequest();
+      const result = requireApiToken(request);
+      expect(result?.status).toBe(503);
+    });
+
+    it('sollte x-api-token akzeptieren', () => {
+      process.env.API_ACCESS_TOKEN = 'secure-123';
+      const request = createMockRequest({
+        headers: { 'x-api-token': 'secure-123' },
+      });
+      const result = requireApiToken(request);
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('validateUploadFile', () => {
+    it('sollte ungültige Endung ablehnen', () => {
+      const file = new File(['abc'], 'test.exe', { type: 'application/octet-stream' });
+      const error = validateUploadFile(file, {
+        maxBytes: 1024 * 1024,
+        allowedExtensions: ['.csv'],
+      });
+      expect(error).toContain('nicht unterstütztes Format');
+    });
+
+    it('sollte gültige Datei akzeptieren', () => {
+      const file = new File(['a,b\n1,2'], 'test.csv', { type: 'text/csv' });
+      const error = validateUploadFile(file, {
+        maxBytes: 1024 * 1024,
+        allowedExtensions: ['.csv'],
+      });
+      expect(error).toBeNull();
     });
   });
 
