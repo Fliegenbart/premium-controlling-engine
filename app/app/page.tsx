@@ -1717,7 +1717,17 @@ export default function Home() {
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
                     <YAxis type="category" dataKey="name" tick={{ fill: '#9ca3af', fontSize: 11 }} width={100} />
-                    <Tooltip formatter={(v) => formatCurrency(v as number)} contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #2d2d44', borderRadius: '8px' }} labelStyle={{ color: '#fff' }} />
+                    <Tooltip
+                      formatter={(v) => [formatCurrency(v as number), 'Abweichung']}
+                      contentStyle={{
+                        backgroundColor: '#1a1a2e',
+                        border: '1px solid #2d2d44',
+                        borderRadius: '8px',
+                        color: '#e5e7eb',
+                      }}
+                      labelStyle={{ color: '#fff' }}
+                      itemStyle={{ color: '#e5e7eb' }}
+                    />
                     <Bar dataKey={mode === 'multi' ? 'deviation' : 'value'} radius={[0, 4, 4, 0]}>
                       {(mode === 'multi' ? benchmarkChartData : topDeviationsData).map((entry, i) => (
                         <Cell key={i} fill={entry.fill} />
@@ -1743,7 +1753,17 @@ export default function Home() {
                       cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={5} dataKey="value"
                       label={({ name, value }) => value > 0 ? `${name}` : ''}
                     />
-                    <Tooltip formatter={(v) => formatCurrency(v as number)} contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid #2d2d44', borderRadius: '8px' }} />
+                    <Tooltip
+                      formatter={(v) => formatCurrency(v as number)}
+                      contentStyle={{
+                        backgroundColor: '#1a1a2e',
+                        border: '1px solid #2d2d44',
+                        borderRadius: '8px',
+                        color: '#e5e7eb',
+                      }}
+                      labelStyle={{ color: '#fff' }}
+                      itemStyle={{ color: '#e5e7eb' }}
+                    />
                     <Legend formatter={v => <span style={{ color: '#9ca3af' }}>{v}</span>} />
                   </RechartsPie>
                 </ResponsiveContainer>

@@ -55,9 +55,6 @@ export function MagicCard({
       onMouseMove={handleMouseMove}
       onMouseOut={handleMouseOut}
     >
-      <div className="absolute inset-px rounded-[inherit] z-10">
-        {children}
-      </div>
       <motion.div
         className="pointer-events-none absolute inset-px rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
@@ -67,6 +64,10 @@ export function MagicCard({
           opacity: gradientOpacity,
         }}
       />
+      {/* Children must stay in normal flow so the card contributes height/width to the layout. */}
+      <div className="relative z-10">
+        {children}
+      </div>
     </div>
   );
 }
