@@ -65,29 +65,29 @@ function EmptyState() {
         />
         <motion.path
           d="M 150 80 C 180 120, 220 120, 260 80"
-          stroke="#3b82f6" strokeWidth="2.5" fill="none" strokeLinecap="round"
+          stroke="#a855f7" strokeWidth="2.5" fill="none" strokeLinecap="round"
           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
           transition={{ duration: 1.5, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut', delay: 0.5 }}
         />
         <motion.path
           d="M 80 130 C 120 90, 180 90, 220 130"
-          stroke="#a855f7" strokeWidth="2.5" fill="none" strokeLinecap="round"
+          stroke="#ec4899" strokeWidth="2.5" fill="none" strokeLinecap="round"
           initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
           transition={{ duration: 1.5, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut', delay: 1 }}
         />
         {/* Center node */}
-        <motion.circle cx="150" cy="80" r="12" fill="#080b16" stroke="#06b6d4" strokeWidth="2"
+        <motion.circle cx="150" cy="80" r="12" fill="#080b16" stroke="#ec4899" strokeWidth="2"
           animate={{ r: [12, 15, 12] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
-        <motion.circle cx="150" cy="80" r="6" fill="#06b6d4" opacity="0.5"
+        <motion.circle cx="150" cy="80" r="6" fill="#ec4899" opacity="0.5"
           animate={{ r: [6, 9, 6], opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
         />
         {/* Labels */}
         <text x="40" y="75" fill="#10b981" fontSize="9" opacity="0.7">Operativ</text>
-        <text x="235" y="75" fill="#3b82f6" fontSize="9" opacity="0.7">Invest</text>
-        <text x="130" y="150" fill="#a855f7" fontSize="9" opacity="0.7">Finanz</text>
+        <text x="235" y="75" fill="#a855f7" fontSize="9" opacity="0.7">Invest</text>
+        <text x="130" y="150" fill="#ec4899" fontSize="9" opacity="0.7">Finanz</text>
       </svg>
       <h3 className="text-xl font-semibold text-white mb-2">Kapitalflussrechnung (DRS 21)</h3>
       <p className="text-gray-400 text-center max-w-md text-sm">
@@ -181,7 +181,7 @@ function NettoBanner({ result }: { result: CashflowResult }) {
         <div className="flex gap-6">
           <div className="text-right">
             <p className="text-[10px] text-gray-500 uppercase tracking-wider">Free CF</p>
-            <p className={`text-lg font-semibold ${result.freeCashflow >= 0 ? 'text-cyan-400' : 'text-orange-400'}`}>
+            <p className={`text-lg font-semibold ${result.freeCashflow >= 0 ? 'text-pink-300' : 'text-orange-400'}`}>
               {formatCurrency(result.freeCashflow)}
             </p>
           </div>
@@ -252,9 +252,9 @@ function MonthlyChart({ monthly }: { monthly: CashflowResult['monthly'] }) {
             contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', color: '#fff', fontSize: 12 }}
           />
           <Bar dataKey="operating" fill="#10b981" name="Operativ" radius={[3, 3, 0, 0]} opacity={0.7} />
-          <Bar dataKey="investing" fill="#3b82f6" name="Investition" radius={[3, 3, 0, 0]} opacity={0.7} />
-          <Bar dataKey="financing" fill="#a855f7" name="Finanzierung" radius={[3, 3, 0, 0]} opacity={0.7} />
-          <Line type="monotone" dataKey="cumulativeCashflow" stroke="#06b6d4" strokeWidth={2} name="Kumuliert" dot={false} />
+          <Bar dataKey="investing" fill="#a855f7" name="Investition" radius={[3, 3, 0, 0]} opacity={0.7} />
+          <Bar dataKey="financing" fill="#ec4899" name="Finanzierung" radius={[3, 3, 0, 0]} opacity={0.7} />
+          <Line type="monotone" dataKey="cumulativeCashflow" stroke="#f472b6" strokeWidth={2} name="Kumuliert" dot={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </motion.div>

@@ -73,7 +73,7 @@ export function NLQueryBar() {
     <div className="mb-6">
       {/* Search Bar */}
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-center bg-[#12121a] rounded-xl border border-white/10 focus-within:border-blue-500/50 transition-colors">
+        <div className="flex items-center bg-[#0b0614] rounded-xl border border-white/10 focus-within:border-pink-400/60 focus-within:ring-4 focus-within:ring-pink-400/10 transition-colors">
           <Search className="w-5 h-5 text-gray-500 ml-4" />
           <input
             type="text"
@@ -94,7 +94,7 @@ export function NLQueryBar() {
           <button
             type="submit"
             disabled={!query.trim() || isLoading}
-            className="m-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+            className="m-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors flex items-center gap-2 bg-gradient-to-br from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-400"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Abfragen
@@ -126,11 +126,11 @@ export function NLQueryBar() {
 
       {/* Results */}
       {result && (
-        <div className="mt-4 bg-[#12121a] rounded-xl border border-white/10 overflow-hidden">
+        <div className="mt-4 bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] overflow-hidden">
           {/* Result Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <Database className="w-4 h-4 text-blue-400" />
+              <Database className="w-4 h-4 text-pink-300" />
               <span className="text-white text-sm font-medium">
                 {result.result.rowCount} Ergebnis{result.result.rowCount !== 1 ? 'se' : ''}
               </span>

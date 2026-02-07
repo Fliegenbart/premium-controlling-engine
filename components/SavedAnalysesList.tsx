@@ -69,7 +69,7 @@ export function SavedAnalysesList({
 
   const statusConfig = {
     draft: { icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/20', label: 'Entwurf' },
-    review: { icon: Eye, color: 'text-blue-400', bg: 'bg-blue-500/20', label: 'Prüfung' },
+    review: { icon: Eye, color: 'text-fuchsia-300', bg: 'bg-fuchsia-500/20', label: 'Prüfung' },
     approved: { icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/20', label: 'Freigegeben' },
   };
 
@@ -80,7 +80,7 @@ export function SavedAnalysesList({
       {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#12121a] rounded-2xl border border-white/10 max-w-lg w-full p-6">
+          <div className="bg-[#0b0614] rounded-2xl border border-white/10 max-w-lg w-full p-6 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.85)]">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Analysen importieren</h3>
               <button
@@ -94,7 +94,7 @@ export function SavedAnalysesList({
               value={importText}
               onChange={(e) => setImportText(e.target.value)}
               placeholder="JSON-Daten hier einfügen..."
-              className="w-full h-48 bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm font-mono placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              className="w-full h-48 bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm font-mono placeholder-gray-500 focus:outline-none focus:border-pink-400/70 focus:ring-4 focus:ring-pink-400/10"
             />
             <div className="flex gap-3 mt-4">
               <button
@@ -106,7 +106,7 @@ export function SavedAnalysesList({
               <button
                 onClick={handleImport}
                 disabled={!importText.trim()}
-                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white rounded-lg"
+                className="flex-1 py-2 rounded-lg text-white font-semibold transition-colors bg-gradient-to-br from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-400"
               >
                 Importieren
               </button>
@@ -116,13 +116,13 @@ export function SavedAnalysesList({
       )}
 
       {/* Saved Analyses Panel */}
-      <div className="bg-[#12121a] rounded-2xl border border-white/10 mb-8 overflow-hidden">
+      <div className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] mb-8 overflow-hidden">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <History className="w-5 h-5 text-blue-400" />
+            <History className="w-5 h-5 text-pink-300" />
             <span className="text-white font-medium">Gespeicherte Analysen</span>
             <span className="px-2 py-0.5 bg-white/10 rounded-full text-xs text-gray-400">
               {analyses.length}

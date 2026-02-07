@@ -587,7 +587,10 @@ export function BWADashboard({ bookings, prevBookings }: BWADashboardProps) {
                   backgroundColor: 'rgba(15, 23, 42, 0.95)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '8px',
+                  color: '#e5e7eb',
                 }}
+                labelStyle={{ color: '#fff' }}
+                itemStyle={{ color: '#e5e7eb' }}
                 formatter={(v: unknown) => {
                   if (typeof v === 'number') {
                     return `${v.toFixed(1)}%`;
@@ -633,6 +636,14 @@ export function BWADashboard({ bookings, prevBookings }: BWADashboardProps) {
                   }
                   return String(v ?? '');
                 }}
+                contentStyle={{
+                  backgroundColor: 'rgba(15, 17, 23, 0.95)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  color: '#e5e7eb',
+                }}
+                labelStyle={{ color: '#fff' }}
+                itemStyle={{ color: '#e5e7eb' }}
               />
               <Legend />
             </PieChart>

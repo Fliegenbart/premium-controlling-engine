@@ -45,7 +45,7 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
   };
 
   return (
-    <main className="min-h-screen bg-[#0b1220] flex items-center justify-center px-6">
+    <main className="min-h-screen bg-[#070511] flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="mb-6 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white">
@@ -72,7 +72,7 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-cyan-400/50 focus:outline-none focus:ring-4 focus:ring-cyan-400/10"
+                  className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-pink-400/60 focus:outline-none focus:ring-4 focus:ring-pink-400/10"
                   placeholder="name@firma.de"
                   autoComplete="email"
                   required
@@ -88,7 +88,7 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-cyan-400/50 focus:outline-none focus:ring-4 focus:ring-cyan-400/10"
+                  className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-pink-400/60 focus:outline-none focus:ring-4 focus:ring-pink-400/10"
                   placeholder="••••••••••••"
                   autoComplete="current-password"
                   required
@@ -105,7 +105,7 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500/90 px-4 py-2.5 text-sm font-semibold text-[#041014] hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-pink-400 to-fuchsia-400 px-4 py-2.5 text-sm font-semibold text-[#170610] shadow-[0_16px_60px_-30px_rgba(236,72,153,0.9)] hover:from-pink-300 hover:to-fuchsia-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Anmelden
@@ -121,4 +121,3 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
     </main>
   );
 }
-

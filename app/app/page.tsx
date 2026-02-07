@@ -80,16 +80,14 @@ import { MonthlyClosingDashboard } from '@/components/MonthlyClosingDashboard';
 import { ContributionDashboard } from '@/components/ContributionDashboard';
 import { CashflowDashboard } from '@/components/CashflowDashboard';
 import { BWADashboard } from '@/components/BWADashboard';
-import { BABDashboard } from '@/components/BABDashboard';
-import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
-import { NumberTicker } from '@/components/magicui/number-ticker';
-import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
-import { ShimmerButton } from '@/components/magicui/shimmer-button';
-import { BorderBeam } from '@/components/magicui/border-beam';
-import { MagicCard } from '@/components/magicui/magic-card';
-import { BlurFade } from '@/components/magicui/blur-fade';
-import { Meteors } from '@/components/magicui/meteors';
-import LoginScreen from '@/components/LoginScreen';
+	import { BABDashboard } from '@/components/BABDashboard';
+	import type { ErrorDetectionResult } from '@/lib/booking-error-detection';
+	import { NumberTicker } from '@/components/magicui/number-ticker';
+	import { ShimmerButton } from '@/components/magicui/shimmer-button';
+	import { BorderBeam } from '@/components/magicui/border-beam';
+	import { BlurFade } from '@/components/magicui/blur-fade';
+	import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid';
+	import LoginScreen from '@/components/LoginScreen';
 
 
 interface EntityUpload {
@@ -444,7 +442,7 @@ export default function Home() {
   // Auth gate: keep the application private by default.
   if (authChecking) {
     return (
-      <main className="min-h-screen bg-[#0b1220] flex items-center justify-center">
+      <main className="min-h-screen bg-[#070511] flex items-center justify-center">
         <div className="text-gray-300 text-sm">Session wird geladen...</div>
       </main>
     );
@@ -471,27 +469,27 @@ export default function Home() {
     group: 'home' | 'controlling' | 'analyse' | 'ki';
   }
 
-  const modeTabs: ModeTab[] = [
-    // ── Start ──
-    { key: 'start',        label: 'Start',          desc: 'Übersicht & nächste Schritte',      icon: Zap,          color: '#22d3ee', group: 'home' },
-    // ── Controlling ──
-    { key: 'liquidity',    label: 'Liquidität',     desc: '13-Wochen Cashflow-Prognose',     icon: TrendingUp,   color: '#3b82f6', group: 'controlling' },
-    { key: 'closing',      label: 'Abschluss',      desc: 'Monatsabschluss mit 12 Checks',   icon: CheckCircle,  color: '#22c55e', group: 'controlling' },
-    { key: 'contribution', label: 'DB-Rechnung',    desc: 'Mehrstufige DB I → DB V',         icon: BarChart3,    color: '#14b8a6', group: 'controlling' },
-    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#06b6d4', group: 'controlling' },
-    { key: 'bwa',          label: 'BWA',            desc: 'DATEV-BWA mit KI-Analyse',        icon: FileText,     color: '#f97316', group: 'controlling' },
-    { key: 'bab',          label: 'BAB',            desc: 'Kostenstellen & GK-Zuschläge',    icon: Grid3x3,      color: '#f43f5e', group: 'controlling' },
-    // ── Analyse ──
-    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#22d3ee', group: 'analyse' },
-    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#38bdf8', group: 'analyse' },
-    { key: 'multi',        label: 'Konzern',        desc: 'Multi-Entity Konsolidierung',     icon: Building2,    color: '#60a5fa', group: 'analyse' },
-    // ── KI-Tools ──
-    { key: 'errors',       label: 'Fehler-Scan',    desc: 'KI-Buchungsfehler-Erkennung',     icon: AlertCircle,  color: '#f43f5e', group: 'ki' },
-    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#0ea5e9', group: 'ki' },
-    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#06b6d4', group: 'ki' },
-    { key: 'trends',       label: 'Trends',         desc: 'Multi-Perioden Trendanalyse',     icon: Activity,     color: '#10b981', group: 'ki' },
-    { key: 'docs',         label: 'Dokumente',      desc: 'KI-Reports & Dokumenten-Archiv',  icon: FolderOpen,   color: '#f59e0b', group: 'ki' },
-  ];
+	  const modeTabs: ModeTab[] = [
+	    // ── Start ──
+	    { key: 'start',        label: 'Start',          desc: 'Übersicht & nächste Schritte',      icon: Zap,          color: '#ec4899', group: 'home' },
+	    // ── Controlling ──
+	    { key: 'liquidity',    label: 'Liquidität',     desc: '13-Wochen Cashflow-Prognose',     icon: TrendingUp,   color: '#f472b6', group: 'controlling' },
+	    { key: 'closing',      label: 'Abschluss',      desc: 'Monatsabschluss mit 12 Checks',   icon: CheckCircle,  color: '#22c55e', group: 'controlling' },
+	    { key: 'contribution', label: 'DB-Rechnung',    desc: 'Mehrstufige DB I → DB V',         icon: BarChart3,    color: '#14b8a6', group: 'controlling' },
+	    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#f472b6', group: 'controlling' },
+	    { key: 'bwa',          label: 'BWA',            desc: 'DATEV-BWA mit KI-Analyse',        icon: FileText,     color: '#f97316', group: 'controlling' },
+	    { key: 'bab',          label: 'BAB',            desc: 'Kostenstellen & GK-Zuschläge',    icon: Grid3x3,      color: '#f43f5e', group: 'controlling' },
+	    // ── Analyse ──
+	    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#ec4899', group: 'analyse' },
+	    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#d946ef', group: 'analyse' },
+	    { key: 'multi',        label: 'Konzern',        desc: 'Multi-Entity Konsolidierung',     icon: Building2,    color: '#a855f7', group: 'analyse' },
+	    // ── KI-Tools ──
+	    { key: 'errors',       label: 'Fehler-Scan',    desc: 'KI-Buchungsfehler-Erkennung',     icon: AlertCircle,  color: '#f43f5e', group: 'ki' },
+	    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#ec4899', group: 'ki' },
+	    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#a855f7', group: 'ki' },
+	    { key: 'trends',       label: 'Trends',         desc: 'Multi-Perioden Trendanalyse',     icon: Activity,     color: '#10b981', group: 'ki' },
+	    { key: 'docs',         label: 'Dokumente',      desc: 'KI-Reports & Dokumenten-Archiv',  icon: FolderOpen,   color: '#f59e0b', group: 'ki' },
+	  ];
 
   const sidebarGroups = [
     { key: 'home' as const, label: 'Start' },
@@ -557,12 +555,12 @@ export default function Home() {
 
   // Main App
   return (
-    <main className="min-h-screen bg-[#0b1220] text-white relative flex">
+    <main className="min-h-screen bg-[#070511] text-white relative flex">
       {/* Calm background: subtle gradients + grid (serious, low distraction) */}
-      <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_10%,rgba(34,211,238,0.16),transparent_60%),radial-gradient(45%_35%_at_85%_20%,rgba(59,130,246,0.12),transparent_55%),radial-gradient(40%_40%_at_50%_95%,rgba(20,184,166,0.08),transparent_55%)]" />
-        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:64px_64px]" />
-      </div>
+	      <div className="pointer-events-none fixed inset-0 z-0">
+	        <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_10%,rgba(236,72,153,0.18),transparent_60%),radial-gradient(45%_35%_at_85%_18%,rgba(217,70,239,0.14),transparent_55%),radial-gradient(40%_40%_at_50%_95%,rgba(255,255,255,0.06),transparent_55%)]" />
+	        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:64px_64px]" />
+	      </div>
 
       {/* Evidence Modal */}
       {showEvidenceModal && selectedDeviation && (
@@ -573,7 +571,7 @@ export default function Home() {
       )}
 
       {/* ═══ Desktop Sidebar ═══ */}
-      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-[#0b1220]/70 backdrop-blur-2xl border-r border-white/10">
+      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-[#070511]/70 backdrop-blur-2xl border-r border-white/10">
         {/* Sidebar Header / Logo */}
         <div className="px-4 py-4 border-b border-white/[0.06]">
           <Link
@@ -581,7 +579,7 @@ export default function Home() {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
           >
             <div className="relative w-9 h-9 rounded-xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-cyan-300" />
+              <BarChart3 className="w-5 h-5 text-pink-300" />
             </div>
             <div>
               <h1 className="text-[15px] font-semibold text-white tracking-[-0.02em]">Controlling Engine</h1>
@@ -621,12 +619,12 @@ export default function Home() {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-[#0b1220] border-r border-white/10 flex flex-col md:hidden"
+	              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-[#070511] border-r border-white/10 flex flex-col md:hidden"
             >
               {/* Mobile Sidebar Header */}
               <div className="px-4 py-4 border-b border-white/[0.06] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center">
                     <BarChart3 className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-sm font-semibold text-white">Navigation</span>
@@ -653,7 +651,7 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative bg-[#0b1220]/70 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-30"
+          className="relative bg-[#070511]/70 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-30"
         >
           <div className="px-6 py-2.5">
             <div className="flex items-center justify-between">
@@ -697,9 +695,9 @@ export default function Home() {
                           <motion.div
                             layoutId="activeWorkflow"
                             className={`absolute inset-0 rounded-md ${
-                              status === 'draft' ? 'bg-yellow-500/15 border border-yellow-500/20'
-                              : status === 'review' ? 'bg-blue-500/15 border border-blue-500/20'
-                              : 'bg-green-500/15 border border-green-500/20'
+                              status === 'draft' ? 'bg-yellow-500/[0.15] border border-yellow-500/20'
+                              : status === 'review' ? 'bg-fuchsia-500/[0.15] border border-fuchsia-500/20'
+                              : 'bg-green-500/[0.15] border border-green-500/20'
                             }`}
                             transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
                           />
@@ -707,7 +705,7 @@ export default function Home() {
                         <span className={`relative z-10 flex items-center gap-1.5 ${
                           workflowStatus === status
                             ? status === 'draft' ? 'text-yellow-400'
-                            : status === 'review' ? 'text-blue-400'
+                            : status === 'review' ? 'text-fuchsia-300'
                             : 'text-green-400'
                             : 'text-gray-500 hover:text-gray-300'
                         }`}>
@@ -734,7 +732,7 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="h-8 w-8 rounded-xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center">
-                    <User className="h-4 w-4 text-cyan-300" />
+                    <User className="h-4 w-4 text-pink-300" />
                   </div>
                   <button
                     onClick={handleLogout}
@@ -749,7 +747,7 @@ export default function Home() {
           </div>
         </motion.div>
 
-      <div className="px-6 py-6 max-w-[1400px] relative z-10">
+	      <div className="px-6 py-8 max-w-[1520px] relative z-10">
         <AnimatePresence mode="wait">
         {/* Start / Landing (after login) */}
         {mode === 'start' && (
@@ -765,27 +763,27 @@ export default function Home() {
               <div className="pointer-events-none absolute inset-0">
                 <motion.div
                   aria-hidden="true"
-                  className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-cyan-500/15 blur-3xl"
+                  className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-pink-500/[0.15] blur-3xl"
                   animate={{ y: [0, 18, 0], x: [0, 10, 0], opacity: [0.55, 0.75, 0.55] }}
                   transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <motion.div
                   aria-hidden="true"
-                  className="absolute -bottom-48 right-0 h-96 w-96 rounded-full bg-blue-500/12 blur-3xl"
+                  className="absolute -bottom-48 right-0 h-96 w-96 rounded-full bg-fuchsia-500/[0.12] blur-3xl"
                   animate={{ y: [0, -14, 0], x: [0, -10, 0], opacity: [0.45, 0.65, 0.45] }}
                   transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
               </div>
 
-              <BorderBeam size={180} duration={18} colorFrom="#22d3ee" colorTo="#60a5fa" />
+              <BorderBeam size={180} duration={18} colorFrom="#ec4899" colorTo="#a855f7" />
 
               <div className="relative">
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                   <div className="max-w-2xl">
                     <BlurFade delay={0.02}>
                       <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-gray-300">
-                        <Shield className="h-3.5 w-3.5 text-cyan-300" />
+                        <Shield className="h-3.5 w-3.5 text-pink-300" />
                         Lokal. Prüffähig. Schnell.
                         <span className="mx-1 h-3 w-px bg-white/10" />
                         <span className="text-gray-400">Start</span>
@@ -795,7 +793,7 @@ export default function Home() {
                     <BlurFade delay={0.06}>
                       <h1 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight text-white">
                         Willkommen zurück,{' '}
-                        <span className="bg-gradient-to-r from-cyan-200 to-blue-200 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-pink-200 to-fuchsia-200 bg-clip-text text-transparent">
                           {currentUser.name}
                         </span>
                         .
@@ -813,10 +811,10 @@ export default function Home() {
                       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <ShimmerButton
                           onClick={() => setMode('single')}
-                          shimmerColor="#22d3ee"
+                          shimmerColor="#fbcfe8"
                           shimmerSize="0.08em"
                           borderRadius="16px"
-                          background="linear-gradient(135deg, #2563eb 0%, #0891b2 100%)"
+                          background="linear-gradient(135deg, #ec4899 0%, #a855f7 100%)"
                           className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
                         >
                           <span className="relative z-10 inline-flex items-center gap-2">
@@ -829,7 +827,7 @@ export default function Home() {
                             onClick={() => setMode('triple')}
                             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
                           >
-                            Plan vs. Ist <GitCompare className="h-4 w-4 text-blue-200" />
+                            Plan vs. Ist <GitCompare className="h-4 w-4 text-fuchsia-200" />
                           </button>
                           <button
                             onClick={() => setMode('docs')}
@@ -873,206 +871,191 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="mt-10">
-                  <BlurFade delay={0.05}>
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-sm font-semibold text-white tracking-tight">Workflows</h2>
-                      <p className="text-xs text-gray-500">Wähle deinen Einstieg</p>
-                    </div>
-                  </BlurFade>
+	                <div className="mt-10">
+	                  <BlurFade delay={0.05}>
+	                    <div className="flex items-center justify-between">
+	                      <h2 className="text-sm font-semibold text-white tracking-tight">Dein Einstieg</h2>
+	                      <p className="text-xs text-gray-500">Workflows & Module</p>
+	                    </div>
+	                  </BlurFade>
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <BlurFade delay={0.10}>
-                      <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <MagicCard
-                          gradientSize={240}
-                          gradientColor="rgba(34,211,238,0.35)"
-                          gradientOpacity={0.75}
-                          className="rounded-2xl border border-white/[0.10] bg-white/[0.02]"
-                        >
-                          <button
-                            onClick={() => setMode('single')}
-                            className="group h-full w-full rounded-[inherit] bg-black/20 p-6 text-left"
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                                <Upload className="h-5 w-5 text-cyan-300 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3" />
-                              </span>
-                              <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold text-cyan-200">
-                                Empfohlen
-                              </span>
-                            </div>
-                            <p className="mt-5 text-base font-semibold text-white tracking-tight">Einzelanalyse</p>
-                            <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                              Vorjahr vs. Aktuell. Format-Erkennung, Plausibilität, Abweichungen und Evidence.
-                            </p>
-                            <div className="mt-5 inline-flex items-center gap-2 text-sm text-gray-400 transition-colors group-hover:text-white">
-                              Öffnen <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                            </div>
-                          </button>
-                        </MagicCard>
-                      </motion.div>
-                    </BlurFade>
+	                  <BlurFade delay={0.10}>
+	                    <BentoGrid className="mt-4 md:auto-rows-[18rem]">
+	                      <BentoCard
+	                        Icon={Upload}
+	                        name="Einzelanalyse"
+	                        description="Vorjahr vs. Aktuell. Format-Erkennung, Plausibilität, Abweichungen und Evidence."
+	                        tag="Empfohlen"
+	                        cta="Öffnen"
+	                        onClick={() => setMode('single')}
+	                        className="md:col-span-2"
+	                        background={
+	                          <div className="absolute inset-0 opacity-80">
+	                            <Upload className="absolute -bottom-10 -right-10 h-52 w-52 text-pink-200/10" />
+	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+	                          </div>
+	                        }
+	                      />
 
-                    <BlurFade delay={0.14}>
-                      <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <MagicCard
-                          gradientSize={240}
-                          gradientColor="rgba(56,189,248,0.35)"
-                          gradientOpacity={0.75}
-                          className="rounded-2xl border border-white/[0.10] bg-white/[0.02]"
-                        >
-                          <button
-                            onClick={() => setMode('triple')}
-                            className="group h-full w-full rounded-[inherit] bg-black/20 p-6 text-left"
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                                <GitCompare className="h-5 w-5 text-blue-300 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
-                              </span>
-                              <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold text-gray-300">
-                                Plan/Ist/VJ
-                              </span>
-                            </div>
-                            <p className="mt-5 text-base font-semibold text-white tracking-tight">Plan vs. Ist</p>
-                            <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                              Dreifachvergleich: Plan, Ist und Vorjahr. Ideal für Budget-Reviews und Forecasts.
-                            </p>
-                            <div className="mt-5 inline-flex items-center gap-2 text-sm text-gray-400 transition-colors group-hover:text-white">
-                              Öffnen <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                            </div>
-                          </button>
-                        </MagicCard>
-                      </motion.div>
-                    </BlurFade>
+	                      <BentoCard
+	                        Icon={GitCompare}
+	                        name="Plan vs. Ist"
+	                        description="Dreifachvergleich: Plan, Ist und Vorjahr. Ideal für Budget-Reviews und Forecasts."
+	                        tag="Plan/Ist/VJ"
+	                        cta="Öffnen"
+	                        onClick={() => setMode('triple')}
+	                        className="md:col-span-1"
+	                        background={
+	                          <div className="absolute inset-0 opacity-80">
+	                            <GitCompare className="absolute -bottom-10 -right-10 h-52 w-52 text-fuchsia-200/10" />
+	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+	                          </div>
+	                        }
+	                      />
 
-                    <BlurFade delay={0.18}>
-                      <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <MagicCard
-                          gradientSize={240}
-                          gradientColor="rgba(34,197,94,0.28)"
-                          gradientOpacity={0.75}
-                          className="rounded-2xl border border-white/[0.10] bg-white/[0.02]"
-                        >
-                          <button
-                            onClick={() => setMode('liquidity')}
-                            className="group h-full w-full rounded-[inherit] bg-black/20 p-6 text-left"
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                                <TrendingUp className="h-5 w-5 text-emerald-300 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3" />
-                              </span>
-                              <span className="rounded-full border border-emerald-300/15 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-200">
-                                13 Wochen
-                              </span>
-                            </div>
-                            <p className="mt-5 text-base font-semibold text-white tracking-tight">Liquidität</p>
-                            <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                              Vorschau und Plausibilisierung aus den geladenen Buchungen. Schnell, visuell, pragmatisch.
-                            </p>
-                            <div className="mt-5 inline-flex items-center gap-2 text-sm text-gray-400 transition-colors group-hover:text-white">
-                              Öffnen <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                            </div>
-                          </button>
-                        </MagicCard>
-                      </motion.div>
-                    </BlurFade>
+	                      <BentoCard
+	                        Icon={TrendingUp}
+	                        name="Liquidität"
+	                        description="13-Wochen Cashflow-Prognose mit Plausibilisierung aus geladenen Buchungen."
+	                        tag="13 Wochen"
+	                        cta="Öffnen"
+	                        onClick={() => setMode('liquidity')}
+	                        className="md:col-span-1"
+	                        background={
+	                          <div className="absolute inset-0 opacity-80">
+	                            <TrendingUp className="absolute -bottom-10 -right-10 h-52 w-52 text-emerald-200/10" />
+	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+	                          </div>
+	                        }
+	                      />
 
-                    <BlurFade delay={0.22}>
-                      <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <MagicCard
-                          gradientSize={240}
-                          gradientColor="rgba(245,158,11,0.25)"
-                          gradientOpacity={0.75}
-                          className="rounded-2xl border border-white/[0.10] bg-white/[0.02]"
-                        >
-                          <button
-                            onClick={() => setMode('docs')}
-                            className="group h-full w-full rounded-[inherit] bg-black/20 p-6 text-left"
-                          >
-                            <div className="flex items-start justify-between gap-4">
-                              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                                <FileText className="h-5 w-5 text-amber-300 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
-                              </span>
-                              <span className="rounded-full border border-amber-300/15 bg-amber-400/10 px-2.5 py-1 text-[10px] font-semibold text-amber-200">
-                                Archive
-                              </span>
-                            </div>
-                            <p className="mt-5 text-base font-semibold text-white tracking-tight">Dokumente</p>
-                            <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                              KI-Reports und Dokumenten-Archiv. Optional token-geschützt für Betrieb und Sharing.
-                            </p>
-                            <div className="mt-5 inline-flex items-center gap-2 text-sm text-gray-400 transition-colors group-hover:text-white">
-                              Öffnen <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                            </div>
-                          </button>
-                        </MagicCard>
-                      </motion.div>
-                    </BlurFade>
-                  </div>
-                </div>
+	                      <BentoCard
+	                        Icon={CheckCircle}
+	                        name="Abschluss"
+	                        description="Monatsabschluss mit 12 Checks, Aufgabenliste und Review-ready Dokumentation."
+	                        tag="12 Checks"
+	                        cta="Öffnen"
+	                        onClick={() => setMode('closing')}
+	                        className="md:col-span-1"
+	                        background={
+	                          <div className="absolute inset-0 opacity-80">
+	                            <CheckCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-green-200/10" />
+	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+	                          </div>
+	                        }
+	                      />
 
-                <div className="mt-10">
-                  <BlurFade delay={0.12}>
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-sm font-semibold text-white tracking-tight">In 3 Schritten</h2>
-                      <p className="text-xs text-gray-500">Klarer Prozess statt UI-Rauschen</p>
-                    </div>
-                  </BlurFade>
+	                      <BentoCard
+	                        Icon={AlertCircle}
+	                        name="Fehler-Scan"
+	                        description="KI-Buchungsfehler-Erkennung: Duplikate, fehlende Belege, ungewöhnliche Buchungen."
+	                        tag="KI"
+	                        cta="Öffnen"
+	                        onClick={() => setMode('errors')}
+	                        className="md:col-span-1"
+	                        background={
+	                          <div className="absolute inset-0 opacity-80">
+	                            <AlertCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-rose-200/10" />
+	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+	                          </div>
+	                        }
+	                      />
 
-                  <div className="mt-4 grid gap-4 md:grid-cols-3">
-                    <BlurFade delay={0.16}>
-                      <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <div className="rounded-2xl border border-white/[0.10] bg-black/20 p-6">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">01</span>
-                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                              <Upload className="h-5 w-5 text-cyan-300" />
-                            </span>
-                          </div>
-                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Daten laden</p>
-                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                            Vorjahr und aktuelles Jahr hochladen. Magic Upload normalisiert Felder automatisch.
-                          </p>
-                        </div>
-                      </motion.div>
-                    </BlurFade>
+	                      <BentoCard
+	                        Icon={FolderOpen}
+	                        name="Dokumente"
+	                        description="KI-Reports und Dokumenten-Archiv. Optional token-geschützt für Betrieb und Sharing."
+	                        tag="Archive"
+	                        cta="Öffnen"
+	                        onClick={() => setMode('docs')}
+	                        className="md:col-span-3"
+	                        background={
+	                          <div className="absolute inset-0 opacity-80">
+	                            <FolderOpen className="absolute -bottom-12 -right-12 h-64 w-64 text-amber-200/10" />
+	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+	                          </div>
+	                        }
+	                      />
+	                    </BentoGrid>
+	                  </BlurFade>
+	                </div>
 
-                    <BlurFade delay={0.20}>
-                      <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <div className="rounded-2xl border border-white/[0.10] bg-black/20 p-6">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">02</span>
-                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                              <Search className="h-5 w-5 text-blue-200" />
-                            </span>
-                          </div>
-                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Abweichungen verstehen</p>
-                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                            Fokus auf wesentliche Treiber: Konten, Kostenstellen, Root Cause. Evidence zeigt Details.
-                          </p>
-                        </div>
-                      </motion.div>
-                    </BlurFade>
+	                <div className="mt-10">
+	                  <BlurFade delay={0.12}>
+	                    <div className="flex items-center justify-between">
+	                      <h2 className="text-sm font-semibold text-white tracking-tight">In 3 Schritten</h2>
+	                      <p className="text-xs text-gray-500">Klarer Prozess statt UI-Rauschen</p>
+	                    </div>
+	                  </BlurFade>
 
-                    <BlurFade delay={0.24}>
-                      <motion.div whileHover={{ y: -3 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}>
-                        <div className="rounded-2xl border border-white/[0.10] bg-black/20 p-6">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">03</span>
-                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-                              <Download className="h-5 w-5 text-emerald-200" />
-                            </span>
-                          </div>
-                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Report exportieren</p>
-                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-                            Summary & Workflow-Status setzen und als Word/Excel exportieren. Fertig fürs Review.
-                          </p>
-                        </div>
-                      </motion.div>
-                    </BlurFade>
-                  </div>
-                </div>
+	                  <BlurFade delay={0.16}>
+	                    <div className="bento-glow relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 p-6 md:p-8">
+	                      <BorderBeam size={220} duration={20} colorFrom="#ec4899" colorTo="#a855f7" />
+	                      <div className="grid gap-4 md:grid-cols-3">
+	                        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.02] p-6">
+	                          <div className="flex items-center justify-between">
+	                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">01</span>
+	                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
+	                              <Upload className="h-5 w-5 text-pink-300" />
+	                            </span>
+	                          </div>
+	                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Daten laden</p>
+	                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
+	                            Vorjahr und aktuelles Jahr hochladen. Magic Upload normalisiert Felder automatisch.
+	                          </p>
+	                        </div>
+
+	                        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.02] p-6">
+	                          <div className="flex items-center justify-between">
+	                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">02</span>
+	                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
+	                              <Search className="h-5 w-5 text-fuchsia-200" />
+	                            </span>
+	                          </div>
+	                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Abweichungen verstehen</p>
+	                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
+	                            Fokus auf Treiber: Konten, Kostenstellen, Root Cause. Evidence zeigt Details.
+	                          </p>
+	                        </div>
+
+	                        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.02] p-6">
+	                          <div className="flex items-center justify-between">
+	                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">03</span>
+	                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
+	                              <Download className="h-5 w-5 text-emerald-200" />
+	                            </span>
+	                          </div>
+	                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Report exportieren</p>
+	                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
+	                            Summary & Workflow-Status setzen und als Word/Excel exportieren. Fertig fürs Review.
+	                          </p>
+	                        </div>
+	                      </div>
+
+	                      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+	                        <ShimmerButton
+	                          onClick={() => setMode('single')}
+	                          shimmerColor="#fbcfe8"
+	                          shimmerSize="0.08em"
+	                          borderRadius="16px"
+	                          background="linear-gradient(135deg, #ec4899 0%, #a855f7 100%)"
+	                          className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
+	                        >
+	                          <span className="relative z-10 inline-flex items-center gap-2">
+	                            Jetzt starten <ArrowRight className="h-4 w-4" />
+	                          </span>
+	                        </ShimmerButton>
+
+	                        <button
+	                          onClick={() => setMode('docs')}
+	                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
+	                        >
+	                          Reports ansehen <FolderOpen className="h-4 w-4 text-amber-200" />
+	                        </button>
+	                      </div>
+	                    </div>
+	                  </BlurFade>
+	                </div>
               </div>
             </div>
           </motion.div>
@@ -1307,7 +1290,7 @@ export default function Home() {
             className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-6 mb-8"
           >
             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 tracking-tight">
-              <BarChart3 className="w-5 h-5 text-cyan-300" />
+              <BarChart3 className="w-5 h-5 text-pink-300" />
               Plan vs. Ist vs. Vorjahr
             </h2>
             <p className="text-gray-300 text-sm mb-6">
@@ -1330,17 +1313,17 @@ export default function Home() {
         >
         <BlurFade delay={0.05} inView>
         <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.08] p-6 mb-8 overflow-hidden">
-          <BorderBeam size={120} duration={18} colorFrom="#22d3ee" colorTo="#60a5fa" />
+          <BorderBeam size={120} duration={18} colorFrom="#ec4899" colorTo="#a855f7" />
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 tracking-tight">
               {useMagicUpload ? (
                 <>
-                  <Sparkles className="w-5 h-5 text-cyan-300" />
+                  <Sparkles className="w-5 h-5 text-pink-300" />
                   Intelligenter Import
                 </>
               ) : (
                 <>
-                  <Upload className="w-5 h-5 text-blue-400" />
+                  <Upload className="w-5 h-5 text-pink-300" />
                   {mode === 'single' ? 'Buchungsdaten hochladen' : 'Gesellschaften hinzufügen'}
                 </>
               )}
@@ -1350,7 +1333,7 @@ export default function Home() {
                 onClick={() => setUseMagicUpload(!useMagicUpload)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   useMagicUpload
-                    ? 'bg-cyan-400/10 text-cyan-200 border border-cyan-300/20'
+                    ? 'bg-pink-400/10 text-pink-200 border border-pink-300/20'
                     : 'bg-white/10 text-gray-400 hover:text-white'
                 }`}
               >
@@ -1411,7 +1394,7 @@ export default function Home() {
                       <select
                         value={entity.name}
                         onChange={e => updateEntity(entity.id, { name: e.target.value })}
-                        className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-pink-400/70 focus:ring-4 focus:ring-pink-400/10"
                       >
                         <option value="">Gesellschaft wählen...</option>
                         {EXAMPLE_ENTITIES.map(name => (
@@ -1427,7 +1410,7 @@ export default function Home() {
                       </span>
                     )}
                     {entity.status === 'analyzing' && (
-                      <span className="flex items-center gap-1 text-blue-400 text-sm">
+                      <span className="flex items-center gap-1 text-fuchsia-300 text-sm">
                         <Loader2 className="w-4 h-4 animate-spin" /> Analysiere...
                       </span>
                     )}
@@ -1450,7 +1433,7 @@ export default function Home() {
                       type="file"
                       accept=".csv"
                       onChange={e => updateEntity(entity.id, { prevFile: e.target.files?.[0] || null })}
-                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
+                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-pink-500 file:text-white hover:file:bg-pink-400 file:cursor-pointer"
                     />
                   </div>
                   <div>
@@ -1459,7 +1442,7 @@ export default function Home() {
                       type="file"
                       accept=".csv"
                       onChange={e => updateEntity(entity.id, { currFile: e.target.files?.[0] || null })}
-                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer"
+                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-pink-500 file:text-white hover:file:bg-pink-400 file:cursor-pointer"
                     />
                   </div>
                 </div>
@@ -1469,7 +1452,7 @@ export default function Home() {
             {mode === 'multi' && (
               <button
                 onClick={addEntity}
-                className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-blue-500/50 hover:text-blue-400 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-pink-500/40 hover:text-pink-300 transition-all flex items-center justify-center gap-2"
               >
                 <Plus className="w-5 h-5" />
                 Weitere Gesellschaft
@@ -1492,9 +1475,9 @@ export default function Home() {
                   ? prevBookings.length === 0 || currBookings.length === 0
                   : entities.every(e => !e.prevFile || !e.currFile)
               )}
-              shimmerColor="#06b6d4"
+              shimmerColor="#fbcfe8"
               shimmerSize="0.08em"
-              background="linear-gradient(135deg, #2563eb 0%, #0891b2 100%)"
+              background="linear-gradient(135deg, #ec4899 0%, #a855f7 100%)"
               borderRadius="12px"
               className="flex-1 min-w-[200px] py-3 px-6 font-medium disabled:opacity-40"
             >
@@ -1510,9 +1493,9 @@ export default function Home() {
                 <button
                   onClick={() => downloadReport('word')}
                   disabled={isGeneratingReport}
-                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-blue-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
+                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-pink-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
                 >
-                  <FileText className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+                  <FileText className="w-5 h-5 text-pink-300 group-hover:scale-110 transition-transform" />
                   Word
                 </button>
                 <button
@@ -1559,7 +1542,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Plan</p>
-                <p className="text-xl font-bold text-blue-400">{formatCurrency(tripleResult.meta.total_plan)}</p>
+                <p className="text-xl font-bold text-fuchsia-300">{formatCurrency(tripleResult.meta.total_plan)}</p>
               </motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
                 <p className="text-sm text-gray-500 mb-1">Ist</p>
@@ -1662,7 +1645,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <BlurFade delay={0.05} inView>
               <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={80} duration={12} colorFrom="#22d3ee" colorTo="#60a5fa" />
+                <BorderBeam size={80} duration={12} colorFrom="#ec4899" colorTo="#a855f7" />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
                 <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={mode === 'multi' ? (konzernResult?.entities.length ?? 0) : currentResult.meta.bookings_prev} />
@@ -1671,7 +1654,7 @@ export default function Home() {
               </BlurFade>
               <BlurFade delay={0.1} inView>
               <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={80} duration={12} delay={3} colorFrom="#3b82f6" colorTo="#06b6d4" />
+                <BorderBeam size={80} duration={12} delay={3} colorFrom="#a855f7" colorTo="#ec4899" />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Vorjahr</p>
                 <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_prev)} prefix="" suffix=" €" />
@@ -1680,7 +1663,7 @@ export default function Home() {
               </BlurFade>
               <BlurFade delay={0.15} inView>
               <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={80} duration={12} delay={6} colorFrom="#06b6d4" colorTo="#22c55e" />
+                <BorderBeam size={80} duration={12} delay={6} colorFrom="#ec4899" colorTo="#22c55e" />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Aktuell</p>
                 <p className="text-2xl font-bold text-white tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_curr)} prefix="" suffix=" €" />
@@ -1691,7 +1674,7 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className={`relative rounded-xl border p-5 overflow-hidden ${
                 currentResult.summary.total_delta > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
-                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#06b6d4'} />
+                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#a855f7'} />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Abweichung</p>
                 <p className={`text-2xl font-bold flex items-center gap-2 tracking-tight ${
                   currentResult.summary.total_delta > 0 ? 'text-red-400' : 'text-green-400'
@@ -1707,9 +1690,9 @@ export default function Home() {
             <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={100} duration={15} colorFrom="#3b82f6" colorTo="#06b6d4" />
+                <BorderBeam size={100} duration={15} colorFrom="#ec4899" colorTo="#a855f7" />
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
-                  <BarChart3 className="w-5 h-5 text-blue-400" />
+                  <BarChart3 className="w-5 h-5 text-pink-300" />
                   {mode === 'multi' ? 'Gesellschaften' : 'Top Abweichungen'}
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
@@ -1738,9 +1721,9 @@ export default function Home() {
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={100} duration={15} delay={7} colorFrom="#22d3ee" colorTo="#60a5fa" />
+                <BorderBeam size={100} duration={15} delay={7} colorFrom="#ec4899" colorTo="#a855f7" />
                 <h3 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
-                  <PieChart className="w-5 h-5 text-cyan-300" />
+                  <PieChart className="w-5 h-5 text-pink-300" />
                   Verteilung
                 </h3>
                 <ResponsiveContainer width="100%" height={280}>
@@ -1774,7 +1757,7 @@ export default function Home() {
             {/* Tabs */}
             <BlurFade delay={0.3} inView>
             <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] overflow-hidden">
-              <BorderBeam size={200} duration={25} colorFrom="#3b82f6" colorTo="#22c55e" />
+              <BorderBeam size={200} duration={25} colorFrom="#ec4899" colorTo="#a855f7" />
               <div className="flex border-b border-white/[0.06]">
                 {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
                   <button
@@ -1787,7 +1770,7 @@ export default function Home() {
                     {activeTab === tab && (
                       <motion.div
                         layoutId="activeTab"
-                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500"
+                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-pink-500 to-fuchsia-500"
                         transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
                       />
                     )}
@@ -1807,7 +1790,7 @@ export default function Home() {
                 {activeTab === 'overview' && (
                   <div className="space-y-3">
                     <h4 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
-                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500" />
+                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-pink-500 to-fuchsia-500" />
                       Signifikante Abweichungen
                     </h4>
                     {currentResult.by_account?.slice(0, 10).map((dev, idx) => (
@@ -1837,20 +1820,21 @@ export default function Home() {
                                 {formatPercent(dev.delta_pct)}
                               </p>
                             </div>
-                            <Link2 className="w-4 h-4 text-blue-400" />
+                            <Link2 className="w-4 h-4 text-pink-300" />
                           </div>
                         </button>
                         <div className="flex gap-2 ml-4">
-                          <button
-                            onClick={() => setRootCauseDeviation(rootCauseDeviation?.account === dev.account ? null : dev)}
-                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
-                              rootCauseDeviation?.account === dev.account
-                                ? 'bg-cyan-400/10 text-cyan-200 border border-cyan-300/20'
-                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
-                            }`}
-                          >
-                            🔍 Warum?
-                          </button>
+	                          <button
+	                            onClick={() => setRootCauseDeviation(rootCauseDeviation?.account === dev.account ? null : dev)}
+	                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
+	                              rootCauseDeviation?.account === dev.account
+	                                ? 'bg-pink-400/10 text-pink-200 border border-pink-300/20'
+	                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
+	                            }`}
+	                          >
+	                            <Search className="h-3.5 w-3.5" />
+	                            Ursache
+	                          </button>
                         </div>
                         {rootCauseDeviation?.account === dev.account && (
                           <RootCausePanel
@@ -1892,9 +1876,9 @@ export default function Home() {
                             <td className="py-3.5 text-right">
                               <button
                                 onClick={() => { setSelectedDeviation(acc); setShowEvidenceModal(true); }}
-                                className="p-1.5 hover:bg-blue-500/20 rounded-lg transition-colors group"
+                                className="p-1.5 hover:bg-pink-500/20 rounded-lg transition-colors group"
                               >
-                                <Link2 className="w-4 h-4 text-blue-400 group-hover:text-blue-300" />
+                                <Link2 className="w-4 h-4 text-pink-300 group-hover:text-pink-200" />
                               </button>
                             </td>
                           </tr>
@@ -1934,9 +1918,9 @@ export default function Home() {
                 {activeTab === 'evidence' && (
                   <div className="text-center py-16">
                     <div className="relative w-20 h-20 mx-auto mb-6">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 animate-pulse" />
-                      <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 flex items-center justify-center">
-                        <Link2 className="w-10 h-10 text-blue-400" />
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/20 to-fuchsia-500/20 animate-pulse" />
+                      <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-pink-500/10 to-fuchsia-500/10 border border-pink-500/20 flex items-center justify-center">
+                        <Link2 className="w-10 h-10 text-pink-300" />
                       </div>
                     </div>
                     <h4 className="text-white font-semibold text-lg mb-3 tracking-tight">Evidence Trail</h4>
@@ -1946,8 +1930,8 @@ export default function Home() {
                     </p>
                     <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-500">
                       <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500/60" /> Prüfungssicher</div>
-                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-blue-500/60" /> Revisionsfest</div>
-                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-cyan-300/70" /> Belegverknüpft</div>
+                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-pink-400/60" /> Revisionsfest</div>
+                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-pink-300/70" /> Belegverknüpft</div>
                     </div>
                   </div>
                 )}

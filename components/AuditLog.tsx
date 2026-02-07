@@ -35,10 +35,10 @@ interface AuditLogProps {
 const ACTION_ICONS: Record<string, React.ReactNode> = {
   LOGIN: <LogIn className="w-4 h-4 text-green-400" />,
   LOGOUT: <LogOut className="w-4 h-4 text-gray-400" />,
-  UPLOAD: <Upload className="w-4 h-4 text-blue-400" />,
+  UPLOAD: <Upload className="w-4 h-4 text-pink-300" />,
   ANALYZE: <Search className="w-4 h-4 text-purple-400" />,
   EXPORT: <FileText className="w-4 h-4 text-orange-400" />,
-  QUERY: <Database className="w-4 h-4 text-cyan-400" />,
+  QUERY: <Database className="w-4 h-4 text-fuchsia-300" />,
   VIEW: <Eye className="w-4 h-4 text-gray-400" />,
 };
 
@@ -175,7 +175,7 @@ export default function AuditLog({ authToken }: AuditLogProps) {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center">
                           <User className="w-3 h-3 text-white" />
                         </div>
                         <span className="text-white text-sm">{entry.userName}</span>

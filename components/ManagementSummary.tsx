@@ -55,7 +55,7 @@ export function ManagementSummary({
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-2xl border border-blue-500/20 p-6 mb-8">
+    <div className="bg-gradient-to-br from-pink-500/10 via-fuchsia-500/10 to-white/5 rounded-2xl border border-white/[0.08] p-6 mb-8">
       <div className="flex items-start justify-between mb-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-yellow-400" />
@@ -72,7 +72,7 @@ export function ManagementSummary({
               workflowStatus === 'draft'
                 ? 'bg-yellow-500/20 text-yellow-400'
                 : workflowStatus === 'review'
-                ? 'bg-blue-500/20 text-blue-400'
+                ? 'bg-fuchsia-500/20 text-fuchsia-300'
                 : 'bg-green-500/20 text-green-400'
             }`}
           >
@@ -111,7 +111,7 @@ export function ManagementSummary({
       {!isLoading && (
       <button
           onClick={generateSummary}
-          className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-blue-400 transition-colors"
+          className="mt-4 flex items-center gap-2 text-sm text-gray-500 hover:text-pink-300 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
           Neu generieren

@@ -39,9 +39,9 @@ const FORMAT_ICONS: Record<FileFormat, string> = {
 };
 
 const FORMAT_COLORS: Record<FileFormat, string> = {
-  sap_fbl3n: 'from-blue-600 to-blue-400',
-  sap_fagll03: 'from-blue-600 to-blue-400',
-  sap_s_alr: 'from-blue-600 to-blue-400',
+  sap_fbl3n: 'from-pink-600 to-fuchsia-500',
+  sap_fagll03: 'from-pink-600 to-fuchsia-500',
+  sap_s_alr: 'from-pink-600 to-fuchsia-500',
   datev_buchungen: 'from-green-600 to-green-400',
   datev_kost: 'from-green-600 to-green-400',
   lexware: 'from-yellow-600 to-yellow-400',
@@ -275,7 +275,7 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
       {/* Format Badges */}
       {!result && (
         <div className="flex items-center justify-center gap-2 text-xs">
-          <span className="px-2 py-1 bg-blue-500/10 text-blue-400 rounded">SAP</span>
+          <span className="px-2 py-1 bg-pink-500/10 text-pink-300 rounded">SAP</span>
           <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded">DATEV</span>
           <span className="px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded">Lexware</span>
           <span className="px-2 py-1 bg-gray-500/10 text-gray-400 rounded">CSV</span>

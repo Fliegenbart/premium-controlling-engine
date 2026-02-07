@@ -205,8 +205,8 @@ export function TripleUpload({ onAnalysisComplete }: TripleUploadProps) {
       </div>
 
       {/* Info */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-        <p className="text-blue-300 text-sm">
+      <div className="bg-pink-500/10 border border-pink-500/20 rounded-lg p-3">
+        <p className="text-pink-200 text-sm">
           💡 Tipp: Nur Ist-Daten sind Pflicht. Ohne VJ/Plan wird automatisch verglichen.
         </p>
       </div>

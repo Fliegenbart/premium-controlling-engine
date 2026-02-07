@@ -197,13 +197,13 @@ export function EvidenceModal({ deviation, onClose, onGenerateComment }: Evidenc
                     className={`px-3 py-2 rounded-lg text-sm flex items-center gap-2 ${
                       flag.severity === 'critical' ? 'bg-red-500/20 text-red-300' :
                       flag.severity === 'warning' ? 'bg-amber-500/20 text-amber-300' :
-                      'bg-blue-500/20 text-blue-300'
+                      'bg-fuchsia-500/20 text-fuchsia-200'
                     }`}
                   >
                     <span className={`w-2 h-2 rounded-full ${
                       flag.severity === 'critical' ? 'bg-red-400' :
                       flag.severity === 'warning' ? 'bg-amber-400' :
-                      'bg-blue-400'
+                      'bg-fuchsia-300'
                     }`} />
                     {flag.flag}
                     <span className="text-xs opacity-60 ml-auto">{flag.source}</span>
@@ -214,7 +214,7 @@ export function EvidenceModal({ deviation, onClose, onGenerateComment }: Evidenc
           )}
 
           {/* AI Comment Section */}
-          <div className="bg-gradient-to-r from-blue-900/20 to-cyan-900/20 rounded-xl border border-blue-500/20 p-4 mb-6">
+          <div className="bg-gradient-to-r from-pink-500/10 via-fuchsia-500/10 to-white/5 rounded-xl border border-white/[0.08] p-4 mb-6">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-white font-medium flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-yellow-400" />
@@ -230,7 +230,7 @@ export function EvidenceModal({ deviation, onClose, onGenerateComment }: Evidenc
                   <button
                     onClick={generateAIComment}
                     disabled={isGeneratingComment}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white text-sm rounded-lg transition-colors flex items-center gap-2"
+                    className="px-3 py-1.5 rounded-lg text-white text-sm font-semibold transition-colors flex items-center gap-2 bg-gradient-to-br from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-400"
                   >
                     {isGeneratingComment ? (
                       <>
@@ -255,7 +255,7 @@ export function EvidenceModal({ deviation, onClose, onGenerateComment }: Evidenc
           {/* Tabs */}
           <div className="flex items-center gap-2 mb-4">
             <h4 className="text-white font-semibold flex items-center gap-2">
-              <Link2 className="w-4 h-4 text-blue-400" />
+              <Link2 className="w-4 h-4 text-pink-300" />
               Buchungen
             </h4>
             <div className="flex-1" />
@@ -266,7 +266,7 @@ export function EvidenceModal({ deviation, onClose, onGenerateComment }: Evidenc
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -307,7 +307,7 @@ export function EvidenceModal({ deviation, onClose, onGenerateComment }: Evidenc
                     <tr key={idx} className="border-t border-white/5 hover:bg-white/5">
                       <td className="p-3 text-gray-300">{booking.date}</td>
                       <td className="p-3">
-                        <span className="text-blue-400 font-mono text-xs">{booking.document_no}</span>
+                        <span className="text-pink-300 font-mono text-xs">{booking.document_no}</span>
                       </td>
                       <td className="p-3 text-gray-300 max-w-[250px] truncate" title={booking.text}>
                         {booking.text}

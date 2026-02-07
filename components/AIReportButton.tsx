@@ -94,8 +94,8 @@ export default function AIReportButton({ analysisResult, disabled }: AIReportBut
           disabled={disabled || !analysisResult || isLoading}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
             disabled || !analysisResult || isLoading
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+              ? 'bg-white/10 text-gray-500 cursor-not-allowed'
+              : 'bg-gradient-to-br from-pink-500 to-fuchsia-500 text-white hover:from-pink-400 hover:to-fuchsia-400 active:scale-95'
           }`}
         >
           {isLoading ? (
@@ -112,21 +112,21 @@ export default function AIReportButton({ analysisResult, disabled }: AIReportBut
         </button>
 
         {/* AI Toggle */}
-        <label className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
+        <label className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
           <input
             type="checkbox"
             checked={includeAI}
             onChange={(e) => setIncludeAI(e.target.checked)}
             disabled={isLoading}
-            className="w-4 h-4 rounded"
+            className="w-4 h-4 rounded accent-pink-500"
           />
-          <span className="text-sm font-medium text-gray-700">Mit KI</span>
+          <span className="text-sm font-medium text-gray-300">Mit KI</span>
         </label>
       </div>
 
       {/* Loading Progress */}
       {isLoading && loadingStage && (
-        <div className="flex items-center gap-2 text-sm text-blue-600">
+        <div className="flex items-center gap-2 text-sm text-pink-300">
           {loadingStage === 'complete' ? (
             <CheckCircle className="w-4 h-4 text-green-600" />
           ) : (
@@ -149,7 +149,7 @@ export default function AIReportButton({ analysisResult, disabled }: AIReportBut
 
       {/* Info Box */}
       {!isLoading && !error && analysisResult && (
-        <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
+        <div className="text-xs text-gray-400 bg-white/5 border border-white/10 p-2 rounded">
           {includeAI
             ? '✓ KI-gestützte Analyse mit Ollama'
             : '✓ Fallback-Template-Generierung'}

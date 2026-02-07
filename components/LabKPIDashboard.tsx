@@ -41,10 +41,10 @@ function KPICard({ title, icon, valuePrev, valueCurr, format, invertTrend }: KPI
   const isNeutral = Math.abs(deltaPct) < 1;
 
   return (
-    <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
+    <div className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-gray-400 text-sm">{title}</span>
-        <span className="text-blue-400">{icon}</span>
+        <span className="text-pink-300">{icon}</span>
       </div>
 
       <div className="flex items-end justify-between">
@@ -76,9 +76,9 @@ function KPICard({ title, icon, valuePrev, valueCurr, format, invertTrend }: KPI
 
 export function LabKPIDashboard({ kpis }: LabKPIDashboardProps) {
   return (
-    <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-2xl border border-purple-500/20 p-6 mb-8">
+    <div className="bg-gradient-to-r from-pink-500/10 via-fuchsia-500/10 to-white/5 rounded-2xl border border-white/[0.08] p-6 mb-8">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-        <Activity className="w-5 h-5 text-purple-400" />
+        <Activity className="w-5 h-5 text-pink-300" />
         Branchen-KPIs
       </h3>
 

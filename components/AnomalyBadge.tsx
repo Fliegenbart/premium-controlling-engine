@@ -26,9 +26,9 @@ export function AnomalyBadge({ hint, type, severity }: AnomalyBadgeProps) {
     },
     info: {
       icon: Info,
-      bg: 'bg-blue-500/20',
-      text: 'text-blue-400',
-      border: 'border-blue-500/30',
+      bg: 'bg-fuchsia-500/[0.15]',
+      text: 'text-fuchsia-200',
+      border: 'border-fuchsia-500/25',
     },
   };
 

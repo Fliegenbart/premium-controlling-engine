@@ -177,7 +177,7 @@ export function LiquidityDashboard({ bookings }: LiquidityDashboardProps) {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Droplets className="w-8 h-8 text-blue-400" />
+            <Droplets className="w-8 h-8 text-pink-300" />
             <div>
               <h1 className="text-2xl font-bold text-white">
                 13-Wochen Liquiditätsplanung
@@ -239,7 +239,7 @@ export function LiquidityDashboard({ bookings }: LiquidityDashboardProps) {
             <span className="text-xs uppercase tracking-[0.08em] text-gray-500">
               Aktueller Kontostand
             </span>
-            <Banknote className="w-5 h-5 text-blue-400" />
+            <Banknote className="w-5 h-5 text-pink-300" />
           </div>
           <div className="text-2xl font-bold text-white tracking-tight tabular-nums">
             <NumberTicker value={startBalance} />
@@ -396,7 +396,10 @@ export function LiquidityDashboard({ bookings }: LiquidityDashboardProps) {
                 backgroundColor: 'rgba(15,17,23,0.95)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: 12,
+                color: '#e5e7eb',
               }}
+              labelStyle={{ color: '#fff' }}
+              itemStyle={{ color: '#e5e7eb' }}
               formatter={(value) => formatCurrency(value as number)}
             />
             <ReferenceLine
@@ -433,9 +436,9 @@ export function LiquidityDashboard({ bookings }: LiquidityDashboardProps) {
             />
             <Line
               dataKey="closingBalance"
-              stroke="#3b82f6"
+              stroke="#ec4899"
               strokeWidth={3}
-              dot={{ fill: '#3b82f6', r: 4 }}
+              dot={{ fill: '#ec4899', r: 4 }}
             />
           </ComposedChart>
         </ResponsiveContainer>

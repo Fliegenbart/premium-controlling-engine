@@ -126,7 +126,7 @@ export default function ForecastPanel() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center shadow-[0_18px_60px_-35px_rgba(236,72,153,0.85)]">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -160,7 +160,7 @@ export default function ForecastPanel() {
           <button
             onClick={runForecast}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-700 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold transition-colors bg-gradient-to-br from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-400"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -228,7 +228,7 @@ export default function ForecastPanel() {
           {/* Chart */}
           <div className="bg-[#12121a] rounded-xl border border-white/10 p-6">
             <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-cyan-400" />
+              <BarChart3 className="w-4 h-4 text-pink-300" />
               Forecast Visualisierung
             </h3>
             <ResponsiveContainer width="100%" height={350}>
@@ -247,8 +247,11 @@ export default function ForecastPanel() {
                   contentStyle={{
                     backgroundColor: '#1a1a2e',
                     border: '1px solid #2d2d44',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
+                    color: '#e5e7eb',
                   }}
+                  labelStyle={{ color: '#fff' }}
+                  itemStyle={{ color: '#e5e7eb' }}
                 />
                 <Legend />
                 <Area
@@ -256,7 +259,7 @@ export default function ForecastPanel() {
                   dataKey="upper"
                   stackId="1"
                   stroke="none"
-                  fill="#06b6d4"
+                  fill="#a855f7"
                   fillOpacity={0.1}
                   name="Obergrenze"
                 />
@@ -265,7 +268,7 @@ export default function ForecastPanel() {
                   dataKey="lower"
                   stackId="2"
                   stroke="none"
-                  fill="#06b6d4"
+                  fill="#a855f7"
                   fillOpacity={0.1}
                   name="Untergrenze"
                 />
@@ -280,10 +283,10 @@ export default function ForecastPanel() {
                 <Line
                   type="monotone"
                   dataKey="forecast"
-                  stroke="#06b6d4"
+                  stroke="#ec4899"
                   strokeWidth={2}
                   strokeDasharray="5 5"
-                  dot={{ fill: '#06b6d4', r: 4 }}
+                  dot={{ fill: '#ec4899', r: 4 }}
                   name="Forecast"
                 />
               </ComposedChart>
@@ -293,14 +296,14 @@ export default function ForecastPanel() {
           {/* Forecast Values */}
           <div className="bg-[#12121a] rounded-xl border border-white/10 p-4">
             <h3 className="text-white font-medium mb-3 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-cyan-400" />
+              <Calendar className="w-4 h-4 text-pink-300" />
               Prognostizierte Werte
             </h3>
             <div className="grid grid-cols-3 gap-4">
               {result.forecast.map((f, i) => (
                 <div key={i} className="bg-white/5 rounded-lg p-4">
                   <p className="text-gray-400 text-sm">{f.period}</p>
-                  <p className="text-xl font-bold text-cyan-400 my-1">
+                  <p className="text-xl font-bold text-pink-300 my-1">
                     {formatCurrency(f.value)}
                   </p>
                   <p className="text-gray-500 text-xs">

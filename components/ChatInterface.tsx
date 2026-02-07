@@ -56,7 +56,7 @@ function formatMessageWithEvidence(content: string, onDocClick?: (docNo: string)
       <button
         key={`${docNo}-${match.index}`}
         onClick={() => onDocClick?.(docNo)}
-        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/30 hover:bg-blue-500/50 rounded text-blue-300 font-mono text-xs transition-colors"
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-pink-500/20 hover:bg-pink-500/30 rounded text-pink-200 font-mono text-xs transition-colors"
         title={`Beleg ${docNo} anzeigen`}
       >
         <FileText className="w-3 h-3" />
@@ -148,7 +148,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 ${
+        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-[0_18px_60px_-25px_rgba(236,72,153,0.8)] hover:shadow-[0_22px_70px_-28px_rgba(236,72,153,0.95)] transition-all hover:scale-105 ${
           isOpen ? 'hidden' : ''
         }`}
       >
@@ -170,7 +170,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
           />
 
           {/* Panel */}
-          <div className="relative w-full max-w-md h-[80vh] max-h-[600px] bg-[#12121a] rounded-2xl border border-white/10 shadow-2xl flex flex-col pointer-events-auto overflow-hidden">
+          <div className="relative w-full max-w-md h-[80vh] max-h-[600px] bg-[#0b0614] rounded-2xl border border-white/10 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.85)] flex flex-col pointer-events-auto overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div>
@@ -218,7 +218,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                         onClick={() => handleSuggestion(q)}
                         className="block w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 transition-colors group"
                       >
-                        <span className="text-blue-400 mr-2">→</span>
+                        <span className="text-pink-300 mr-2">→</span>
                         {q}
                       </button>
                     ))}
@@ -236,7 +236,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                           msg.role === 'user'
-                            ? 'bg-blue-600 text-white rounded-br-md'
+                            ? 'bg-gradient-to-br from-pink-500 to-fuchsia-500 text-white rounded-br-md'
                             : 'bg-white/10 text-gray-200 rounded-bl-md'
                         }`}
                       >
@@ -279,12 +279,12 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Frage eingeben..."
                   disabled={isLoading}
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm disabled:opacity-50"
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-pink-400/70 focus:ring-4 focus:ring-pink-400/10 text-sm disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded-xl transition-colors"
+                  className="p-2 rounded-xl text-white transition-colors bg-gradient-to-br from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-400"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

@@ -140,8 +140,8 @@ const config: Config = {
           "66%": { transform: "translate(20px, -30px) scale(0.92)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(99, 102, 241, 0.1), 0 0 40px rgba(99, 102, 241, 0.05)" },
-          "50%": { boxShadow: "0 0 30px rgba(99, 102, 241, 0.2), 0 0 60px rgba(99, 102, 241, 0.1)" },
+          "0%, 100%": { boxShadow: "0 0 25px rgba(236, 72, 153, 0.16), 0 0 50px rgba(217, 70, 239, 0.08)" },
+          "50%": { boxShadow: "0 0 40px rgba(236, 72, 153, 0.30), 0 0 80px rgba(217, 70, 239, 0.14)" },
         },
       },
     },

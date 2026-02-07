@@ -234,7 +234,7 @@ export function BABDashboard({ bookings }: BABDashboardProps) {
     const ratio = value / maxCellValue;
     if (ratio > 0.7) return 'bg-indigo-600/40';
     if (ratio > 0.4) return 'bg-indigo-500/25';
-    if (ratio > 0.1) return 'bg-indigo-400/15';
+    if (ratio > 0.1) return 'bg-indigo-400/[0.15]';
     return 'bg-indigo-300/10';
   };
 

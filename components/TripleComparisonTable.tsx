@@ -38,7 +38,7 @@ function StatusBadge({ status }: { status: string }) {
       );
     case 'under_plan':
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-fuchsia-500/20 text-fuchsia-300 rounded-full text-xs">
           <TrendingDown className="w-3 h-3" />
           Unter Plan
         </span>
@@ -203,7 +203,7 @@ export function TripleComparisonTable({ result, onShowEvidence }: TripleComparis
                     <td className="p-4 text-right text-gray-400 font-mono">
                       {formatCurrency(deviation.amount_vj)}
                     </td>
-                    <td className="p-4 text-right text-blue-400 font-mono">
+                    <td className="p-4 text-right text-fuchsia-300 font-mono">
                       {formatCurrency(deviation.amount_plan)}
                     </td>
                     <td className="p-4 text-right text-white font-mono font-medium">
@@ -274,8 +274,8 @@ export function TripleComparisonTable({ result, onShowEvidence }: TripleComparis
                         </div>
 
                         {/* Plan vs VJ Info */}
-                        <div className="mt-3 p-3 bg-blue-500/10 rounded-lg">
-                          <p className="text-blue-300 text-xs">
+                        <div className="mt-3 p-3 bg-pink-500/10 rounded-lg border border-pink-500/20">
+                          <p className="text-pink-200 text-xs">
                             💡 Plan war {deviation.plan_vs_vj_pct >= 0 ? 'ambitionierter' : 'konservativer'} als VJ:{' '}
                             {formatCurrency(deviation.plan_vs_vj_abs)} ({formatPercent(deviation.plan_vs_vj_pct)})
                           </p>
