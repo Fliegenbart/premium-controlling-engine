@@ -112,10 +112,6 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
             </button>
           </form>
 
-          <p className="mt-4 text-xs text-gray-500">
-            Demo (wenn aktiviert): <span className="font-mono">admin@controlling.local</span> /{' '}
-            <span className="font-mono">demo123</span>
-          </p>
         </div>
       </div>
     </main>
