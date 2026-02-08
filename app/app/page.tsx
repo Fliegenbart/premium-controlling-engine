@@ -879,7 +879,7 @@ export default function Home() {
 		                  </BlurFade>
 
 	                  <BlurFade delay={0.10}>
-	                    <BentoGrid className="mt-4 md:auto-rows-[18rem]">
+		                    <BentoGrid className="mt-4">
 	                      <BentoCard
 	                        Icon={Upload}
 	                        name="Einzelanalyse"
