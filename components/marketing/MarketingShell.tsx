@@ -5,10 +5,9 @@ import SiteHeader from "./SiteHeader";
 
 export default function MarketingShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#f6f7f9] text-gray-900">
+    <div className="min-h-screen bg-[rgb(var(--background-rgb))] text-[rgb(var(--foreground-rgb))]">
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_20%_0%,rgba(10,108,255,0.10),transparent_55%),radial-gradient(900px_circle_at_85%_5%,rgba(94,92,230,0.10),transparent_55%),radial-gradient(900px_circle_at_55%_95%,rgba(16,185,129,0.08),transparent_55%)]" />
-        <div className="absolute inset-0 opacity-[0.60] [background-image:linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] [background-size:72px_72px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_circle_at_20%_0%,rgba(0,122,255,0.05),transparent_50%),radial-gradient(800px_circle_at_80%_5%,rgba(88,86,214,0.04),transparent_50%)]" />
       </div>
 
       <SiteHeader />
@@ -17,4 +16,3 @@ export default function MarketingShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

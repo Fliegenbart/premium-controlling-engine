@@ -474,22 +474,22 @@ export default function Home() {
 
 		  const modeTabs: ModeTab[] = [
 		    // ── Start ──
-		    { key: 'start',        label: 'Start',          desc: 'Übersicht & nächste Schritte',      icon: Zap,          color: '#0071e3', group: 'home' },
+		    { key: 'start',        label: 'Start',          desc: 'Übersicht & nächste Schritte',      icon: Zap,          color: '#007AFF', group: 'home' },
 		    // ── Controlling ──
 		    { key: 'liquidity',    label: 'Liquidität',     desc: '13-Wochen Cashflow-Prognose',     icon: TrendingUp,   color: '#10b981', group: 'controlling' },
 		    { key: 'closing',      label: 'Abschluss',      desc: 'Monatsabschluss mit 12 Checks',   icon: CheckCircle,  color: '#22c55e', group: 'controlling' },
 		    { key: 'contribution', label: 'DB-Rechnung',    desc: 'Mehrstufige DB I → DB V',         icon: BarChart3,    color: '#14b8a6', group: 'controlling' },
-		    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#5e5ce6', group: 'controlling' },
+		    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#5856D6', group: 'controlling' },
 		    { key: 'bwa',          label: 'BWA',            desc: 'DATEV-BWA mit KI-Analyse',        icon: FileText,     color: '#f97316', group: 'controlling' },
 		    { key: 'bab',          label: 'BAB',            desc: 'Kostenstellen & GK-Zuschläge',    icon: Grid3x3,      color: '#ef4444', group: 'controlling' },
 		    // ── Analyse ──
-		    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#0071e3', group: 'analyse' },
-		    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#5e5ce6', group: 'analyse' },
+		    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#007AFF', group: 'analyse' },
+		    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#5856D6', group: 'analyse' },
 		    { key: 'multi',        label: 'Konzern',        desc: 'Multi-Entity Konsolidierung',     icon: Building2,    color: '#0ea5e9', group: 'analyse' },
 		    // ── KI-Tools ──
 		    { key: 'errors',       label: 'Fehler-Scan',    desc: 'KI-Buchungsfehler-Erkennung',     icon: AlertCircle,  color: '#f97316', group: 'ki' },
-		    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#0071e3', group: 'ki' },
-		    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#5e5ce6', group: 'ki' },
+		    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#007AFF', group: 'ki' },
+		    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#5856D6', group: 'ki' },
 		    { key: 'trends',       label: 'Trends',         desc: 'Multi-Perioden Trendanalyse',     icon: Activity,     color: '#10b981', group: 'ki' },
 		    { key: 'docs',         label: 'Dokumente',      desc: 'KI-Reports & Dokumenten-Archiv',  icon: FolderOpen,   color: '#f59e0b', group: 'ki' },
 		  ];
@@ -506,8 +506,8 @@ export default function Home() {
     <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-thin">
       {sidebarGroups.map((group, gi) => (
         <div key={group.key}>
-          {gi > 0 && <div className="my-3 mx-2 h-px bg-black/[0.06]" />}
-          <p className="text-[10px] uppercase tracking-[0.12em] text-gray-600 font-semibold px-3 mb-2">{group.label}</p>
+          {gi > 0 && <div className="my-3 mx-2 h-px bg-black/[0.04]" />}
+          <p className="text-[10px] uppercase tracking-[0.12em] text-gray-400 font-semibold px-3 mb-2">{group.label}</p>
           <div className="space-y-0.5">
             {modeTabs.filter(t => t.group === group.key).map((tab) => {
               const Icon = tab.icon;
@@ -559,9 +559,9 @@ export default function Home() {
   // Main App
   return (
     <main className="min-h-screen bg-[rgb(var(--background-rgb))] text-[rgb(var(--foreground-rgb))] relative flex">
-      {/* Subtle grid overlay (keeps structure without looking "dark") */}
+      {/* Subtle background gradient */}
       <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute inset-0 opacity-[0.55] [background-image:linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.035)_1px,transparent_1px)] [background-size:72px_72px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(800px_circle_at_20%_0%,rgba(0,122,255,0.03),transparent_50%)]" />
       </div>
 
       {/* Evidence Modal */}
@@ -573,19 +573,19 @@ export default function Home() {
       )}
 
       {/* ═══ Desktop Sidebar ═══ */}
-      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-white/70 backdrop-blur-2xl border-r border-black/[0.10]">
+      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-white/80 backdrop-blur-2xl saturate-[180%] border-r border-black/[0.06]">
         {/* Sidebar Header / Logo */}
-        <div className="px-4 py-4 border-b border-black/[0.08]">
+        <div className="px-4 py-4 border-b border-black/[0.06]">
           <Link
             href="/"
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
           >
-            <div className="relative w-9 h-9 rounded-xl bg-black/[0.03] ring-1 ring-black/[0.08] flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-[#0071e3]" />
+            <div className="relative w-8 h-8 rounded-lg bg-gradient-to-b from-[#007AFF] to-[#0055D4] flex items-center justify-center">
+              <BarChart3 className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-[15px] font-semibold text-gray-900 tracking-[-0.02em]">Controlling Engine</h1>
-              <p className="text-[10px] text-gray-500 tracking-wide">Abweichungsanalyse</p>
+              <p className="text-[10px] text-gray-400 tracking-wide">Abweichungsanalyse</p>
             </div>
           </Link>
         </div>
@@ -594,9 +594,9 @@ export default function Home() {
         {renderSidebarNav()}
 
         {/* Sidebar Footer */}
-        <div className="px-4 py-3 border-t border-black/[0.08]">
-          <div className="flex items-center gap-2 text-[11px] text-gray-500">
-            <div className="w-2 h-2 rounded-full bg-green-500/60 animate-pulse" />
+        <div className="px-4 py-3 border-t border-black/[0.06]">
+          <div className="flex items-center gap-2 text-[11px] text-gray-400">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span>14 Module aktiv</span>
           </div>
         </div>
@@ -612,7 +612,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-black/35 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm md:hidden"
               onClick={() => setSidebarOpen(false)}
             />
             {/* Sidebar Panel */}
@@ -621,12 +621,12 @@ export default function Home() {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-		              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-white border-r border-black/[0.10] flex flex-col md:hidden"
+		              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-white/95 backdrop-blur-2xl border-r border-black/[0.06] flex flex-col md:hidden"
             >
               {/* Mobile Sidebar Header */}
-              <div className="px-4 py-4 border-b border-black/[0.08] flex items-center justify-between">
+              <div className="px-4 py-4 border-b border-black/[0.06] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] flex items-center justify-center shadow-[0_12px_30px_-18px_rgba(0,113,227,0.35)]">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-b from-[#007AFF] to-[#0055D4] flex items-center justify-center">
                     <BarChart3 className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-sm font-semibold text-gray-900">Navigation</span>
@@ -653,7 +653,7 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative bg-white/70 backdrop-blur-2xl border-b border-black/[0.10] sticky top-0 z-30"
+          className="relative bg-white/80 backdrop-blur-2xl saturate-[180%] border-b border-black/[0.06] sticky top-0 z-30"
         >
           <div className="px-6 py-2.5">
             <div className="flex items-center justify-between">
@@ -661,7 +661,7 @@ export default function Home() {
                 {/* Mobile hamburger */}
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="md:hidden w-9 h-9 rounded-xl bg-black/[0.03] border border-black/[0.08] flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-black/[0.05] transition-colors"
+                  className="md:hidden w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-black/[0.04] transition-colors"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
@@ -686,7 +686,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 {/* Workflow Status */}
                 {mode !== 'start' && hasValidData && (
-                  <div className="hidden sm:flex items-center gap-1 bg-white/70 rounded-lg p-1 border border-black/[0.08] shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]">
+                  <div className="hidden sm:flex items-center gap-1 bg-white/80 rounded-lg p-1 border border-black/[0.06] shadow-apple-sm">
                     {(['draft', 'review', 'approved'] as WorkflowStatus[]).map(status => (
                       <button
                         key={status}
@@ -722,7 +722,7 @@ export default function Home() {
                 )}
 
                 {/* User / Logout */}
-                <div className="flex items-center gap-2 rounded-xl border border-black/[0.10] bg-white/70 px-3 py-2 shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]">
+                <div className="flex items-center gap-2 rounded-xl border border-black/[0.06] bg-white/80 px-3 py-2 shadow-apple-sm">
                   <div className="hidden sm:block">
                     <p className="text-xs font-semibold text-gray-900 leading-none">{currentUser.name}</p>
                     <p className="mt-0.5 text-[10px] text-gray-500 leading-none">
@@ -733,8 +733,8 @@ export default function Home() {
                           : 'Leser'}
                     </p>
                   </div>
-                  <div className="h-8 w-8 rounded-xl bg-black/[0.03] ring-1 ring-black/[0.08] flex items-center justify-center">
-                    <User className="h-4 w-4 text-[#0071e3]" />
+                  <div className="h-8 w-8 rounded-lg bg-[#007AFF]/[0.08] flex items-center justify-center">
+                    <User className="h-4 w-4 text-[#007AFF]" />
                   </div>
                   <button
                     onClick={handleLogout}
@@ -761,31 +761,31 @@ export default function Home() {
             transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-10"
           >
-	            <div className="relative overflow-hidden rounded-[28px] border border-black/[0.10] bg-white/70 backdrop-blur-2xl p-8 md:p-10 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
+	            <div className="relative overflow-hidden rounded-[28px] border border-black/[0.06] bg-white/70 backdrop-blur-2xl p-8 md:p-10 shadow-apple-lg">
 	              <div className="pointer-events-none absolute inset-0">
 	                <motion.div
 	                  aria-hidden="true"
-	                  className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-[#0071e3]/12 blur-3xl"
+	                  className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-[#007AFF]/12 blur-3xl"
 	                  animate={{ y: [0, 18, 0], x: [0, 10, 0], opacity: [0.55, 0.75, 0.55] }}
 	                  transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
 	                />
 	                <motion.div
 	                  aria-hidden="true"
-	                  className="absolute -bottom-48 right-0 h-96 w-96 rounded-full bg-[#5e5ce6]/12 blur-3xl"
+	                  className="absolute -bottom-48 right-0 h-96 w-96 rounded-full bg-[#5856D6]/12 blur-3xl"
 	                  animate={{ y: [0, -14, 0], x: [0, -10, 0], opacity: [0.45, 0.65, 0.45] }}
 	                  transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
 	                />
-	                <div className="absolute inset-0 opacity-[0.55] [background-image:linear-gradient(to_right,rgba(0,0,0,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.028)_1px,transparent_1px)] [background-size:72px_72px]" />
+	                <div className="absolute inset-0 opacity-0" />
 	              </div>
 
-	              <BorderBeam size={180} duration={18} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	              <BorderBeam size={180} duration={18} colorFrom="#007AFF" colorTo="#5856D6" />
 
               <div className="relative">
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                   <div className="max-w-2xl">
                     <BlurFade delay={0.02}>
-                      <p className="inline-flex items-center gap-2 rounded-full border border-black/[0.10] bg-white/60 px-3 py-1 text-xs text-gray-700 shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]">
-                        <Shield className="h-3.5 w-3.5 text-[#0071e3]" />
+                      <p className="inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/60 px-3 py-1 text-xs text-gray-700 shadow-apple-sm">
+                        <Shield className="h-3.5 w-3.5 text-[#007AFF]" />
                         Lokal. Prüffähig. Schnell.
                         <span className="mx-1 h-3 w-px bg-black/10" />
                         <span className="text-gray-400">Start</span>
@@ -795,7 +795,7 @@ export default function Home() {
                     <BlurFade delay={0.06}>
                       <h1 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">
                         Willkommen zurück,{' '}
-                        <span className="bg-gradient-to-r from-[#0071e3] to-[#5e5ce6] bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#007AFF] to-[#5856D6] bg-clip-text text-transparent">
                           {currentUser.name}
                         </span>
                         .
@@ -815,8 +815,8 @@ export default function Home() {
                           onClick={() => setMode('single')}
                           shimmerColor="#bfdbfe"
                           shimmerSize="0.08em"
-                          borderRadius="16px"
-                          background="linear-gradient(135deg, #0071e3 0%, #5e5ce6 100%)"
+                          borderRadius="9999px"
+                          background="#007AFF"
                           className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
                         >
                           <span className="relative z-10 inline-flex items-center gap-2">
@@ -827,13 +827,13 @@ export default function Home() {
                         <div className="flex gap-3">
                           <button
                             onClick={() => setMode('triple')}
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/[0.06] bg-white/60 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-apple-sm"
                           >
-                            Plan vs. Ist <GitCompare className="h-4 w-4 text-[#5e5ce6]" />
+                            Plan vs. Ist <GitCompare className="h-4 w-4 text-[#5856D6]" />
                           </button>
                           <button
                             onClick={() => setMode('docs')}
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/[0.06] bg-white/60 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-apple-sm"
                           >
                             Dokumente <FolderOpen className="h-4 w-4 text-amber-600" />
                           </button>
@@ -844,7 +844,7 @@ export default function Home() {
 
                   <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 lg:w-[360px]">
 	                    <BlurFade delay={0.08}>
-	                      <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+	                      <div className="rounded-2xl border border-black/[0.06] bg-white/60 p-5 shadow-apple-md">
 	                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Quick tip</p>
 	                        <p className="mt-2 text-sm font-semibold text-gray-900 tracking-tight">Magic Upload</p>
 	                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
@@ -853,7 +853,7 @@ export default function Home() {
 	                      </div>
 	                    </BlurFade>
 	                    <BlurFade delay={0.12}>
-	                      <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+	                      <div className="rounded-2xl border border-black/[0.06] bg-white/60 p-5 shadow-apple-md">
 	                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Sicherheit</p>
 	                        <p className="mt-2 text-sm font-semibold text-gray-900 tracking-tight">Session basiert</p>
 	                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
@@ -862,7 +862,7 @@ export default function Home() {
 	                      </div>
 	                    </BlurFade>
 	                    <BlurFade delay={0.16}>
-	                      <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+	                      <div className="rounded-2xl border border-black/[0.06] bg-white/60 p-5 shadow-apple-md">
 	                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Output</p>
 	                        <p className="mt-2 text-sm font-semibold text-gray-900 tracking-tight">Review-ready</p>
 	                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
@@ -895,7 +895,7 @@ export default function Home() {
 	                        className="md:col-span-2"
 		                        background={
 		                          <div className="absolute inset-0">
-		                            <Upload className="absolute -bottom-10 -right-10 h-52 w-52 text-[#0071e3]/10" />
+		                            <Upload className="absolute -bottom-10 -right-10 h-52 w-52 text-[#007AFF]/10" />
 		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
 		                          </div>
 		                        }
@@ -911,7 +911,7 @@ export default function Home() {
 		                        className="md:col-span-1"
 		                        background={
 		                          <div className="absolute inset-0">
-		                            <GitCompare className="absolute -bottom-10 -right-10 h-52 w-52 text-[#5e5ce6]/10" />
+		                            <GitCompare className="absolute -bottom-10 -right-10 h-52 w-52 text-[#5856D6]/10" />
 		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
 		                          </div>
 		                        }
@@ -991,7 +991,7 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() => setShowAllModules((v) => !v)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
+                        className="inline-flex items-center gap-2 rounded-xl border border-black/[0.06] bg-white/60 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-apple-sm"
                       >
                         {showAllModules ? (
                           <>
@@ -1015,14 +1015,14 @@ export default function Home() {
 		                  </BlurFade>
 
 	                  <BlurFade delay={0.16}>
-		                    <div className="bento-glow relative overflow-hidden rounded-3xl border border-black/[0.10] bg-white/70 backdrop-blur-2xl p-6 md:p-8 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
-		                      <BorderBeam size={220} duration={20} colorFrom="#0071e3" colorTo="#5e5ce6" />
+		                    <div className="bento-glow relative overflow-hidden rounded-3xl border border-black/[0.06] bg-white/70 backdrop-blur-2xl p-6 md:p-8 shadow-apple-lg">
+		                      <BorderBeam size={220} duration={20} colorFrom="#007AFF" colorTo="#5856D6" />
 		                      <div className="grid gap-4 md:grid-cols-3">
-		                        <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-6 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+		                        <div className="rounded-2xl border border-black/[0.06] bg-white/60 p-6 shadow-apple-md">
 		                          <div className="flex items-center justify-between">
 		                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">01</span>
 		                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.03] ring-1 ring-black/[0.08]">
-		                              <Upload className="h-5 w-5 text-[#0071e3]" />
+		                              <Upload className="h-5 w-5 text-[#007AFF]" />
 		                            </span>
 		                          </div>
 		                          <p className="mt-4 text-sm font-semibold text-gray-900 tracking-tight">Daten laden</p>
@@ -1031,11 +1031,11 @@ export default function Home() {
 		                          </p>
 		                        </div>
 
-		                        <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-6 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+		                        <div className="rounded-2xl border border-black/[0.06] bg-white/60 p-6 shadow-apple-md">
 		                          <div className="flex items-center justify-between">
 		                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">02</span>
 		                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.03] ring-1 ring-black/[0.08]">
-		                              <Search className="h-5 w-5 text-[#5e5ce6]" />
+		                              <Search className="h-5 w-5 text-[#5856D6]" />
 		                            </span>
 		                          </div>
 		                          <p className="mt-4 text-sm font-semibold text-gray-900 tracking-tight">Abweichungen verstehen</p>
@@ -1044,7 +1044,7 @@ export default function Home() {
 		                          </p>
 		                        </div>
 
-		                        <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-6 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+		                        <div className="rounded-2xl border border-black/[0.06] bg-white/60 p-6 shadow-apple-md">
 		                          <div className="flex items-center justify-between">
 		                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">03</span>
 		                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.03] ring-1 ring-black/[0.08]">
@@ -1063,8 +1063,8 @@ export default function Home() {
 		                          onClick={() => setMode('single')}
 		                          shimmerColor="#bfdbfe"
 		                          shimmerSize="0.08em"
-		                          borderRadius="16px"
-		                          background="linear-gradient(135deg, #0071e3 0%, #5e5ce6 100%)"
+		                          borderRadius="9999px"
+		                          background="#007AFF"
 		                          className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
 		                        >
 	                          <span className="relative z-10 inline-flex items-center gap-2">
@@ -1074,7 +1074,7 @@ export default function Home() {
 
 		                        <button
 		                          onClick={() => setMode('docs')}
-		                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
+		                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-black/[0.06] bg-white/60 px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-apple-sm"
 		                        >
 		                          Reports ansehen <FolderOpen className="h-4 w-4 text-amber-600" />
 		                        </button>
@@ -1111,27 +1111,27 @@ export default function Home() {
             transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-8"
           >
-            <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-10 text-center overflow-hidden">
-              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-gradient-to-b from-emerald-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="relative rounded-2xl border border-black/[0.06] bg-white/80 backdrop-blur-2xl p-10 text-center overflow-hidden shadow-apple-md">
+              <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-gradient-to-b from-emerald-500/[0.06] to-transparent rounded-full blur-3xl pointer-events-none" />
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
-                className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/25"
+                className="relative w-16 h-16 rounded-2xl bg-emerald-500/[0.10] flex items-center justify-center mx-auto mb-6"
               >
-                <TrendingUp className="w-10 h-10 text-white" />
+                <TrendingUp className="w-8 h-8 text-emerald-600" />
               </motion.div>
               <motion.h2
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-2xl font-semibold text-white mb-3 tracking-tight"
+                className="text-2xl font-bold text-gray-900 mb-3 tracking-tight"
               >Multi-Perioden Trendanalyse</motion.h2>
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-gray-300 mb-6 max-w-lg mx-auto"
+                className="text-gray-500 mb-6 max-w-lg mx-auto"
               >
                 Laden Sie Buchungsdaten aus mehreren Jahren hoch, um CAGR, Volatilität, Forecasts und Anomalien über 3-5 Perioden zu analysieren.
               </motion.p>
@@ -1142,7 +1142,7 @@ export default function Home() {
                 transition={{ delay: 0.5 }}
                 className="max-w-md mx-auto"
               >
-                <svg viewBox="0 0 300 60" className="w-full h-auto opacity-30">
+                <svg viewBox="0 0 300 60" className="w-full h-auto opacity-40">
                   <motion.path
                     d="M0,50 L30,45 L60,48 L90,35 L120,38 L150,25 L180,28 L210,15 L240,18 L270,10 L300,5"
                     fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round"
@@ -1164,7 +1164,7 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="text-gray-500 text-sm mt-4"
+                className="text-gray-400 text-sm mt-4"
               >
                 Nutzen Sie die Einzelanalyse, um zunächst Daten zu laden.
               </motion.p>
@@ -1313,10 +1313,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-	            className="bg-white/70 backdrop-blur-2xl rounded-2xl border border-black/[0.10] p-6 mb-8 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]"
+	            className="bg-white/70 backdrop-blur-2xl rounded-2xl border border-black/[0.06] p-6 mb-8 shadow-apple-lg"
 	          >
 	            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2 tracking-tight">
-	              <BarChart3 className="w-5 h-5 text-[#0071e3]" />
+	              <BarChart3 className="w-5 h-5 text-[#007AFF]" />
 	              Plan vs. Ist vs. Vorjahr
 	            </h2>
 	            <p className="text-gray-600 text-sm mb-6">
@@ -1338,18 +1338,18 @@ export default function Home() {
           transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
         <BlurFade delay={0.05} inView>
-	        <div className="relative bg-white/70 backdrop-blur-2xl rounded-2xl border border-black/[0.10] p-6 mb-8 overflow-hidden shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
-	          <BorderBeam size={120} duration={18} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	        <div className="relative bg-white/70 backdrop-blur-2xl rounded-2xl border border-black/[0.06] p-6 mb-8 overflow-hidden shadow-apple-lg">
+	          <BorderBeam size={120} duration={18} colorFrom="#007AFF" colorTo="#5856D6" />
 	          <div className="flex items-center justify-between mb-4">
 	            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 tracking-tight">
 	              {useMagicUpload ? (
 	                <>
-	                  <Sparkles className="w-5 h-5 text-[#5e5ce6]" />
+	                  <Sparkles className="w-5 h-5 text-[#5856D6]" />
 	                  Intelligenter Import
 	                </>
 	              ) : (
 	                <>
-	                  <Upload className="w-5 h-5 text-[#0071e3]" />
+	                  <Upload className="w-5 h-5 text-[#007AFF]" />
 	                  {mode === 'single' ? 'Buchungsdaten hochladen' : 'Gesellschaften hinzufügen'}
 	                </>
 	              )}
@@ -1359,7 +1359,7 @@ export default function Home() {
 	                onClick={() => setUseMagicUpload(!useMagicUpload)}
 	                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
 	                  useMagicUpload
-	                    ? 'bg-[#0071e3]/10 text-[#005bb5] border border-[#0071e3]/20'
+	                    ? 'bg-[#007AFF]/10 text-[#005bb5] border border-[#007AFF]/20'
 	                    : 'bg-black/[0.04] text-gray-700 hover:text-gray-900 border border-black/[0.06]'
 	                }`}
 	              >
@@ -1413,14 +1413,14 @@ export default function Home() {
           {(!useMagicUpload || mode === 'multi') && (
           <div className="space-y-4">
 	            {entities.map((entity) => (
-	              <div key={entity.id} className="bg-white/60 rounded-xl p-4 border border-black/[0.06] shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	              <div key={entity.id} className="bg-white/60 rounded-xl p-4 border border-black/[0.06] shadow-apple-sm">
 	                <div className="flex items-center justify-between mb-3">
 	                  <div className="flex items-center gap-3">
 	                    {mode === 'multi' ? (
 	                      <select
 	                        value={entity.name}
 	                        onChange={e => updateEntity(entity.id, { name: e.target.value })}
-	                        className="bg-white/80 border border-black/[0.10] rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-[#0071e3]/60 focus:ring-4 focus:ring-[#0071e3]/10"
+	                        className="bg-white/80 border border-black/[0.06] rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-[#007AFF]/60 focus:ring-4 focus:ring-[#007AFF]/10"
 	                      >
                         <option value="">Gesellschaft wählen...</option>
                         {EXAMPLE_ENTITIES.map(name => (
@@ -1459,7 +1459,7 @@ export default function Home() {
 	                      type="file"
 	                      accept=".csv"
 	                      onChange={e => updateEntity(entity.id, { prevFile: e.target.files?.[0] || null })}
-	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
+	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#007AFF] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
 	                    />
                   </div>
                   <div>
@@ -1468,7 +1468,7 @@ export default function Home() {
 	                      type="file"
 	                      accept=".csv"
 	                      onChange={e => updateEntity(entity.id, { currFile: e.target.files?.[0] || null })}
-	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
+	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#007AFF] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
 	                    />
                   </div>
                 </div>
@@ -1478,7 +1478,7 @@ export default function Home() {
 	            {mode === 'multi' && (
 	              <button
 	                onClick={addEntity}
-	                className="w-full py-3 border-2 border-dashed border-black/[0.10] rounded-xl text-gray-700 hover:border-[#0071e3]/40 hover:text-[#0071e3] transition-all flex items-center justify-center gap-2 bg-white/50"
+	                className="w-full py-3 border-2 border-dashed border-black/[0.06] rounded-xl text-gray-700 hover:border-[#007AFF]/40 hover:text-[#007AFF] transition-all flex items-center justify-center gap-2 bg-white/50"
 	              >
                 <Plus className="w-5 h-5" />
                 Weitere Gesellschaft
@@ -1503,7 +1503,7 @@ export default function Home() {
               )}
 	              shimmerColor="#bfdbfe"
 	              shimmerSize="0.08em"
-	              background="linear-gradient(135deg, #0071e3 0%, #5e5ce6 100%)"
+	              background="#007AFF"
 	              borderRadius="12px"
 	              className="flex-1 min-w-[200px] py-3 px-6 font-medium disabled:opacity-40"
             >
@@ -1519,15 +1519,15 @@ export default function Home() {
 	                <button
 	                  onClick={() => downloadReport('word')}
 	                  disabled={isGeneratingReport}
-	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.10] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.06] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-apple-sm"
 	                >
-	                  <FileText className="w-5 h-5 text-[#0071e3] group-hover:scale-110 transition-transform" />
+	                  <FileText className="w-5 h-5 text-[#007AFF] group-hover:scale-110 transition-transform" />
 	                  Word
 	                </button>
 	                <button
 	                  onClick={() => downloadReport('excel')}
 	                  disabled={isGeneratingReport}
-	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.10] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.06] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-apple-sm"
 	                >
 	                  <FileSpreadsheet className="w-5 h-5 text-green-400 group-hover:scale-110 transition-transform" />
 	                  Excel
@@ -1542,7 +1542,7 @@ export default function Home() {
                       }
                     }
                   }}
-	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.10] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.06] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-apple-sm"
 	                >
 	                  <Save className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
 	                  Speichern
@@ -1566,15 +1566,15 @@ export default function Home() {
           >
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] p-4 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.06] p-4 shadow-apple-sm">
 	                <p className="text-sm text-gray-500 mb-1">Plan</p>
-	                <p className="text-xl font-bold text-[#5e5ce6]">{formatCurrency(tripleResult.meta.total_plan)}</p>
+	                <p className="text-xl font-bold text-[#5856D6]">{formatCurrency(tripleResult.meta.total_plan)}</p>
 	              </motion.div>
-	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] p-4 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.06] p-4 shadow-apple-sm">
 	                <p className="text-sm text-gray-500 mb-1">Ist</p>
 	                <p className="text-xl font-bold text-gray-900">{formatCurrency(tripleResult.meta.total_ist)}</p>
 	              </motion.div>
-	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] p-4 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.06] p-4 shadow-apple-sm">
 	                <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
 	                <p className="text-xl font-bold text-gray-700">{formatCurrency(tripleResult.meta.total_vj)}</p>
 	              </motion.div>
@@ -1670,8 +1670,8 @@ export default function Home() {
             {/* KPI Cards with NumberTicker */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <BlurFade delay={0.05} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
-                <BorderBeam size={80} duration={12} colorFrom="#0071e3" colorTo="#5e5ce6" />
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.06] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-apple-sm">
+                <BorderBeam size={80} duration={12} colorFrom="#007AFF" colorTo="#5856D6" />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-600 mb-1.5">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight">
                   <NumberTicker value={mode === 'multi' ? (konzernResult?.entities.length ?? 0) : currentResult.meta.bookings_prev} />
@@ -1679,8 +1679,8 @@ export default function Home() {
               </motion.div>
               </BlurFade>
               <BlurFade delay={0.1} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
-                <BorderBeam size={80} duration={12} delay={3} colorFrom="#5e5ce6" colorTo="#0071e3" />
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.06] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-apple-sm">
+                <BorderBeam size={80} duration={12} delay={3} colorFrom="#5856D6" colorTo="#007AFF" />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-600 mb-1.5">Vorjahr</p>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_prev)} prefix="" suffix=" €" />
@@ -1688,8 +1688,8 @@ export default function Home() {
               </motion.div>
               </BlurFade>
               <BlurFade delay={0.15} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
-                <BorderBeam size={80} duration={12} delay={6} colorFrom="#0071e3" colorTo="#5e5ce6" />
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.06] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-apple-sm">
+                <BorderBeam size={80} duration={12} delay={6} colorFrom="#007AFF" colorTo="#5856D6" />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-600 mb-1.5">Aktuell</p>
                 <p className="text-2xl font-bold text-gray-900 tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_curr)} prefix="" suffix=" €" />
@@ -1700,7 +1700,7 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className={`relative rounded-xl border p-5 overflow-hidden ${
                 currentResult.summary.total_delta > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
-                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#5e5ce6'} />
+                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#5856D6'} />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Abweichung</p>
                 <p className={`text-2xl font-bold flex items-center gap-2 tracking-tight ${
                   currentResult.summary.total_delta > 0 ? 'text-red-400' : 'text-green-400'
@@ -1715,10 +1715,10 @@ export default function Home() {
             {/* Charts */}
             <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-	              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-6 overflow-hidden hover:border-black/[0.14] transition-colors shadow-[0_30px_90px_-70px_rgba(0,0,0,0.35)]">
-	                <BorderBeam size={100} duration={15} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.06] p-6 overflow-hidden hover:border-black/[0.14] transition-colors shadow-apple-md">
+	                <BorderBeam size={100} duration={15} colorFrom="#007AFF" colorTo="#5856D6" />
 	                <h3 className="text-gray-900 font-semibold mb-4 flex items-center gap-2 tracking-tight">
-	                  <BarChart3 className="w-5 h-5 text-[#0071e3]" />
+	                  <BarChart3 className="w-5 h-5 text-[#007AFF]" />
 	                  {mode === 'multi' ? 'Gesellschaften' : 'Top Abweichungen'}
 	                </h3>
 	                <ResponsiveContainer width="100%" height={280}>
@@ -1747,10 +1747,10 @@ export default function Home() {
                 </ResponsiveContainer>
               </motion.div>
 
-	              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-6 overflow-hidden hover:border-black/[0.14] transition-colors shadow-[0_30px_90px_-70px_rgba(0,0,0,0.35)]">
-	                <BorderBeam size={100} duration={15} delay={7} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.06] p-6 overflow-hidden hover:border-black/[0.14] transition-colors shadow-apple-md">
+	                <BorderBeam size={100} duration={15} delay={7} colorFrom="#007AFF" colorTo="#5856D6" />
 	                <h3 className="text-gray-900 font-semibold mb-4 flex items-center gap-2 tracking-tight">
-	                  <PieChart className="w-5 h-5 text-[#0071e3]" />
+	                  <PieChart className="w-5 h-5 text-[#007AFF]" />
 	                  Verteilung
 	                </h3>
                 <ResponsiveContainer width="100%" height={280}>
@@ -1784,8 +1784,8 @@ export default function Home() {
 
             {/* Tabs */}
             <BlurFade delay={0.3} inView>
-	            <div className="relative bg-white/70 backdrop-blur-xl rounded-2xl border border-black/[0.10] overflow-hidden shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
-	              <BorderBeam size={200} duration={25} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	            <div className="relative bg-white/70 backdrop-blur-xl rounded-2xl border border-black/[0.06] overflow-hidden shadow-apple-lg">
+	              <BorderBeam size={200} duration={25} colorFrom="#007AFF" colorTo="#5856D6" />
 	              <div className="flex border-b border-black/[0.08]">
 	                {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
 	                  <button
@@ -1798,7 +1798,7 @@ export default function Home() {
 	                    {activeTab === tab && (
 	                      <motion.div
 	                        layoutId="activeTab"
-	                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-[#0071e3] to-[#5e5ce6]"
+	                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-[#007AFF] to-[#5856D6]"
 	                        transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
 	                      />
 	                    )}
@@ -1818,7 +1818,7 @@ export default function Home() {
 	                {activeTab === 'overview' && (
 	                  <div className="space-y-3">
 	                    <h4 className="text-gray-900 font-semibold mb-4 flex items-center gap-2 tracking-tight">
-	                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-[#0071e3] to-[#5e5ce6]" />
+	                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-[#007AFF] to-[#5856D6]" />
 	                      Signifikante Abweichungen
 	                    </h4>
                     {currentResult.by_account?.slice(0, 10).map((dev, idx) => (
@@ -1826,7 +1826,7 @@ export default function Home() {
                       <div className="space-y-2">
 	                        <button
 	                          onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
-	                          className="w-full flex items-center justify-between bg-white/60 hover:bg-white/80 border border-black/[0.06] hover:border-black/[0.10] rounded-xl p-4 transition-all text-left group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                          className="w-full flex items-center justify-between bg-white/60 hover:bg-white/80 border border-black/[0.06] hover:border-black/[0.06] rounded-xl p-4 transition-all text-left group shadow-apple-sm"
 	                        >
 	                          <div>
 	                            <div className="flex items-center gap-2">
@@ -1848,7 +1848,7 @@ export default function Home() {
                                 {formatPercent(dev.delta_pct)}
                               </p>
                             </div>
-	                            <Link2 className="w-4 h-4 text-[#0071e3]" />
+	                            <Link2 className="w-4 h-4 text-[#007AFF]" />
 	                          </div>
 	                        </button>
                         <div className="flex gap-2 ml-4">
@@ -1856,7 +1856,7 @@ export default function Home() {
 	                            onClick={() => setRootCauseDeviation(rootCauseDeviation?.account === dev.account ? null : dev)}
 		                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
 		                              rootCauseDeviation?.account === dev.account
-		                                ? 'bg-[#0071e3]/10 text-[#005bb5] border border-[#0071e3]/20'
+		                                ? 'bg-[#007AFF]/10 text-[#005bb5] border border-[#007AFF]/20'
 		                                : 'bg-black/[0.04] hover:bg-black/[0.06] text-gray-700 hover:text-gray-900 border border-black/[0.06]'
 		                            }`}
 		                          >
@@ -1904,9 +1904,9 @@ export default function Home() {
 	                            <td className="py-3.5 text-right">
 	                              <button
 	                                onClick={() => { setSelectedDeviation(acc); setShowEvidenceModal(true); }}
-	                                className="p-1.5 hover:bg-[#0071e3]/10 rounded-lg transition-colors group"
+	                                className="p-1.5 hover:bg-[#007AFF]/10 rounded-lg transition-colors group"
 	                              >
-	                                <Link2 className="w-4 h-4 text-[#0071e3] group-hover:text-[#005bb5]" />
+	                                <Link2 className="w-4 h-4 text-[#007AFF] group-hover:text-[#005bb5]" />
 	                              </button>
 	                            </td>
 	                          </tr>
@@ -1946,9 +1946,9 @@ export default function Home() {
 	                {activeTab === 'evidence' && (
 	                  <div className="text-center py-16">
 	                    <div className="relative w-20 h-20 mx-auto mb-6">
-	                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#0071e3]/16 to-[#5e5ce6]/14 animate-pulse" />
-	                      <div className="relative w-full h-full rounded-2xl bg-white/70 border border-black/[0.10] flex items-center justify-center shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
-	                        <Link2 className="w-10 h-10 text-[#0071e3]" />
+	                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#007AFF]/16 to-[#5856D6]/14 animate-pulse" />
+	                      <div className="relative w-full h-full rounded-2xl bg-white/70 border border-black/[0.06] flex items-center justify-center shadow-apple-sm">
+	                        <Link2 className="w-10 h-10 text-[#007AFF]" />
 	                      </div>
 	                    </div>
 	                    <h4 className="text-gray-900 font-semibold text-lg mb-3 tracking-tight">Evidence Trail</h4>
@@ -1958,8 +1958,8 @@ export default function Home() {
 	                    </p>
 	                    <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-500">
 	                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500/60" /> Prüfungssicher</div>
-	                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#0071e3]/70" /> Revisionsfest</div>
-	                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-[#0071e3]/70" /> Belegverknüpft</div>
+	                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#007AFF]/70" /> Revisionsfest</div>
+	                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-[#007AFF]/70" /> Belegverknüpft</div>
 	                    </div>
 	                  </div>
 	                )}
