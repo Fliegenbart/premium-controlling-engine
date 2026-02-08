@@ -348,9 +348,9 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
               className="flex items-center justify-between pt-2 border-t border-white/10"
             >
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#0071e3]/10 border border-[#0071e3]/20">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#007AFF]/10 border border-[#007AFF]/20">
                   {patternIcons[explanation.pattern]}
-                  <span className="text-xs text-[#005bb5] font-medium">{patternLabels[explanation.pattern]}</span>
+                  <span className="text-xs text-[#007AFF] font-medium">{patternLabels[explanation.pattern]}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -456,7 +456,7 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
                       {cluster.bookings.slice(0, 5).map((b, i) => (
                         <tr key={i} className="border-t border-white/5">
                           <td className="p-2 text-gray-400">{b.date}</td>
-                          <td className="p-2 text-[#0071e3] font-mono">{b.document_no}</td>
+                          <td className="p-2 text-[#007AFF] font-mono">{b.document_no}</td>
                           <td className="p-2 text-gray-300 max-w-[200px] truncate">{b.text}</td>
                           <td className={`p-2 text-right font-medium ${b.amount > 0 ? 'text-red-400' : 'text-green-400'}`}>
                             {formatCurrency(b.amount)}

@@ -50,7 +50,7 @@ export function BentoCard({
 }: BentoCardProps) {
   const base = cn(
     "group relative h-full overflow-hidden rounded-2xl border border-black/[0.06] bg-white/80 backdrop-blur-xl shadow-apple-sm",
-    "transition-all duration-300 hover:border-black/[0.10] hover:shadow-apple-md",
+    "transition-all duration-300 hover:border-black/[0.08] hover:shadow-apple-md",
     "transform-gpu hover:-translate-y-0.5",
     className,
   );

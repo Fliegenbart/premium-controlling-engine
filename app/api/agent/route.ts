@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
     }
     
     // Local mode with Ollama
-    console.log('Using local LLM (Ollama)');
 
     const localAgent = getLocalAgent(model);
 

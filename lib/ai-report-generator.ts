@@ -316,8 +316,6 @@ export async function generateAIReportSections(data: AnalysisResult): Promise<AI
   }
 
   try {
-    console.log('Generating AI report sections with Ollama...');
-
     // Generate all sections in parallel for performance
     const [
       executiveSummary,
