@@ -584,13 +584,14 @@ export function BWADashboard({ bookings, prevBookings }: BWADashboardProps) {
               <YAxis stroke="rgba(255,255,255,0.5)" />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  color: '#e5e7eb',
+                  backgroundColor: 'rgba(255,255,255,0.98)',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  borderRadius: '12px',
+                  boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)',
+                  color: '#111827',
                 }}
-                labelStyle={{ color: '#fff' }}
-                itemStyle={{ color: '#e5e7eb' }}
+                labelStyle={{ color: '#111827', fontWeight: 600 }}
+                itemStyle={{ color: '#374151' }}
                 formatter={(v: unknown) => {
                   if (typeof v === 'number') {
                     return `${v.toFixed(1)}%`;
@@ -637,13 +638,14 @@ export function BWADashboard({ bookings, prevBookings }: BWADashboardProps) {
                   return String(v ?? '');
                 }}
                 contentStyle={{
-                  backgroundColor: 'rgba(15, 17, 23, 0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  color: '#e5e7eb',
+                  backgroundColor: 'rgba(255,255,255,0.98)',
+                  border: '1px solid rgba(0,0,0,0.12)',
+                  borderRadius: '12px',
+                  boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)',
+                  color: '#111827',
                 }}
-                labelStyle={{ color: '#fff' }}
-                itemStyle={{ color: '#e5e7eb' }}
+                labelStyle={{ color: '#111827', fontWeight: 600 }}
+                itemStyle={{ color: '#374151' }}
               />
               <Legend />
             </PieChart>

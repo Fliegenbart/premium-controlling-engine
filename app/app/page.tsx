@@ -442,8 +442,8 @@ export default function Home() {
   // Auth gate: keep the application private by default.
   if (authChecking) {
     return (
-      <main className="min-h-screen bg-[#070511] flex items-center justify-center">
-        <div className="text-gray-300 text-sm">Session wird geladen...</div>
+      <main className="min-h-screen bg-[rgb(var(--background-rgb))] flex items-center justify-center">
+        <div className="text-gray-600 text-sm">Session wird geladen...</div>
       </main>
     );
   }
@@ -469,27 +469,27 @@ export default function Home() {
     group: 'home' | 'controlling' | 'analyse' | 'ki';
   }
 
-	  const modeTabs: ModeTab[] = [
-	    // ── Start ──
-	    { key: 'start',        label: 'Start',          desc: 'Übersicht & nächste Schritte',      icon: Zap,          color: '#ec4899', group: 'home' },
-	    // ── Controlling ──
-	    { key: 'liquidity',    label: 'Liquidität',     desc: '13-Wochen Cashflow-Prognose',     icon: TrendingUp,   color: '#f472b6', group: 'controlling' },
-	    { key: 'closing',      label: 'Abschluss',      desc: 'Monatsabschluss mit 12 Checks',   icon: CheckCircle,  color: '#22c55e', group: 'controlling' },
-	    { key: 'contribution', label: 'DB-Rechnung',    desc: 'Mehrstufige DB I → DB V',         icon: BarChart3,    color: '#14b8a6', group: 'controlling' },
-	    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#f472b6', group: 'controlling' },
-	    { key: 'bwa',          label: 'BWA',            desc: 'DATEV-BWA mit KI-Analyse',        icon: FileText,     color: '#f97316', group: 'controlling' },
-	    { key: 'bab',          label: 'BAB',            desc: 'Kostenstellen & GK-Zuschläge',    icon: Grid3x3,      color: '#f43f5e', group: 'controlling' },
-	    // ── Analyse ──
-	    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#ec4899', group: 'analyse' },
-	    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#d946ef', group: 'analyse' },
-	    { key: 'multi',        label: 'Konzern',        desc: 'Multi-Entity Konsolidierung',     icon: Building2,    color: '#a855f7', group: 'analyse' },
-	    // ── KI-Tools ──
-	    { key: 'errors',       label: 'Fehler-Scan',    desc: 'KI-Buchungsfehler-Erkennung',     icon: AlertCircle,  color: '#f43f5e', group: 'ki' },
-	    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#ec4899', group: 'ki' },
-	    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#a855f7', group: 'ki' },
-	    { key: 'trends',       label: 'Trends',         desc: 'Multi-Perioden Trendanalyse',     icon: Activity,     color: '#10b981', group: 'ki' },
-	    { key: 'docs',         label: 'Dokumente',      desc: 'KI-Reports & Dokumenten-Archiv',  icon: FolderOpen,   color: '#f59e0b', group: 'ki' },
-	  ];
+		  const modeTabs: ModeTab[] = [
+		    // ── Start ──
+		    { key: 'start',        label: 'Start',          desc: 'Übersicht & nächste Schritte',      icon: Zap,          color: '#0071e3', group: 'home' },
+		    // ── Controlling ──
+		    { key: 'liquidity',    label: 'Liquidität',     desc: '13-Wochen Cashflow-Prognose',     icon: TrendingUp,   color: '#10b981', group: 'controlling' },
+		    { key: 'closing',      label: 'Abschluss',      desc: 'Monatsabschluss mit 12 Checks',   icon: CheckCircle,  color: '#22c55e', group: 'controlling' },
+		    { key: 'contribution', label: 'DB-Rechnung',    desc: 'Mehrstufige DB I → DB V',         icon: BarChart3,    color: '#14b8a6', group: 'controlling' },
+		    { key: 'cashflow',     label: 'Cashflow',       desc: 'DRS 21 Kapitalflussrechnung',     icon: Wallet,       color: '#5e5ce6', group: 'controlling' },
+		    { key: 'bwa',          label: 'BWA',            desc: 'DATEV-BWA mit KI-Analyse',        icon: FileText,     color: '#f97316', group: 'controlling' },
+		    { key: 'bab',          label: 'BAB',            desc: 'Kostenstellen & GK-Zuschläge',    icon: Grid3x3,      color: '#ef4444', group: 'controlling' },
+		    // ── Analyse ──
+		    { key: 'single',       label: 'Einzelanalyse',  desc: 'Abweichungsanalyse je Periode',   icon: Search,       color: '#0071e3', group: 'analyse' },
+		    { key: 'triple',       label: 'Plan vs Ist',    desc: 'Dreifach-Vergleich mit VJ',       icon: GitCompare,   color: '#5e5ce6', group: 'analyse' },
+		    { key: 'multi',        label: 'Konzern',        desc: 'Multi-Entity Konsolidierung',     icon: Building2,    color: '#0ea5e9', group: 'analyse' },
+		    // ── KI-Tools ──
+		    { key: 'errors',       label: 'Fehler-Scan',    desc: 'KI-Buchungsfehler-Erkennung',     icon: AlertCircle,  color: '#f97316', group: 'ki' },
+		    { key: 'scenario',     label: 'Szenario',       desc: 'What-if Simulation',              icon: Target,       color: '#0071e3', group: 'ki' },
+		    { key: 'forecast',     label: 'Forecast',       desc: 'Rollierender 12-Monats-Forecast', icon: TrendingUp,   color: '#5e5ce6', group: 'ki' },
+		    { key: 'trends',       label: 'Trends',         desc: 'Multi-Perioden Trendanalyse',     icon: Activity,     color: '#10b981', group: 'ki' },
+		    { key: 'docs',         label: 'Dokumente',      desc: 'KI-Reports & Dokumenten-Archiv',  icon: FolderOpen,   color: '#f59e0b', group: 'ki' },
+		  ];
 
   const sidebarGroups = [
     { key: 'home' as const, label: 'Start' },
@@ -503,7 +503,7 @@ export default function Home() {
     <nav className="flex-1 overflow-y-auto py-4 px-3 scrollbar-thin">
       {sidebarGroups.map((group, gi) => (
         <div key={group.key}>
-          {gi > 0 && <div className="my-3 mx-2 h-px bg-white/[0.06]" />}
+          {gi > 0 && <div className="my-3 mx-2 h-px bg-black/[0.06]" />}
           <p className="text-[10px] uppercase tracking-[0.12em] text-gray-600 font-semibold px-3 mb-2">{group.label}</p>
           <div className="space-y-0.5">
             {modeTabs.filter(t => t.group === group.key).map((tab) => {
@@ -513,9 +513,9 @@ export default function Home() {
                 <button
                   key={tab.key}
                   onClick={() => { setMode(tab.key); onSelect?.(); }}
-                  className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left transition-all group/item relative ${
-                    isActive ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'
-                  }`}
+	                  className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left transition-all group/item relative ${
+	                    isActive ? 'bg-black/[0.03]' : 'hover:bg-black/[0.02]'
+	                  }`}
                 >
                   {isActive && (
                     <motion.div
@@ -527,7 +527,7 @@ export default function Home() {
                   )}
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
-                      isActive ? '' : 'bg-white/[0.04]'
+                      isActive ? '' : 'bg-black/[0.03]'
                     }`}
                     style={isActive ? { backgroundColor: `${tab.color}18` } : undefined}
                   >
@@ -535,11 +535,11 @@ export default function Home() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className={`text-sm font-medium leading-tight transition-colors ${
-                      isActive ? 'text-white' : 'text-gray-400 group-hover/item:text-gray-200'
+                      isActive ? 'text-gray-900' : 'text-gray-600 group-hover/item:text-gray-900'
                     }`}>
                       {tab.label}
                     </p>
-                    <p className="text-[11px] text-gray-600 leading-tight mt-0.5 truncate">{tab.desc}</p>
+                    <p className="text-[11px] text-gray-500 leading-tight mt-0.5 truncate">{tab.desc}</p>
                   </div>
                 </button>
               );
@@ -555,12 +555,11 @@ export default function Home() {
 
   // Main App
   return (
-    <main className="min-h-screen bg-[#070511] text-white relative flex">
-      {/* Calm background: subtle gradients + grid (serious, low distraction) */}
-	      <div className="pointer-events-none fixed inset-0 z-0">
-	        <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_10%,rgba(236,72,153,0.18),transparent_60%),radial-gradient(45%_35%_at_85%_18%,rgba(217,70,239,0.14),transparent_55%),radial-gradient(40%_40%_at_50%_95%,rgba(255,255,255,0.06),transparent_55%)]" />
-	        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:64px_64px]" />
-	      </div>
+    <main className="min-h-screen bg-[rgb(var(--background-rgb))] text-[rgb(var(--foreground-rgb))] relative flex">
+      {/* Subtle grid overlay (keeps structure without looking "dark") */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <div className="absolute inset-0 opacity-[0.55] [background-image:linear-gradient(to_right,rgba(0,0,0,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.035)_1px,transparent_1px)] [background-size:72px_72px]" />
+      </div>
 
       {/* Evidence Modal */}
       {showEvidenceModal && selectedDeviation && (
@@ -571,18 +570,18 @@ export default function Home() {
       )}
 
       {/* ═══ Desktop Sidebar ═══ */}
-      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-[#070511]/70 backdrop-blur-2xl border-r border-white/10">
+      <aside className="hidden md:flex flex-col w-[260px] h-screen sticky top-0 z-40 bg-white/70 backdrop-blur-2xl border-r border-black/[0.10]">
         {/* Sidebar Header / Logo */}
-        <div className="px-4 py-4 border-b border-white/[0.06]">
+        <div className="px-4 py-4 border-b border-black/[0.08]">
           <Link
             href="/"
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
           >
-            <div className="relative w-9 h-9 rounded-xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-pink-300" />
+            <div className="relative w-9 h-9 rounded-xl bg-black/[0.03] ring-1 ring-black/[0.08] flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-[#0071e3]" />
             </div>
             <div>
-              <h1 className="text-[15px] font-semibold text-white tracking-[-0.02em]">Controlling Engine</h1>
+              <h1 className="text-[15px] font-semibold text-gray-900 tracking-[-0.02em]">Controlling Engine</h1>
               <p className="text-[10px] text-gray-500 tracking-wide">Abweichungsanalyse</p>
             </div>
           </Link>
@@ -592,8 +591,8 @@ export default function Home() {
         {renderSidebarNav()}
 
         {/* Sidebar Footer */}
-        <div className="px-4 py-3 border-t border-white/[0.06]">
-          <div className="flex items-center gap-2 text-[11px] text-gray-600">
+        <div className="px-4 py-3 border-t border-black/[0.08]">
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
             <div className="w-2 h-2 rounded-full bg-green-500/60 animate-pulse" />
             <span>14 Module aktiv</span>
           </div>
@@ -610,7 +609,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-50 bg-black/35 backdrop-blur-sm md:hidden"
               onClick={() => setSidebarOpen(false)}
             />
             {/* Sidebar Panel */}
@@ -619,19 +618,19 @@ export default function Home() {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-	              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-[#070511] border-r border-white/10 flex flex-col md:hidden"
+		              className="fixed left-0 top-0 bottom-0 w-[270px] z-50 bg-white border-r border-black/[0.10] flex flex-col md:hidden"
             >
               {/* Mobile Sidebar Header */}
-              <div className="px-4 py-4 border-b border-white/[0.06] flex items-center justify-between">
+              <div className="px-4 py-4 border-b border-black/[0.08] flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] flex items-center justify-center shadow-[0_12px_30px_-18px_rgba(0,113,227,0.35)]">
                     <BarChart3 className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-semibold text-white">Navigation</span>
+                  <span className="text-sm font-semibold text-gray-900">Navigation</span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                  className="w-8 h-8 rounded-lg bg-black/[0.04] flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-black/[0.06] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -651,7 +650,7 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="relative bg-[#070511]/70 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-30"
+          className="relative bg-white/70 backdrop-blur-2xl border-b border-black/[0.10] sticky top-0 z-30"
         >
           <div className="px-6 py-2.5">
             <div className="flex items-center justify-between">
@@ -659,7 +658,7 @@ export default function Home() {
                 {/* Mobile hamburger */}
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="md:hidden w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                  className="md:hidden w-9 h-9 rounded-xl bg-black/[0.03] border border-black/[0.08] flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-black/[0.05] transition-colors"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
@@ -674,7 +673,7 @@ export default function Home() {
                       <activeTab_meta.icon className="w-4 h-4" style={{ color: activeTab_meta.color }} />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-white tracking-tight leading-none">{activeTab_meta.label}</h2>
+                      <h2 className="text-sm font-semibold text-gray-900 tracking-tight leading-none">{activeTab_meta.label}</h2>
                       <p className="text-[11px] text-gray-500 mt-0.5">{activeTab_meta.desc}</p>
                     </div>
                   </div>
@@ -684,7 +683,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 {/* Workflow Status */}
                 {mode !== 'start' && hasValidData && (
-                  <div className="hidden sm:flex items-center gap-1 bg-white/[0.04] rounded-lg p-1 border border-white/[0.05]">
+                  <div className="hidden sm:flex items-center gap-1 bg-white/70 rounded-lg p-1 border border-black/[0.08] shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]">
                     {(['draft', 'review', 'approved'] as WorkflowStatus[]).map(status => (
                       <button
                         key={status}
@@ -696,7 +695,7 @@ export default function Home() {
                             layoutId="activeWorkflow"
                             className={`absolute inset-0 rounded-md ${
                               status === 'draft' ? 'bg-yellow-500/[0.15] border border-yellow-500/20'
-                              : status === 'review' ? 'bg-fuchsia-500/[0.15] border border-fuchsia-500/20'
+                              : status === 'review' ? 'bg-blue-500/[0.12] border border-blue-500/20'
                               : 'bg-green-500/[0.15] border border-green-500/20'
                             }`}
                             transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
@@ -704,10 +703,10 @@ export default function Home() {
                         )}
                         <span className={`relative z-10 flex items-center gap-1.5 ${
                           workflowStatus === status
-                            ? status === 'draft' ? 'text-yellow-400'
-                            : status === 'review' ? 'text-fuchsia-300'
-                            : 'text-green-400'
-                            : 'text-gray-500 hover:text-gray-300'
+                            ? status === 'draft' ? 'text-yellow-700'
+                            : status === 'review' ? 'text-blue-700'
+                            : 'text-green-700'
+                            : 'text-gray-600 hover:text-gray-800'
                         }`}>
                           {status === 'draft' && <Clock className="w-3 h-3" />}
                           {status === 'review' && <Eye className="w-3 h-3" />}
@@ -720,9 +719,9 @@ export default function Home() {
                 )}
 
                 {/* User / Logout */}
-                <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
+                <div className="flex items-center gap-2 rounded-xl border border-black/[0.10] bg-white/70 px-3 py-2 shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]">
                   <div className="hidden sm:block">
-                    <p className="text-xs font-semibold text-white leading-none">{currentUser.name}</p>
+                    <p className="text-xs font-semibold text-gray-900 leading-none">{currentUser.name}</p>
                     <p className="mt-0.5 text-[10px] text-gray-500 leading-none">
                       {currentUser.role === 'admin'
                         ? 'Administrator'
@@ -731,12 +730,12 @@ export default function Home() {
                           : 'Leser'}
                     </p>
                   </div>
-                  <div className="h-8 w-8 rounded-xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center">
-                    <User className="h-4 w-4 text-pink-300" />
+                  <div className="h-8 w-8 rounded-xl bg-black/[0.03] ring-1 ring-black/[0.08] flex items-center justify-center">
+                    <User className="h-4 w-4 text-[#0071e3]" />
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="h-8 w-8 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 flex items-center justify-center"
+                    className="h-8 w-8 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-black/[0.04] flex items-center justify-center"
                     title="Abmelden"
                   >
                     <LogOut className="h-4 w-4" />
@@ -759,41 +758,41 @@ export default function Home() {
             transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="mb-10"
           >
-            <div className="relative overflow-hidden rounded-[28px] border border-white/[0.10] bg-gradient-to-b from-white/[0.06] via-white/[0.03] to-white/[0.02] p-8 md:p-10">
-              <div className="pointer-events-none absolute inset-0">
-                <motion.div
-                  aria-hidden="true"
-                  className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-pink-500/[0.15] blur-3xl"
-                  animate={{ y: [0, 18, 0], x: [0, 10, 0], opacity: [0.55, 0.75, 0.55] }}
-                  transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <motion.div
-                  aria-hidden="true"
-                  className="absolute -bottom-48 right-0 h-96 w-96 rounded-full bg-fuchsia-500/[0.12] blur-3xl"
-                  animate={{ y: [0, -14, 0], x: [0, -10, 0], opacity: [0.45, 0.65, 0.45] }}
-                  transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:72px_72px]" />
-              </div>
+	            <div className="relative overflow-hidden rounded-[28px] border border-black/[0.10] bg-white/70 backdrop-blur-2xl p-8 md:p-10 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
+	              <div className="pointer-events-none absolute inset-0">
+	                <motion.div
+	                  aria-hidden="true"
+	                  className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-[#0071e3]/12 blur-3xl"
+	                  animate={{ y: [0, 18, 0], x: [0, 10, 0], opacity: [0.55, 0.75, 0.55] }}
+	                  transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+	                />
+	                <motion.div
+	                  aria-hidden="true"
+	                  className="absolute -bottom-48 right-0 h-96 w-96 rounded-full bg-[#5e5ce6]/12 blur-3xl"
+	                  animate={{ y: [0, -14, 0], x: [0, -10, 0], opacity: [0.45, 0.65, 0.45] }}
+	                  transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+	                />
+	                <div className="absolute inset-0 opacity-[0.55] [background-image:linear-gradient(to_right,rgba(0,0,0,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.028)_1px,transparent_1px)] [background-size:72px_72px]" />
+	              </div>
 
-              <BorderBeam size={180} duration={18} colorFrom="#ec4899" colorTo="#a855f7" />
+	              <BorderBeam size={180} duration={18} colorFrom="#0071e3" colorTo="#5e5ce6" />
 
               <div className="relative">
                 <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                   <div className="max-w-2xl">
                     <BlurFade delay={0.02}>
-                      <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-gray-300">
-                        <Shield className="h-3.5 w-3.5 text-pink-300" />
+                      <p className="inline-flex items-center gap-2 rounded-full border border-black/[0.10] bg-white/60 px-3 py-1 text-xs text-gray-700 shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]">
+                        <Shield className="h-3.5 w-3.5 text-[#0071e3]" />
                         Lokal. Prüffähig. Schnell.
-                        <span className="mx-1 h-3 w-px bg-white/10" />
+                        <span className="mx-1 h-3 w-px bg-black/10" />
                         <span className="text-gray-400">Start</span>
                       </p>
                     </BlurFade>
 
                     <BlurFade delay={0.06}>
-                      <h1 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight text-white">
+                      <h1 className="mt-4 text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">
                         Willkommen zurück,{' '}
-                        <span className="bg-gradient-to-r from-pink-200 to-fuchsia-200 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#0071e3] to-[#5e5ce6] bg-clip-text text-transparent">
                           {currentUser.name}
                         </span>
                         .
@@ -801,7 +800,7 @@ export default function Home() {
                     </BlurFade>
 
                     <BlurFade delay={0.12}>
-                      <p className="mt-4 text-base text-gray-300 leading-relaxed">
+                      <p className="mt-4 text-base text-gray-700 leading-relaxed">
                         Starte mit einem Import, analysiere die wesentlichen Abweichungen und exportiere einen Report,
                         der direkt ins Review gehen kann.
                       </p>
@@ -811,10 +810,10 @@ export default function Home() {
                       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <ShimmerButton
                           onClick={() => setMode('single')}
-                          shimmerColor="#fbcfe8"
+                          shimmerColor="#bfdbfe"
                           shimmerSize="0.08em"
                           borderRadius="16px"
-                          background="linear-gradient(135deg, #ec4899 0%, #a855f7 100%)"
+                          background="linear-gradient(135deg, #0071e3 0%, #5e5ce6 100%)"
                           className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
                         >
                           <span className="relative z-10 inline-flex items-center gap-2">
@@ -825,15 +824,15 @@ export default function Home() {
                         <div className="flex gap-3">
                           <button
                             onClick={() => setMode('triple')}
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
                           >
-                            Plan vs. Ist <GitCompare className="h-4 w-4 text-fuchsia-200" />
+                            Plan vs. Ist <GitCompare className="h-4 w-4 text-[#5e5ce6]" />
                           </button>
                           <button
                             onClick={() => setMode('docs')}
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-5 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
                           >
-                            Dokumente <FolderOpen className="h-4 w-4 text-amber-200" />
+                            Dokumente <FolderOpen className="h-4 w-4 text-amber-600" />
                           </button>
                         </div>
                       </div>
@@ -841,43 +840,43 @@ export default function Home() {
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 lg:w-[360px]">
-                    <BlurFade delay={0.08}>
-                      <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Quick tip</p>
-                        <p className="mt-2 text-sm font-semibold text-white tracking-tight">Magic Upload</p>
-                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
-                          In der Einzelanalyse erkennt der Import Formate automatisch. Perfekt für den schnellen Einstieg.
-                        </p>
-                      </div>
-                    </BlurFade>
-                    <BlurFade delay={0.12}>
-                      <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Sicherheit</p>
-                        <p className="mt-2 text-sm font-semibold text-white tracking-tight">Session basiert</p>
-                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
-                          Zugriff ist standardmäßig geschützt. Rollen und Logout sind direkt erreichbar.
-                        </p>
-                      </div>
-                    </BlurFade>
-                    <BlurFade delay={0.16}>
-                      <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Output</p>
-                        <p className="mt-2 text-sm font-semibold text-white tracking-tight">Review-ready</p>
-                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
-                          Export als Word/Excel, inkl. Summary und Workflow-Status (Entwurf, Prüfung, Freigabe).
-                        </p>
-                      </div>
-                    </BlurFade>
+	                    <BlurFade delay={0.08}>
+	                      <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+	                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Quick tip</p>
+	                        <p className="mt-2 text-sm font-semibold text-gray-900 tracking-tight">Magic Upload</p>
+	                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
+	                          In der Einzelanalyse erkennt der Import Formate automatisch. Perfekt für den schnellen Einstieg.
+	                        </p>
+	                      </div>
+	                    </BlurFade>
+	                    <BlurFade delay={0.12}>
+	                      <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+	                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Sicherheit</p>
+	                        <p className="mt-2 text-sm font-semibold text-gray-900 tracking-tight">Session basiert</p>
+	                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
+	                          Zugriff ist standardmäßig geschützt. Rollen und Logout sind direkt erreichbar.
+	                        </p>
+	                      </div>
+	                    </BlurFade>
+	                    <BlurFade delay={0.16}>
+	                      <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+	                        <p className="text-[11px] uppercase tracking-[0.12em] text-gray-600 font-semibold">Output</p>
+	                        <p className="mt-2 text-sm font-semibold text-gray-900 tracking-tight">Review-ready</p>
+	                        <p className="mt-1 text-xs text-gray-500 leading-relaxed">
+	                          Export als Word/Excel, inkl. Summary und Workflow-Status (Entwurf, Prüfung, Freigabe).
+	                        </p>
+	                      </div>
+	                    </BlurFade>
                   </div>
                 </div>
 
 	                <div className="mt-10">
-	                  <BlurFade delay={0.05}>
-	                    <div className="flex items-center justify-between">
-	                      <h2 className="text-sm font-semibold text-white tracking-tight">Dein Einstieg</h2>
-	                      <p className="text-xs text-gray-500">Workflows & Module</p>
-	                    </div>
-	                  </BlurFade>
+		                  <BlurFade delay={0.05}>
+		                    <div className="flex items-center justify-between">
+		                      <h2 className="text-sm font-semibold text-gray-900 tracking-tight">Dein Einstieg</h2>
+		                      <p className="text-xs text-gray-500">Workflows & Module</p>
+		                    </div>
+		                  </BlurFade>
 
 	                  <BlurFade delay={0.10}>
 	                    <BentoGrid className="mt-4 md:auto-rows-[18rem]">
@@ -889,13 +888,13 @@ export default function Home() {
 	                        cta="Öffnen"
 	                        onClick={() => setMode('single')}
 	                        className="md:col-span-2"
-	                        background={
-	                          <div className="absolute inset-0 opacity-80">
-	                            <Upload className="absolute -bottom-10 -right-10 h-52 w-52 text-pink-200/10" />
-	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-	                          </div>
-	                        }
-	                      />
+		                        background={
+		                          <div className="absolute inset-0">
+		                            <Upload className="absolute -bottom-10 -right-10 h-52 w-52 text-[#0071e3]/10" />
+		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+		                          </div>
+		                        }
+		                      />
 
 	                      <BentoCard
 	                        Icon={GitCompare}
@@ -905,13 +904,13 @@ export default function Home() {
 	                        cta="Öffnen"
 	                        onClick={() => setMode('triple')}
 	                        className="md:col-span-1"
-	                        background={
-	                          <div className="absolute inset-0 opacity-80">
-	                            <GitCompare className="absolute -bottom-10 -right-10 h-52 w-52 text-fuchsia-200/10" />
-	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-	                          </div>
-	                        }
-	                      />
+		                        background={
+		                          <div className="absolute inset-0">
+		                            <GitCompare className="absolute -bottom-10 -right-10 h-52 w-52 text-[#5e5ce6]/10" />
+		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+		                          </div>
+		                        }
+		                      />
 
 	                      <BentoCard
 	                        Icon={TrendingUp}
@@ -921,13 +920,13 @@ export default function Home() {
 	                        cta="Öffnen"
 	                        onClick={() => setMode('liquidity')}
 	                        className="md:col-span-1"
-	                        background={
-	                          <div className="absolute inset-0 opacity-80">
-	                            <TrendingUp className="absolute -bottom-10 -right-10 h-52 w-52 text-emerald-200/10" />
-	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-	                          </div>
-	                        }
-	                      />
+		                        background={
+		                          <div className="absolute inset-0">
+		                            <TrendingUp className="absolute -bottom-10 -right-10 h-52 w-52 text-emerald-700/10" />
+		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+		                          </div>
+		                        }
+		                      />
 
 	                      <BentoCard
 	                        Icon={CheckCircle}
@@ -937,13 +936,13 @@ export default function Home() {
 	                        cta="Öffnen"
 	                        onClick={() => setMode('closing')}
 	                        className="md:col-span-1"
-	                        background={
-	                          <div className="absolute inset-0 opacity-80">
-	                            <CheckCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-green-200/10" />
-	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-	                          </div>
-	                        }
-	                      />
+		                        background={
+		                          <div className="absolute inset-0">
+		                            <CheckCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-green-700/10" />
+		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+		                          </div>
+		                        }
+		                      />
 
 	                      <BentoCard
 	                        Icon={AlertCircle}
@@ -953,13 +952,13 @@ export default function Home() {
 	                        cta="Öffnen"
 	                        onClick={() => setMode('errors')}
 	                        className="md:col-span-1"
-	                        background={
-	                          <div className="absolute inset-0 opacity-80">
-	                            <AlertCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-rose-200/10" />
-	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-	                          </div>
-	                        }
-	                      />
+		                        background={
+		                          <div className="absolute inset-0">
+		                            <AlertCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-orange-700/10" />
+		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+		                          </div>
+		                        }
+		                      />
 
 	                      <BentoCard
 	                        Icon={FolderOpen}
@@ -969,91 +968,91 @@ export default function Home() {
 	                        cta="Öffnen"
 	                        onClick={() => setMode('docs')}
 	                        className="md:col-span-3"
-	                        background={
-	                          <div className="absolute inset-0 opacity-80">
-	                            <FolderOpen className="absolute -bottom-12 -right-12 h-64 w-64 text-amber-200/10" />
-	                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
-	                          </div>
-	                        }
-	                      />
+		                        background={
+		                          <div className="absolute inset-0">
+		                            <FolderOpen className="absolute -bottom-12 -right-12 h-64 w-64 text-amber-700/10" />
+		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+		                          </div>
+		                        }
+		                      />
 	                    </BentoGrid>
 	                  </BlurFade>
 	                </div>
 
 	                <div className="mt-10">
-	                  <BlurFade delay={0.12}>
-	                    <div className="flex items-center justify-between">
-	                      <h2 className="text-sm font-semibold text-white tracking-tight">In 3 Schritten</h2>
-	                      <p className="text-xs text-gray-500">Klarer Prozess statt UI-Rauschen</p>
-	                    </div>
-	                  </BlurFade>
+		                  <BlurFade delay={0.12}>
+		                    <div className="flex items-center justify-between">
+		                      <h2 className="text-sm font-semibold text-gray-900 tracking-tight">In 3 Schritten</h2>
+		                      <p className="text-xs text-gray-500">Klarer Prozess statt UI-Rauschen</p>
+		                    </div>
+		                  </BlurFade>
 
 	                  <BlurFade delay={0.16}>
-	                    <div className="bento-glow relative overflow-hidden rounded-3xl border border-white/10 bg-black/20 p-6 md:p-8">
-	                      <BorderBeam size={220} duration={20} colorFrom="#ec4899" colorTo="#a855f7" />
-	                      <div className="grid gap-4 md:grid-cols-3">
-	                        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.02] p-6">
-	                          <div className="flex items-center justify-between">
-	                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">01</span>
-	                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-	                              <Upload className="h-5 w-5 text-pink-300" />
-	                            </span>
-	                          </div>
-	                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Daten laden</p>
-	                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-	                            Vorjahr und aktuelles Jahr hochladen. Magic Upload normalisiert Felder automatisch.
-	                          </p>
-	                        </div>
+		                    <div className="bento-glow relative overflow-hidden rounded-3xl border border-black/[0.10] bg-white/70 backdrop-blur-2xl p-6 md:p-8 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
+		                      <BorderBeam size={220} duration={20} colorFrom="#0071e3" colorTo="#5e5ce6" />
+		                      <div className="grid gap-4 md:grid-cols-3">
+		                        <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-6 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+		                          <div className="flex items-center justify-between">
+		                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">01</span>
+		                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.03] ring-1 ring-black/[0.08]">
+		                              <Upload className="h-5 w-5 text-[#0071e3]" />
+		                            </span>
+		                          </div>
+		                          <p className="mt-4 text-sm font-semibold text-gray-900 tracking-tight">Daten laden</p>
+		                          <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+		                            Vorjahr und aktuelles Jahr hochladen. Magic Upload normalisiert Felder automatisch.
+		                          </p>
+		                        </div>
 
-	                        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.02] p-6">
-	                          <div className="flex items-center justify-between">
-	                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">02</span>
-	                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-	                              <Search className="h-5 w-5 text-fuchsia-200" />
-	                            </span>
-	                          </div>
-	                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Abweichungen verstehen</p>
-	                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-	                            Fokus auf Treiber: Konten, Kostenstellen, Root Cause. Evidence zeigt Details.
-	                          </p>
-	                        </div>
+		                        <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-6 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+		                          <div className="flex items-center justify-between">
+		                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">02</span>
+		                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.03] ring-1 ring-black/[0.08]">
+		                              <Search className="h-5 w-5 text-[#5e5ce6]" />
+		                            </span>
+		                          </div>
+		                          <p className="mt-4 text-sm font-semibold text-gray-900 tracking-tight">Abweichungen verstehen</p>
+		                          <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+		                            Fokus auf Treiber: Konten, Kostenstellen, Root Cause. Evidence zeigt Details.
+		                          </p>
+		                        </div>
 
-	                        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.02] p-6">
-	                          <div className="flex items-center justify-between">
-	                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">03</span>
-	                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-	                              <Download className="h-5 w-5 text-emerald-200" />
-	                            </span>
-	                          </div>
-	                          <p className="mt-4 text-sm font-semibold text-white tracking-tight">Report exportieren</p>
-	                          <p className="mt-2 text-sm text-gray-400 leading-relaxed">
-	                            Summary & Workflow-Status setzen und als Word/Excel exportieren. Fertig fürs Review.
-	                          </p>
-	                        </div>
-	                      </div>
+		                        <div className="rounded-2xl border border-black/[0.10] bg-white/60 p-6 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.35)]">
+		                          <div className="flex items-center justify-between">
+		                            <span className="text-[10px] font-semibold tracking-[0.14em] text-gray-600">03</span>
+		                            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.03] ring-1 ring-black/[0.08]">
+		                              <Download className="h-5 w-5 text-emerald-700" />
+		                            </span>
+		                          </div>
+		                          <p className="mt-4 text-sm font-semibold text-gray-900 tracking-tight">Report exportieren</p>
+		                          <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+		                            Summary & Workflow-Status setzen und als Word/Excel exportieren. Fertig fürs Review.
+		                          </p>
+		                        </div>
+		                      </div>
 
 	                      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-	                        <ShimmerButton
-	                          onClick={() => setMode('single')}
-	                          shimmerColor="#fbcfe8"
-	                          shimmerSize="0.08em"
-	                          borderRadius="16px"
-	                          background="linear-gradient(135deg, #ec4899 0%, #a855f7 100%)"
-	                          className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
-	                        >
+		                        <ShimmerButton
+		                          onClick={() => setMode('single')}
+		                          shimmerColor="#bfdbfe"
+		                          shimmerSize="0.08em"
+		                          borderRadius="16px"
+		                          background="linear-gradient(135deg, #0071e3 0%, #5e5ce6 100%)"
+		                          className="w-full sm:w-auto py-3 px-6 text-sm font-semibold"
+		                        >
 	                          <span className="relative z-10 inline-flex items-center gap-2">
 	                            Jetzt starten <ArrowRight className="h-4 w-4" />
 	                          </span>
 	                        </ShimmerButton>
 
-	                        <button
-	                          onClick={() => setMode('docs')}
-	                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white hover:bg-white/[0.06] transition-colors"
-	                        >
-	                          Reports ansehen <FolderOpen className="h-4 w-4 text-amber-200" />
-	                        </button>
-	                      </div>
-	                    </div>
+		                        <button
+		                          onClick={() => setMode('docs')}
+		                          className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-6 py-3 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
+		                        >
+		                          Reports ansehen <FolderOpen className="h-4 w-4 text-amber-600" />
+		                        </button>
+		                      </div>
+		                    </div>
 	                  </BlurFade>
 	                </div>
               </div>
@@ -1287,19 +1286,19 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] p-6 mb-8"
-          >
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2 tracking-tight">
-              <BarChart3 className="w-5 h-5 text-pink-300" />
-              Plan vs. Ist vs. Vorjahr
-            </h2>
-            <p className="text-gray-300 text-sm mb-6">
-              Vergleiche Plan-Daten mit Ist-Buchungen und Vorjahr. Nur Ist ist Pflicht - ohne VJ/Plan wird automatisch verglichen.
-            </p>
-            <TripleUpload
-              onAnalysisComplete={(result) => setTripleResult(result)}
-            />
-          </motion.div>
+	            className="bg-white/70 backdrop-blur-2xl rounded-2xl border border-black/[0.10] p-6 mb-8 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]"
+	          >
+	            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2 tracking-tight">
+	              <BarChart3 className="w-5 h-5 text-[#0071e3]" />
+	              Plan vs. Ist vs. Vorjahr
+	            </h2>
+	            <p className="text-gray-600 text-sm mb-6">
+	              Vergleiche Plan-Daten mit Ist-Buchungen und Vorjahr. Nur Ist ist Pflicht - ohne VJ/Plan wird automatisch verglichen.
+	            </p>
+	            <TripleUpload
+	              onAnalysisComplete={(result) => setTripleResult(result)}
+	            />
+	          </motion.div>
         )}
 
         {/* Upload Section */}
@@ -1312,42 +1311,42 @@ export default function Home() {
           transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
         <BlurFade delay={0.05} inView>
-        <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.08] p-6 mb-8 overflow-hidden">
-          <BorderBeam size={120} duration={18} colorFrom="#ec4899" colorTo="#a855f7" />
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2 tracking-tight">
-              {useMagicUpload ? (
-                <>
-                  <Sparkles className="w-5 h-5 text-pink-300" />
-                  Intelligenter Import
-                </>
-              ) : (
-                <>
-                  <Upload className="w-5 h-5 text-pink-300" />
-                  {mode === 'single' ? 'Buchungsdaten hochladen' : 'Gesellschaften hinzufügen'}
-                </>
-              )}
-            </h2>
-            {mode === 'single' && (
-              <button
-                onClick={() => setUseMagicUpload(!useMagicUpload)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  useMagicUpload
-                    ? 'bg-pink-400/10 text-pink-200 border border-pink-300/20'
-                    : 'bg-white/10 text-gray-400 hover:text-white'
-                }`}
-              >
-                {useMagicUpload ? 'Aktiv' : 'Aktivieren'}
-              </button>
-            )}
-          </div>
+	        <div className="relative bg-white/70 backdrop-blur-2xl rounded-2xl border border-black/[0.10] p-6 mb-8 overflow-hidden shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
+	          <BorderBeam size={120} duration={18} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	          <div className="flex items-center justify-between mb-4">
+	            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 tracking-tight">
+	              {useMagicUpload ? (
+	                <>
+	                  <Sparkles className="w-5 h-5 text-[#5e5ce6]" />
+	                  Intelligenter Import
+	                </>
+	              ) : (
+	                <>
+	                  <Upload className="w-5 h-5 text-[#0071e3]" />
+	                  {mode === 'single' ? 'Buchungsdaten hochladen' : 'Gesellschaften hinzufügen'}
+	                </>
+	              )}
+	            </h2>
+	            {mode === 'single' && (
+	              <button
+	                onClick={() => setUseMagicUpload(!useMagicUpload)}
+	                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+	                  useMagicUpload
+	                    ? 'bg-[#0071e3]/10 text-[#005bb5] border border-[#0071e3]/20'
+	                    : 'bg-black/[0.04] text-gray-700 hover:text-gray-900 border border-black/[0.06]'
+	                }`}
+	              >
+	                {useMagicUpload ? 'Aktiv' : 'Aktivieren'}
+	              </button>
+	            )}
+	          </div>
 
           {/* Magic Upload Mode */}
           {mode === 'single' && useMagicUpload && (
             <div className="space-y-4">
-              <p className="text-gray-300 text-sm">
-                Laden Sie Ihre Dateien hoch – SAP, DATEV oder CSV wird automatisch erkannt und geparst.
-              </p>
+	              <p className="text-gray-600 text-sm">
+	                Laden Sie Ihre Dateien hoch – SAP, DATEV oder CSV wird automatisch erkannt und geparst.
+	              </p>
               <div className="grid md:grid-cols-2 gap-4">
                 <MagicUpload
                   period="prev"
@@ -1386,34 +1385,34 @@ export default function Home() {
           {/* Classic Upload Mode */}
           {(!useMagicUpload || mode === 'multi') && (
           <div className="space-y-4">
-            {entities.map((entity) => (
-              <div key={entity.id} className="bg-white/[0.015] rounded-xl p-4 border border-white/[0.04]">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    {mode === 'multi' ? (
-                      <select
-                        value={entity.name}
-                        onChange={e => updateEntity(entity.id, { name: e.target.value })}
-                        className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-pink-400/70 focus:ring-4 focus:ring-pink-400/10"
-                      >
+	            {entities.map((entity) => (
+	              <div key={entity.id} className="bg-white/60 rounded-xl p-4 border border-black/[0.06] shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	                <div className="flex items-center justify-between mb-3">
+	                  <div className="flex items-center gap-3">
+	                    {mode === 'multi' ? (
+	                      <select
+	                        value={entity.name}
+	                        onChange={e => updateEntity(entity.id, { name: e.target.value })}
+	                        className="bg-white/80 border border-black/[0.10] rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-[#0071e3]/60 focus:ring-4 focus:ring-[#0071e3]/10"
+	                      >
                         <option value="">Gesellschaft wählen...</option>
                         {EXAMPLE_ENTITIES.map(name => (
                           <option key={name} value={name}>{name}</option>
                         ))}
                       </select>
-                    ) : (
-                      <span className="text-white font-medium">{entity.name || 'Analyse'}</span>
-                    )}
+	                    ) : (
+	                      <span className="text-gray-900 font-medium">{entity.name || 'Analyse'}</span>
+	                    )}
                     {entity.status === 'success' && (
                       <span className="flex items-center gap-1 text-green-400 text-sm">
                         <CheckCircle className="w-4 h-4" /> Analysiert
                       </span>
                     )}
-                    {entity.status === 'analyzing' && (
-                      <span className="flex items-center gap-1 text-fuchsia-300 text-sm">
-                        <Loader2 className="w-4 h-4 animate-spin" /> Analysiere...
-                      </span>
-                    )}
+	                    {entity.status === 'analyzing' && (
+	                      <span className="flex items-center gap-1 text-blue-700 text-sm">
+	                        <Loader2 className="w-4 h-4 animate-spin" /> Analysiere...
+	                      </span>
+	                    )}
                     {entity.status === 'error' && (
                       <span className="flex items-center gap-1 text-red-400 text-sm">
                         <AlertCircle className="w-4 h-4" /> {entity.error}
@@ -1429,31 +1428,31 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-gray-500 mb-1">Vorjahr (CSV)</label>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={e => updateEntity(entity.id, { prevFile: e.target.files?.[0] || null })}
-                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-pink-500 file:text-white hover:file:bg-pink-400 file:cursor-pointer"
-                    />
+	                    <input
+	                      type="file"
+	                      accept=".csv"
+	                      onChange={e => updateEntity(entity.id, { prevFile: e.target.files?.[0] || null })}
+	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
+	                    />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-500 mb-1">Aktuell (CSV)</label>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={e => updateEntity(entity.id, { currFile: e.target.files?.[0] || null })}
-                      className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-pink-500 file:text-white hover:file:bg-pink-400 file:cursor-pointer"
-                    />
+	                    <input
+	                      type="file"
+	                      accept=".csv"
+	                      onChange={e => updateEntity(entity.id, { currFile: e.target.files?.[0] || null })}
+	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#0071e3] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
+	                    />
                   </div>
                 </div>
               </div>
             ))}
 
-            {mode === 'multi' && (
-              <button
-                onClick={addEntity}
-                className="w-full py-3 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:border-pink-500/40 hover:text-pink-300 transition-all flex items-center justify-center gap-2"
-              >
+	            {mode === 'multi' && (
+	              <button
+	                onClick={addEntity}
+	                className="w-full py-3 border-2 border-dashed border-black/[0.10] rounded-xl text-gray-700 hover:border-[#0071e3]/40 hover:text-[#0071e3] transition-all flex items-center justify-center gap-2 bg-white/50"
+	              >
                 <Plus className="w-5 h-5" />
                 Weitere Gesellschaft
               </button>
@@ -1475,11 +1474,11 @@ export default function Home() {
                   ? prevBookings.length === 0 || currBookings.length === 0
                   : entities.every(e => !e.prevFile || !e.currFile)
               )}
-              shimmerColor="#fbcfe8"
-              shimmerSize="0.08em"
-              background="linear-gradient(135deg, #ec4899 0%, #a855f7 100%)"
-              borderRadius="12px"
-              className="flex-1 min-w-[200px] py-3 px-6 font-medium disabled:opacity-40"
+	              shimmerColor="#bfdbfe"
+	              shimmerSize="0.08em"
+	              background="linear-gradient(135deg, #0071e3 0%, #5e5ce6 100%)"
+	              borderRadius="12px"
+	              className="flex-1 min-w-[200px] py-3 px-6 font-medium disabled:opacity-40"
             >
               {isAnalyzing ? (
                 <span className="flex items-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> Analysiere...</span>
@@ -1490,24 +1489,24 @@ export default function Home() {
 
             {hasValidData && (
               <>
-                <button
-                  onClick={() => downloadReport('word')}
-                  disabled={isGeneratingReport}
-                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-pink-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
-                >
-                  <FileText className="w-5 h-5 text-pink-300 group-hover:scale-110 transition-transform" />
-                  Word
-                </button>
-                <button
-                  onClick={() => downloadReport('excel')}
-                  disabled={isGeneratingReport}
-                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-green-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
-                >
-                  <FileSpreadsheet className="w-5 h-5 text-green-400 group-hover:scale-110 transition-transform" />
-                  Excel
-                </button>
+	                <button
+	                  onClick={() => downloadReport('word')}
+	                  disabled={isGeneratingReport}
+	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.10] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                >
+	                  <FileText className="w-5 h-5 text-[#0071e3] group-hover:scale-110 transition-transform" />
+	                  Word
+	                </button>
+	                <button
+	                  onClick={() => downloadReport('excel')}
+	                  disabled={isGeneratingReport}
+	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.10] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                >
+	                  <FileSpreadsheet className="w-5 h-5 text-green-400 group-hover:scale-110 transition-transform" />
+	                  Excel
+	                </button>
                 <AIReportButton analysisResult={currentResult ?? null} />
-                <button
+	                <button
                   onClick={() => {
                     if (currentResult) {
                       const name = prompt('Name für die Analyse:', `Analyse ${new Date().toLocaleDateString('de-DE')}`);
@@ -1516,11 +1515,11 @@ export default function Home() {
                       }
                     }
                   }}
-                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] hover:border-yellow-500/25 text-white py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group"
-                >
-                  <Save className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
-                  Speichern
-                </button>
+	                  className="bg-white/60 hover:bg-white/80 border border-black/[0.10] hover:border-black/[0.14] text-gray-900 py-3 px-5 rounded-xl font-medium transition-all flex items-center gap-2 group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                >
+	                  <Save className="w-5 h-5 text-yellow-400 group-hover:scale-110 transition-transform" />
+	                  Speichern
+	                </button>
               </>
             )}
           </div>
@@ -1540,18 +1539,18 @@ export default function Home() {
           >
             {/* Summary Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
-                <p className="text-sm text-gray-500 mb-1">Plan</p>
-                <p className="text-xl font-bold text-fuchsia-300">{formatCurrency(tripleResult.meta.total_plan)}</p>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
-                <p className="text-sm text-gray-500 mb-1">Ist</p>
-                <p className="text-xl font-bold text-white">{formatCurrency(tripleResult.meta.total_ist)}</p>
-              </motion.div>
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-4">
-                <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
-                <p className="text-xl font-bold text-gray-400">{formatCurrency(tripleResult.meta.total_vj)}</p>
-              </motion.div>
+	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] p-4 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	                <p className="text-sm text-gray-500 mb-1">Plan</p>
+	                <p className="text-xl font-bold text-[#5e5ce6]">{formatCurrency(tripleResult.meta.total_plan)}</p>
+	              </motion.div>
+	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] p-4 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	                <p className="text-sm text-gray-500 mb-1">Ist</p>
+	                <p className="text-xl font-bold text-gray-900">{formatCurrency(tripleResult.meta.total_ist)}</p>
+	              </motion.div>
+	              <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] p-4 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	                <p className="text-sm text-gray-500 mb-1">Vorjahr</p>
+	                <p className="text-xl font-bold text-gray-700">{formatCurrency(tripleResult.meta.total_vj)}</p>
+	              </motion.div>
               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.25 }} className={`rounded-xl border p-4 ${
                 tripleResult.summary.total_delta_plan > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
@@ -1689,28 +1688,29 @@ export default function Home() {
             {/* Charts */}
             <BlurFade delay={0.25} inView>
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={100} duration={15} colorFrom="#ec4899" colorTo="#a855f7" />
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
-                  <BarChart3 className="w-5 h-5 text-pink-300" />
-                  {mode === 'multi' ? 'Gesellschaften' : 'Top Abweichungen'}
-                </h3>
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={mode === 'multi' ? benchmarkChartData : topDeviationsData} layout="vertical" margin={{ left: 10, right: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                    <YAxis type="category" dataKey="name" tick={{ fill: '#9ca3af', fontSize: 11 }} width={100} />
-                    <Tooltip
-                      formatter={(v) => [formatCurrency(v as number), 'Abweichung']}
-                      contentStyle={{
-                        backgroundColor: '#1a1a2e',
-                        border: '1px solid #2d2d44',
-                        borderRadius: '8px',
-                        color: '#e5e7eb',
-                      }}
-                      labelStyle={{ color: '#fff' }}
-                      itemStyle={{ color: '#e5e7eb' }}
-                    />
+	              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-6 overflow-hidden hover:border-black/[0.14] transition-colors shadow-[0_30px_90px_-70px_rgba(0,0,0,0.35)]">
+	                <BorderBeam size={100} duration={15} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	                <h3 className="text-gray-900 font-semibold mb-4 flex items-center gap-2 tracking-tight">
+	                  <BarChart3 className="w-5 h-5 text-[#0071e3]" />
+	                  {mode === 'multi' ? 'Gesellschaften' : 'Top Abweichungen'}
+	                </h3>
+	                <ResponsiveContainer width="100%" height={280}>
+	                  <BarChart data={mode === 'multi' ? benchmarkChartData : topDeviationsData} layout="vertical" margin={{ left: 10, right: 10 }}>
+	                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+	                    <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
+	                    <YAxis type="category" dataKey="name" tick={{ fill: '#4b5563', fontSize: 11 }} width={100} />
+	                    <Tooltip
+	                      formatter={(v) => [formatCurrency(v as number), 'Abweichung']}
+	                      contentStyle={{
+	                        backgroundColor: 'rgba(255,255,255,0.98)',
+	                        border: '1px solid rgba(0,0,0,0.12)',
+	                        borderRadius: '12px',
+	                        boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)',
+	                        color: '#111827',
+	                      }}
+	                      labelStyle={{ color: '#111827', fontWeight: 600 }}
+	                      itemStyle={{ color: '#374151' }}
+	                    />
                     <Bar dataKey={mode === 'multi' ? 'deviation' : 'value'} radius={[0, 4, 4, 0]}>
                       {(mode === 'multi' ? benchmarkChartData : topDeviationsData).map((entry, i) => (
                         <Cell key={i} fill={entry.fill} />
@@ -1720,12 +1720,12 @@ export default function Home() {
                 </ResponsiveContainer>
               </motion.div>
 
-              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-6 overflow-hidden hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={100} duration={15} delay={7} colorFrom="#ec4899" colorTo="#a855f7" />
-                <h3 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
-                  <PieChart className="w-5 h-5 text-pink-300" />
-                  Verteilung
-                </h3>
+	              <motion.div whileHover={{ scale: 1.01 }} transition={{ type: 'spring', stiffness: 200 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-6 overflow-hidden hover:border-black/[0.14] transition-colors shadow-[0_30px_90px_-70px_rgba(0,0,0,0.35)]">
+	                <BorderBeam size={100} duration={15} delay={7} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	                <h3 className="text-gray-900 font-semibold mb-4 flex items-center gap-2 tracking-tight">
+	                  <PieChart className="w-5 h-5 text-[#0071e3]" />
+	                  Verteilung
+	                </h3>
                 <ResponsiveContainer width="100%" height={280}>
                   <RechartsPie>
                     <Pie
@@ -1736,17 +1736,18 @@ export default function Home() {
                       cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={5} dataKey="value"
                       label={({ name, value }) => value > 0 ? `${name}` : ''}
                     />
-                    <Tooltip
-                      formatter={(v) => formatCurrency(v as number)}
-                      contentStyle={{
-                        backgroundColor: '#1a1a2e',
-                        border: '1px solid #2d2d44',
-                        borderRadius: '8px',
-                        color: '#e5e7eb',
-                      }}
-                      labelStyle={{ color: '#fff' }}
-                      itemStyle={{ color: '#e5e7eb' }}
-                    />
+	                    <Tooltip
+	                      formatter={(v) => formatCurrency(v as number)}
+	                      contentStyle={{
+	                        backgroundColor: 'rgba(255,255,255,0.98)',
+	                        border: '1px solid rgba(0,0,0,0.12)',
+	                        borderRadius: '12px',
+	                        boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)',
+	                        color: '#111827',
+	                      }}
+	                      labelStyle={{ color: '#111827', fontWeight: 600 }}
+	                      itemStyle={{ color: '#374151' }}
+	                    />
                     <Legend formatter={v => <span style={{ color: '#9ca3af' }}>{v}</span>} />
                   </RechartsPie>
                 </ResponsiveContainer>
@@ -1756,24 +1757,24 @@ export default function Home() {
 
             {/* Tabs */}
             <BlurFade delay={0.3} inView>
-            <div className="relative bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.06] overflow-hidden">
-              <BorderBeam size={200} duration={25} colorFrom="#ec4899" colorTo="#a855f7" />
-              <div className="flex border-b border-white/[0.06]">
-                {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`flex-1 py-3.5 px-4 text-sm font-medium transition-all relative ${
-                      activeTab === tab ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-                    }`}
-                  >
-                    {activeTab === tab && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-pink-500 to-fuchsia-500"
-                        transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
-                      />
-                    )}
+	            <div className="relative bg-white/70 backdrop-blur-xl rounded-2xl border border-black/[0.10] overflow-hidden shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
+	              <BorderBeam size={200} duration={25} colorFrom="#0071e3" colorTo="#5e5ce6" />
+	              <div className="flex border-b border-black/[0.08]">
+	                {(['overview', 'accounts', 'costcenters', 'evidence'] as const).map(tab => (
+	                  <button
+	                    key={tab}
+	                    onClick={() => setActiveTab(tab)}
+	                    className={`flex-1 py-3.5 px-4 text-sm font-medium transition-all relative ${
+	                      activeTab === tab ? 'text-gray-900' : 'text-gray-600 hover:text-gray-900'
+	                    }`}
+	                  >
+	                    {activeTab === tab && (
+	                      <motion.div
+	                        layoutId="activeTab"
+	                        className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-[#0071e3] to-[#5e5ce6]"
+	                        transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+	                      />
+	                    )}
                     {tab === 'overview' && 'Übersicht'}
                     {tab === 'accounts' && 'Konten'}
                     {tab === 'costcenters' && 'Kostenstellen'}
@@ -1786,31 +1787,31 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="p-6">
-                {activeTab === 'overview' && (
-                  <div className="space-y-3">
-                    <h4 className="text-white font-semibold mb-4 flex items-center gap-2 tracking-tight">
-                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-pink-500 to-fuchsia-500" />
-                      Signifikante Abweichungen
-                    </h4>
+	              <div className="p-6">
+	                {activeTab === 'overview' && (
+	                  <div className="space-y-3">
+	                    <h4 className="text-gray-900 font-semibold mb-4 flex items-center gap-2 tracking-tight">
+	                      <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-[#0071e3] to-[#5e5ce6]" />
+	                      Signifikante Abweichungen
+	                    </h4>
                     {currentResult.by_account?.slice(0, 10).map((dev, idx) => (
                       <BlurFade key={idx} delay={0.03 * idx} inView>
                       <div className="space-y-2">
-                        <button
-                          onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
-                          className="w-full flex items-center justify-between bg-white/[0.015] hover:bg-white/[0.04] border border-transparent hover:border-white/[0.06] rounded-xl p-4 transition-all text-left group"
-                        >
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-white font-medium">{dev.account_name}</p>
-                              <AnomalyBadge
-                                hint={dev.anomalyHint}
-                                type={dev.anomalyType}
-                                severity={dev.anomalySeverity}
-                              />
-                            </div>
-                            <p className="text-sm text-gray-500">Konto {dev.account}</p>
-                          </div>
+	                        <button
+	                          onClick={() => { setSelectedDeviation(dev); setShowEvidenceModal(true); }}
+	                          className="w-full flex items-center justify-between bg-white/60 hover:bg-white/80 border border-black/[0.06] hover:border-black/[0.10] rounded-xl p-4 transition-all text-left group shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
+	                        >
+	                          <div>
+	                            <div className="flex items-center gap-2">
+	                              <p className="text-gray-900 font-medium">{dev.account_name}</p>
+	                              <AnomalyBadge
+	                                hint={dev.anomalyHint}
+	                                type={dev.anomalyType}
+	                                severity={dev.anomalySeverity}
+	                              />
+	                            </div>
+	                            <p className="text-sm text-gray-500">Konto {dev.account}</p>
+	                          </div>
                           <div className="flex items-center gap-4">
                             <div className="text-right">
                               <p className={`font-bold ${dev.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
@@ -1820,18 +1821,18 @@ export default function Home() {
                                 {formatPercent(dev.delta_pct)}
                               </p>
                             </div>
-                            <Link2 className="w-4 h-4 text-pink-300" />
-                          </div>
-                        </button>
+	                            <Link2 className="w-4 h-4 text-[#0071e3]" />
+	                          </div>
+	                        </button>
                         <div className="flex gap-2 ml-4">
 	                          <button
 	                            onClick={() => setRootCauseDeviation(rootCauseDeviation?.account === dev.account ? null : dev)}
-	                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
-	                              rootCauseDeviation?.account === dev.account
-	                                ? 'bg-pink-400/10 text-pink-200 border border-pink-300/20'
-	                                : 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white'
-	                            }`}
-	                          >
+		                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
+		                              rootCauseDeviation?.account === dev.account
+		                                ? 'bg-[#0071e3]/10 text-[#005bb5] border border-[#0071e3]/20'
+		                                : 'bg-black/[0.04] hover:bg-black/[0.06] text-gray-700 hover:text-gray-900 border border-black/[0.06]'
+		                            }`}
+		                          >
 	                            <Search className="h-3.5 w-3.5" />
 	                            Ursache
 	                          </button>
@@ -1865,23 +1866,23 @@ export default function Home() {
                       </thead>
                       <tbody className="text-sm">
                         {currentResult.by_account?.slice(0, 15).map((acc, idx) => (
-                          <tr key={idx} className={`border-t border-white/[0.04] hover:bg-white/[0.04] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.015]' : ''}`}>
-                            <td className="py-3.5 text-gray-500 font-mono text-xs">{acc.account}</td>
-                            <td className="py-3.5 text-white">{acc.account_name}</td>
-                            <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(acc.amount_prev)}</td>
-                            <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(acc.amount_curr)}</td>
-                            <td className={`py-3.5 text-right font-semibold tabular-nums ${acc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                              {formatCurrency(acc.delta_abs)}
-                            </td>
-                            <td className="py-3.5 text-right">
-                              <button
-                                onClick={() => { setSelectedDeviation(acc); setShowEvidenceModal(true); }}
-                                className="p-1.5 hover:bg-pink-500/20 rounded-lg transition-colors group"
-                              >
-                                <Link2 className="w-4 h-4 text-pink-300 group-hover:text-pink-200" />
-                              </button>
-                            </td>
-                          </tr>
+	                          <tr key={idx} className={`border-t border-black/[0.06] hover:bg-black/[0.02] transition-colors ${idx % 2 === 0 ? 'bg-black/[0.01]' : ''}`}>
+	                            <td className="py-3.5 text-gray-500 font-mono text-xs">{acc.account}</td>
+	                            <td className="py-3.5 text-gray-900">{acc.account_name}</td>
+	                            <td className="py-3.5 text-right text-gray-700 tabular-nums">{formatCurrency(acc.amount_prev)}</td>
+	                            <td className="py-3.5 text-right text-gray-700 tabular-nums">{formatCurrency(acc.amount_curr)}</td>
+	                            <td className={`py-3.5 text-right font-semibold tabular-nums ${acc.delta_abs > 0 ? 'text-red-500' : 'text-green-600'}`}>
+	                              {formatCurrency(acc.delta_abs)}
+	                            </td>
+	                            <td className="py-3.5 text-right">
+	                              <button
+	                                onClick={() => { setSelectedDeviation(acc); setShowEvidenceModal(true); }}
+	                                className="p-1.5 hover:bg-[#0071e3]/10 rounded-lg transition-colors group"
+	                              >
+	                                <Link2 className="w-4 h-4 text-[#0071e3] group-hover:text-[#005bb5]" />
+	                              </button>
+	                            </td>
+	                          </tr>
                         ))}
                       </tbody>
                     </table>
@@ -1901,40 +1902,40 @@ export default function Home() {
                       </thead>
                       <tbody className="text-sm">
                         {currentResult.by_cost_center?.slice(0, 15).map((cc, idx) => (
-                          <tr key={idx} className={`border-t border-white/[0.04] hover:bg-white/[0.04] transition-colors ${idx % 2 === 0 ? 'bg-white/[0.015]' : ''}`}>
-                            <td className="py-3.5 text-white font-medium">{cc.cost_center || '(keine)'}</td>
-                            <td className="py-3.5 text-right text-gray-400 tabular-nums">{formatCurrency(cc.amount_prev)}</td>
-                            <td className="py-3.5 text-right text-gray-300 tabular-nums">{formatCurrency(cc.amount_curr)}</td>
-                            <td className={`py-3.5 text-right font-semibold tabular-nums ${cc.delta_abs > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                              {formatCurrency(cc.delta_abs)}
-                            </td>
-                          </tr>
+	                          <tr key={idx} className={`border-t border-black/[0.06] hover:bg-black/[0.02] transition-colors ${idx % 2 === 0 ? 'bg-black/[0.01]' : ''}`}>
+	                            <td className="py-3.5 text-gray-900 font-medium">{cc.cost_center || '(keine)'}</td>
+	                            <td className="py-3.5 text-right text-gray-400 tabular-nums">{formatCurrency(cc.amount_prev)}</td>
+	                            <td className="py-3.5 text-right text-gray-700 tabular-nums">{formatCurrency(cc.amount_curr)}</td>
+	                            <td className={`py-3.5 text-right font-semibold tabular-nums ${cc.delta_abs > 0 ? 'text-red-500' : 'text-green-600'}`}>
+	                              {formatCurrency(cc.delta_abs)}
+	                            </td>
+	                          </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 )}
 
-                {activeTab === 'evidence' && (
-                  <div className="text-center py-16">
-                    <div className="relative w-20 h-20 mx-auto mb-6">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-pink-500/20 to-fuchsia-500/20 animate-pulse" />
-                      <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-pink-500/10 to-fuchsia-500/10 border border-pink-500/20 flex items-center justify-center">
-                        <Link2 className="w-10 h-10 text-pink-300" />
-                      </div>
-                    </div>
-                    <h4 className="text-white font-semibold text-lg mb-3 tracking-tight">Evidence Trail</h4>
-                    <p className="text-gray-300 max-w-md mx-auto leading-relaxed">
-                      Klicke auf eine Abweichung in der Übersicht oder Konten-Tabelle,
-                      um die verknüpften Buchungen bis auf Belegebene nachzuverfolgen.
-                    </p>
-                    <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-500">
-                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500/60" /> Prüfungssicher</div>
-                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-pink-400/60" /> Revisionsfest</div>
-                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-pink-300/70" /> Belegverknüpft</div>
-                    </div>
-                  </div>
-                )}
+	                {activeTab === 'evidence' && (
+	                  <div className="text-center py-16">
+	                    <div className="relative w-20 h-20 mx-auto mb-6">
+	                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#0071e3]/16 to-[#5e5ce6]/14 animate-pulse" />
+	                      <div className="relative w-full h-full rounded-2xl bg-white/70 border border-black/[0.10] flex items-center justify-center shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+	                        <Link2 className="w-10 h-10 text-[#0071e3]" />
+	                      </div>
+	                    </div>
+	                    <h4 className="text-gray-900 font-semibold text-lg mb-3 tracking-tight">Evidence Trail</h4>
+	                    <p className="text-gray-600 max-w-md mx-auto leading-relaxed">
+	                      Klicke auf eine Abweichung in der Übersicht oder Konten-Tabelle,
+	                      um die verknüpften Buchungen bis auf Belegebene nachzuverfolgen.
+	                    </p>
+	                    <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-500">
+	                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-500/60" /> Prüfungssicher</div>
+	                      <div className="flex items-center gap-2"><Shield className="w-4 h-4 text-[#0071e3]/70" /> Revisionsfest</div>
+	                      <div className="flex items-center gap-2"><Link2 className="w-4 h-4 text-[#0071e3]/70" /> Belegverknüpft</div>
+	                    </div>
+	                  </div>
+	                )}
               </div>
             </div>
             </BlurFade>

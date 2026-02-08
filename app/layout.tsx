@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de">
-      <body className={inter.className}>{children}</body>
+      <body className={`${inter.className} antialiased mesh-gradient noise-overlay`}>{children}</body>
     </html>
   );
 }

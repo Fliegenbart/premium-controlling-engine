@@ -163,7 +163,7 @@ export function TrendDashboard({ result, isLoading = false }: TrendDashboardProp
               <XAxis dataKey="label" stroke="#9ca3af" />
               <YAxis stroke="#9ca3af" />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
+                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)' }}
                 formatter={(value: number | undefined) => value ? value.toLocaleString('de-DE', { maximumFractionDigits: 0 }) : ''}
               />
               <Legend />
@@ -210,7 +210,7 @@ export function TrendDashboard({ result, isLoading = false }: TrendDashboardProp
               <XAxis dataKey="label" stroke="#9ca3af" />
               <YAxis stroke="#9ca3af" label={{ value: '%', angle: -90, position: 'insideLeft' }} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
+                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)' }}
                 formatter={(value: number | undefined) => value ? (value as number).toFixed(2) + '%' : ''}
               />
               <Legend />
@@ -374,7 +374,7 @@ function AccountTrendCard({
               <XAxis dataKey="label" stroke="#9ca3af" fontSize={12} />
               <YAxis stroke="#9ca3af" fontSize={12} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
+                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)' }}
                 formatter={(value: number | undefined) => value ? value.toLocaleString('de-DE', { maximumFractionDigits: 0 }) : ''}
               />
               <Line
@@ -468,7 +468,7 @@ function CostCenterTrendCard({
               <XAxis dataKey="label" stroke="#9ca3af" fontSize={12} />
               <YAxis stroke="#9ca3af" fontSize={12} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
+                contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)' }}
                 formatter={(value: number | undefined) => value ? value.toLocaleString('de-DE', { maximumFractionDigits: 0 }) : ''}
               />
               <Bar dataKey="amount" fill="#10b981" radius={[4, 4, 0, 0]} />

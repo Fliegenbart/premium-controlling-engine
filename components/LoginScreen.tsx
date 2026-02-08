@@ -45,34 +45,34 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
   };
 
   return (
-    <main className="min-h-screen bg-[#070511] flex items-center justify-center px-6">
+    <main className="min-h-screen bg-[rgb(var(--background-rgb))] flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="mb-6 flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white">
-            <BarChart3 className="h-4 w-4" />
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900">
+            <BarChart3 className="h-4 w-4 text-[#0071e3]" />
             <span>Premium Controlling Engine</span>
           </Link>
           <span className="text-xs text-gray-500">Anmeldung</span>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 shadow-[0_20px_80px_-40px_rgba(0,0,0,0.7)]">
+        <div className="rounded-2xl border border-black/[0.10] bg-white/70 backdrop-blur-2xl p-6 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
           <div className="mb-5">
-            <h1 className="text-lg font-semibold text-white tracking-tight">Willkommen zurück</h1>
-            <p className="mt-1 text-sm text-gray-400">
+            <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Willkommen zurück</h1>
+            <p className="mt-1 text-sm text-gray-600">
               Bitte melde dich an, um Analysen zu erstellen und Reports zu exportieren.
             </p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-3">
             <label className="block">
-              <span className="mb-1 block text-xs font-medium text-gray-400">E-Mail</span>
+              <span className="mb-1 block text-xs font-medium text-gray-600">E-Mail</span>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-pink-400/60 focus:outline-none focus:ring-4 focus:ring-pink-400/10"
+                  className="w-full rounded-xl border border-black/[0.10] bg-white/80 py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#0071e3]/60 focus:outline-none focus:ring-4 focus:ring-[#0071e3]/10"
                   placeholder="name@firma.de"
                   autoComplete="email"
                   required
@@ -81,14 +81,14 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
             </label>
 
             <label className="block">
-              <span className="mb-1 block text-xs font-medium text-gray-400">Passwort</span>
+              <span className="mb-1 block text-xs font-medium text-gray-600">Passwort</span>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-black/25 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 focus:border-pink-400/60 focus:outline-none focus:ring-4 focus:ring-pink-400/10"
+                  className="w-full rounded-xl border border-black/[0.10] bg-white/80 py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#0071e3]/60 focus:outline-none focus:ring-4 focus:ring-[#0071e3]/10"
                   placeholder="••••••••••••"
                   autoComplete="current-password"
                   required
@@ -97,7 +97,7 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
             </label>
 
             {error && (
-              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-700">
                 {error}
               </div>
             )}
@@ -105,7 +105,7 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-pink-400 to-fuchsia-400 px-4 py-2.5 text-sm font-semibold text-[#170610] shadow-[0_16px_60px_-30px_rgba(236,72,153,0.9)] hover:from-pink-300 hover:to-fuchsia-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0071e3] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_-18px_rgba(0,113,227,0.35)] hover:bg-[#0077ed] active:translate-y-px transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Anmelden

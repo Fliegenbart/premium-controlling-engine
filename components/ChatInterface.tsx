@@ -56,7 +56,7 @@ function formatMessageWithEvidence(content: string, onDocClick?: (docNo: string)
       <button
         key={`${docNo}-${match.index}`}
         onClick={() => onDocClick?.(docNo)}
-        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-pink-500/20 hover:bg-pink-500/30 rounded text-pink-200 font-mono text-xs transition-colors"
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#0071e3]/10 hover:bg-[#0071e3]/15 rounded text-[#005bb5] font-mono text-xs transition-colors"
         title={`Beleg ${docNo} anzeigen`}
       >
         <FileText className="w-3 h-3" />
@@ -148,7 +148,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-[0_18px_60px_-25px_rgba(236,72,153,0.8)] hover:shadow-[0_22px_70px_-28px_rgba(236,72,153,0.95)] transition-all hover:scale-105 ${
+        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-[#0071e3] to-[#5e5ce6] text-white shadow-[0_18px_60px_-25px_rgba(0,113,227,0.45)] hover:shadow-[0_22px_70px_-28px_rgba(0,113,227,0.60)] transition-all hover:scale-105 ${
           isOpen ? 'hidden' : ''
         }`}
       >
@@ -162,21 +162,21 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
 
       {/* Chat Panel */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-end p-4 sm:items-center sm:justify-end pointer-events-none">
+          <div className="fixed inset-0 z-50 flex items-end justify-end p-4 sm:items-center sm:justify-end pointer-events-none">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/50 pointer-events-auto"
+            className="fixed inset-0 bg-black/30 pointer-events-auto"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Panel */}
-          <div className="relative w-full max-w-md h-[80vh] max-h-[600px] bg-[#0b0614] rounded-2xl border border-white/10 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.85)] flex flex-col pointer-events-auto overflow-hidden">
+          <div className="relative w-full max-w-md h-[80vh] max-h-[600px] bg-white/80 backdrop-blur-2xl rounded-2xl border border-black/[0.10] shadow-[0_40px_120px_-80px_rgba(0,0,0,0.45)] flex flex-col pointer-events-auto overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 border-b border-black/[0.08]">
               <div>
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-yellow-400" />
-                  <h3 className="text-white font-semibold">Frag deine Zahlen</h3>
+                  <h3 className="text-gray-900 font-semibold">Frag deine Zahlen</h3>
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {deviationCount} Abweichungen • {formatCurrency(totalDeviation)} gesamt
@@ -186,7 +186,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                 {messages.length > 0 && (
                   <button
                     onClick={clearChat}
-                    className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-black/[0.04] rounded-lg transition-colors"
                     title="Chat leeren"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -194,7 +194,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-black/[0.04] rounded-lg transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -216,9 +216,9 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                       <button
                         key={idx}
                         onClick={() => handleSuggestion(q)}
-                        className="block w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 transition-colors group"
+                        className="block w-full text-left px-3 py-2 bg-white/60 hover:bg-white/80 rounded-lg text-sm text-gray-700 transition-colors group border border-black/[0.06]"
                       >
-                        <span className="text-pink-300 mr-2">→</span>
+                        <span className="text-[#0071e3] mr-2">→</span>
                         {q}
                       </button>
                     ))}
@@ -236,8 +236,8 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                           msg.role === 'user'
-                            ? 'bg-gradient-to-br from-pink-500 to-fuchsia-500 text-white rounded-br-md'
-                            : 'bg-white/10 text-gray-200 rounded-bl-md'
+                            ? 'bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] text-white rounded-br-md'
+                            : 'bg-black/[0.04] text-gray-800 rounded-bl-md border border-black/[0.06]'
                         }`}
                       >
                         {msg.isLoading ? (
@@ -269,7 +269,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
             {/* Input */}
             <form
               onSubmit={handleSubmit}
-              className="p-4 border-t border-white/10"
+              className="p-4 border-t border-black/[0.08]"
             >
               <div className="flex gap-2">
                 <input
@@ -279,12 +279,12 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Frage eingeben..."
                   disabled={isLoading}
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-pink-400/70 focus:ring-4 focus:ring-pink-400/10 text-sm disabled:opacity-50"
+                  className="flex-1 bg-white/80 border border-black/[0.10] rounded-xl px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0071e3]/60 focus:ring-4 focus:ring-[#0071e3]/10 text-sm disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="p-2 rounded-xl text-white transition-colors bg-gradient-to-br from-pink-500 to-fuchsia-500 hover:from-pink-400 hover:to-fuchsia-400 disabled:from-gray-700 disabled:to-gray-700 disabled:text-gray-400"
+                  className="p-2 rounded-xl text-white transition-colors bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] hover:opacity-95 active:translate-y-px disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

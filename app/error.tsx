@@ -14,15 +14,15 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-[#12121a] border border-white/10 rounded-2xl p-6">
-        <h2 className="text-xl font-semibold mb-2">Etwas ist schiefgelaufen</h2>
-        <p className="text-sm text-gray-400 mb-4">
+    <div className="min-h-screen bg-[rgb(var(--background-rgb))] text-[rgb(var(--foreground-rgb))] flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-xl border border-black/[0.08] rounded-2xl p-6 shadow-[0_30px_90px_-60px_rgba(0,0,0,0.35)]">
+        <h2 className="text-xl font-semibold mb-2 text-gray-900">Etwas ist schiefgelaufen</h2>
+        <p className="text-sm text-gray-600 mb-4">
           Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.
         </p>
         <button
           onClick={() => reset()}
-          className="w-full py-2 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors text-white text-sm font-medium"
+          className="w-full py-2 px-4 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] active:translate-y-px transition text-white text-sm font-semibold shadow-[0_12px_30px_-18px_rgba(0,113,227,0.35)]"
         >
           Neu laden
         </button>

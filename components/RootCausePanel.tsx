@@ -40,9 +40,9 @@ const formatCurrency = (value: number) =>
 const clusterTypeLabels: Record<string, { label: string; color: string; icon: string }> = {
   new_cost: { label: 'Neue Kosten', color: 'bg-purple-500/20 text-purple-400', icon: '🆕' },
   removed_cost: { label: 'Weggefallen', color: 'bg-gray-500/20 text-gray-400', icon: '🗑️' },
-  volume_change: { label: 'Mengenänderung', color: 'bg-fuchsia-500/20 text-fuchsia-300', icon: '📊' },
+  volume_change: { label: 'Mengenänderung', color: 'bg-blue-500/15 text-blue-700', icon: '📊' },
   price_change: { label: 'Preisänderung', color: 'bg-orange-500/20 text-orange-400', icon: '💰' },
-  vendor_change: { label: 'Lieferantenwechsel', color: 'bg-pink-500/20 text-pink-300', icon: '🔄' },
+  vendor_change: { label: 'Lieferantenwechsel', color: 'bg-indigo-500/15 text-indigo-700', icon: '🔄' },
   timing_shift: { label: 'Zeitverschiebung', color: 'bg-yellow-500/20 text-yellow-400', icon: '⏰' },
   one_time: { label: 'Einmaleffekt', color: 'bg-red-500/20 text-red-400', icon: '⚡' },
 };
@@ -348,9 +348,9 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
               className="flex items-center justify-between pt-2 border-t border-white/10"
             >
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-pink-500/[0.15] border border-pink-500/25">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#0071e3]/10 border border-[#0071e3]/20">
                   {patternIcons[explanation.pattern]}
-                  <span className="text-xs text-pink-200 font-medium">{patternLabels[explanation.pattern]}</span>
+                  <span className="text-xs text-[#005bb5] font-medium">{patternLabels[explanation.pattern]}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -456,7 +456,7 @@ export function RootCausePanel({ deviation, prevBookings, currBookings, onClose,
                       {cluster.bookings.slice(0, 5).map((b, i) => (
                         <tr key={i} className="border-t border-white/5">
                           <td className="p-2 text-gray-400">{b.date}</td>
-                          <td className="p-2 text-pink-300 font-mono">{b.document_no}</td>
+                          <td className="p-2 text-[#0071e3] font-mono">{b.document_no}</td>
                           <td className="p-2 text-gray-300 max-w-[200px] truncate">{b.text}</td>
                           <td className={`p-2 text-right font-medium ${b.amount > 0 ? 'text-red-400' : 'text-green-400'}`}>
                             {formatCurrency(b.amount)}

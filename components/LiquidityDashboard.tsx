@@ -393,13 +393,14 @@ export function LiquidityDashboard({ bookings }: LiquidityDashboardProps) {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(15,17,23,0.95)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(255,255,255,0.98)',
+                border: '1px solid rgba(0,0,0,0.12)',
                 borderRadius: 12,
-                color: '#e5e7eb',
+                boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)',
+                color: '#111827',
               }}
-              labelStyle={{ color: '#fff' }}
-              itemStyle={{ color: '#e5e7eb' }}
+              labelStyle={{ color: '#111827', fontWeight: 600 }}
+              itemStyle={{ color: '#374151' }}
               formatter={(value) => formatCurrency(value as number)}
             />
             <ReferenceLine

@@ -215,7 +215,7 @@ function WaterfallChart({ data }: { data: CashflowResult['waterfallData'] }) {
           <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
           <Tooltip
             formatter={(v: unknown) => formatCurrency(Number(v ?? 0))}
-            contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', color: '#fff', fontSize: 12 }}
+            contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)', color: '#111827', fontSize: 12 }}
           />
           <Bar dataKey="base" stackId="w" fill="transparent" />
           <Bar dataKey="value" stackId="w" radius={[4, 4, 0, 0]}>
@@ -249,7 +249,7 @@ function MonthlyChart({ monthly }: { monthly: CashflowResult['monthly'] }) {
           <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
           <Tooltip
             formatter={(v: unknown) => formatCurrency(Number(v ?? 0))}
-            contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', color: '#fff', fontSize: 12 }}
+            contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)', color: '#111827', fontSize: 12 }}
           />
           <Bar dataKey="operating" fill="#10b981" name="Operativ" radius={[3, 3, 0, 0]} opacity={0.7} />
           <Bar dataKey="investing" fill="#a855f7" name="Investition" radius={[3, 3, 0, 0]} opacity={0.7} />
@@ -285,7 +285,7 @@ function FlowChart({ result }: { result: CashflowResult }) {
           <YAxis tick={{ fill: '#6b7280', fontSize: 10 }} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
           <Tooltip
             formatter={(v: unknown) => formatCurrency(Number(v ?? 0))}
-            contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', color: '#fff', fontSize: 12 }}
+            contentStyle={{ backgroundColor: 'rgba(255,255,255,0.98)', border: '1px solid rgba(0,0,0,0.12)', borderRadius: '12px', boxShadow: '0 18px 60px -40px rgba(0,0,0,0.45)', color: '#111827', fontSize: 12 }}
           />
           <Bar dataKey="zufluss" fill="#10b981" name="Zuflüsse" radius={[4, 4, 0, 0]} />
           <Bar dataKey="abfluss" fill="#ef4444" name="Abflüsse" radius={[4, 4, 0, 0]} opacity={0.7} />
