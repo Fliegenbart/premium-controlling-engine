@@ -39,14 +39,14 @@ const FORMAT_ICONS: Record<FileFormat, string> = {
 };
 
 const FORMAT_COLORS: Record<FileFormat, string> = {
-  sap_fbl3n: 'from-pink-600 to-fuchsia-500',
-  sap_fagll03: 'from-pink-600 to-fuchsia-500',
-  sap_s_alr: 'from-pink-600 to-fuchsia-500',
-  datev_buchungen: 'from-green-600 to-green-400',
-  datev_kost: 'from-green-600 to-green-400',
-  lexware: 'from-yellow-600 to-yellow-400',
-  generic_csv: 'from-gray-600 to-gray-400',
-  unknown: 'from-red-600 to-red-400',
+  sap_fbl3n: 'bg-[#007AFF]/10',
+  sap_fagll03: 'bg-[#007AFF]/10',
+  sap_s_alr: 'bg-[#007AFF]/10',
+  datev_buchungen: 'bg-emerald-500/10',
+  datev_kost: 'bg-emerald-500/10',
+  lexware: 'bg-amber-500/10',
+  generic_csv: 'bg-gray-500/10',
+  unknown: 'bg-red-500/10',
 };
 
 export function MagicUpload({ onBookingsParsed, period, label, existingFile }: MagicUploadProps) {
@@ -130,24 +130,23 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`relative border-2 border-dashed rounded-xl p-6 transition-all ${
+        className={`relative border-2 border-dashed rounded-2xl p-6 transition-all ${
           isDragging
-            ? 'border-pink-500 bg-pink-500/10'
+            ? 'border-[#007AFF] bg-[#007AFF]/[0.04]'
             : result?.success
-            ? 'border-green-500/50 bg-green-500/5'
+            ? 'border-emerald-400/40 bg-emerald-500/[0.03]'
             : result && !result.success
-            ? 'border-red-500/50 bg-red-500/5'
-            : 'border-white/10 hover:border-white/30 bg-white/5'
+            ? 'border-red-400/40 bg-red-500/[0.03]'
+            : 'border-black/[0.08] hover:border-black/[0.15] bg-[rgb(var(--bg-surface))]'
         }`}
       >
         {isProcessing ? (
           <div className="flex flex-col items-center gap-3 py-4">
             <div className="relative">
-              <Loader2 className="w-10 h-10 text-pink-400 animate-spin" />
-              <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
+              <Loader2 className="w-10 h-10 text-[#007AFF] animate-spin" />
             </div>
             <div className="text-center">
-              <p className="text-white font-medium">Analysiere Datei...</p>
+              <p className="text-gray-900 font-medium">Analysiere Datei...</p>
               <p className="text-gray-500 text-sm">Format wird automatisch erkannt</p>
             </div>
           </div>
@@ -157,23 +156,23 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 {result.success ? (
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${FORMAT_COLORS[result.detection.format]} flex items-center justify-center`}>
+                  <div className={`w-10 h-10 rounded-xl ${FORMAT_COLORS[result.detection.format]} flex items-center justify-center`}>
                     <span className="text-lg">{FORMAT_ICONS[result.detection.format]}</span>
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-                    <AlertCircle className="w-5 h-5 text-red-400" />
+                  <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 text-red-500" />
                   </div>
                 )}
                 <div>
-                  <p className="text-white font-medium flex items-center gap-2">
+                  <p className="text-gray-900 font-medium flex items-center gap-2">
                     {fileName}
-                    {result.success && <CheckCircle className="w-4 h-4 text-green-400" />}
+                    {result.success && <CheckCircle className="w-4 h-4 text-emerald-500" />}
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-500">
                     {getFormatDisplayName(result.detection.format)}
                     {result.detection.confidence > 0 && (
-                      <span className="ml-2 text-gray-500">
+                      <span className="ml-2 text-gray-400">
                         ({result.detection.confidence.toFixed(0)}% Konfidenz)
                       </span>
                     )}
@@ -182,24 +181,24 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
               </div>
               <button
                 onClick={clearFile}
-                className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-1.5 hover:bg-black/[0.04] rounded-lg transition-colors"
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="w-4 h-4 text-gray-400" />
               </button>
             </div>
 
             {/* Stats */}
             {result.success && (
               <div className="grid grid-cols-3 gap-2 py-2">
-                <div className="bg-white/5 rounded-lg px-3 py-2 text-center">
-                  <p className="text-lg font-bold text-white">{result.stats.parsedRows}</p>
+                <div className="bg-[rgb(var(--bg-surface))] rounded-xl px-3 py-2.5 text-center border border-black/[0.04]">
+                  <p className="text-lg font-bold text-gray-900">{result.stats.parsedRows}</p>
                   <p className="text-xs text-gray-500">Buchungen</p>
                 </div>
-                <div className="bg-white/5 rounded-lg px-3 py-2 text-center">
-                  <p className="text-lg font-bold text-white">{formatCurrency(result.stats.totalAmount)}</p>
+                <div className="bg-[rgb(var(--bg-surface))] rounded-xl px-3 py-2.5 text-center border border-black/[0.04]">
+                  <p className="text-lg font-bold text-gray-900">{formatCurrency(result.stats.totalAmount)}</p>
                   <p className="text-xs text-gray-500">Summe</p>
                 </div>
-                <div className="bg-white/5 rounded-lg px-3 py-2 text-center">
+                <div className="bg-[rgb(var(--bg-surface))] rounded-xl px-3 py-2.5 text-center border border-black/[0.04]">
                   <p className="text-lg font-bold text-gray-400">{result.stats.skippedRows}</p>
                   <p className="text-xs text-gray-500">Übersprungen</p>
                 </div>
@@ -210,7 +209,7 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
             {result.errors.length > 0 && (
               <div className="space-y-1">
                 {result.errors.slice(0, 3).map((error, i) => (
-                  <p key={i} className="text-xs text-red-400 flex items-center gap-1">
+                  <p key={i} className="text-xs text-red-600 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" /> {error}
                   </p>
                 ))}
@@ -225,7 +224,7 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
             {/* Details Toggle */}
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
             >
               {showDetails ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
               Erkannte Spalten anzeigen
@@ -233,13 +232,13 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
 
             {/* Column Details */}
             {showDetails && (
-              <div className="bg-white/5 rounded-lg p-3 text-xs">
-                <p className="text-gray-400 mb-2">Spalten-Mapping:</p>
+              <div className="bg-[rgb(var(--bg-surface))] rounded-xl p-3 text-xs border border-black/[0.04]">
+                <p className="text-gray-500 mb-2">Spalten-Mapping:</p>
                 <div className="grid grid-cols-2 gap-1">
                   {Object.entries(result.detection.mappedColumns).map(([field, index]) => (
                     <div key={field} className="flex items-center gap-1">
-                      <span className="text-gray-500">{field}:</span>
-                      <span className="text-white">{result.detection.detectedColumns[index as number] || '-'}</span>
+                      <span className="text-gray-400">{field}:</span>
+                      <span className="text-gray-900">{result.detection.detectedColumns[index as number] || '-'}</span>
                     </div>
                   ))}
                 </div>
@@ -255,14 +254,11 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
               className="hidden"
             />
             <div className="flex flex-col items-center gap-3 py-2">
-              <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
-                  <Upload className="w-7 h-7 text-pink-400" />
-                </div>
-                <Sparkles className="w-4 h-4 text-yellow-400 absolute -top-1 -right-1" />
+              <div className="w-14 h-14 rounded-2xl bg-[#007AFF]/[0.08] flex items-center justify-center">
+                <Upload className="w-7 h-7 text-[#007AFF]" />
               </div>
               <div className="text-center">
-                <p className="text-white font-medium">{label}</p>
+                <p className="text-gray-900 font-medium">{label}</p>
                 <p className="text-gray-500 text-sm">
                   SAP, DATEV, CSV – wird automatisch erkannt
                 </p>
@@ -275,10 +271,10 @@ export function MagicUpload({ onBookingsParsed, period, label, existingFile }: M
       {/* Format Badges */}
       {!result && (
         <div className="flex items-center justify-center gap-2 text-xs">
-          <span className="px-2 py-1 bg-pink-500/10 text-pink-300 rounded">SAP</span>
-          <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded">DATEV</span>
-          <span className="px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded">Lexware</span>
-          <span className="px-2 py-1 bg-gray-500/10 text-gray-400 rounded">CSV</span>
+          <span className="px-2.5 py-1 bg-[#007AFF]/[0.06] text-[#007AFF] rounded-full font-medium">SAP</span>
+          <span className="px-2.5 py-1 bg-emerald-500/[0.06] text-emerald-600 rounded-full font-medium">DATEV</span>
+          <span className="px-2.5 py-1 bg-amber-500/[0.06] text-amber-600 rounded-full font-medium">Lexware</span>
+          <span className="px-2.5 py-1 bg-gray-500/[0.06] text-gray-500 rounded-full font-medium">CSV</span>
         </div>
       )}
     </div>
