@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
-import { BarChart3, Loader2, Lock, Mail } from 'lucide-react';
+import { Loader2, Lock, Mail } from 'lucide-react';
 
 type AuthUser = {
   id: string;
@@ -46,14 +45,6 @@ export default function LoginScreen({ onLoggedIn }: { onLoggedIn: (user: AuthUse
 
   return (
     <div className="w-full max-w-md">
-      <div className="mb-6 flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900">
-          <BarChart3 className="h-4 w-4 text-[#0a6cff]" />
-          <span>Premium Controlling Engine</span>
-        </Link>
-        <span className="text-xs text-gray-500">Anmeldung</span>
-      </div>
-
       <div className="rounded-2xl border border-black/[0.10] bg-white/70 backdrop-blur-2xl p-6 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
         <div className="mb-5">
           <h1 className="text-lg font-semibold text-gray-900 tracking-tight">Willkommen zurück</h1>
