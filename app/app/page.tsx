@@ -222,6 +222,9 @@ export default function Home() {
   // Sidebar state (mobile)
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Start screen: keep the entry compact, reveal the rest on demand.
+  const [showAllModules, setShowAllModules] = useState(false);
+
   // Magic Upload state
   const [useMagicUpload, setUseMagicUpload] = useState(true);
   const [prevBookings, setPrevBookings] = useState<Booking[]>([]);
@@ -874,7 +877,9 @@ export default function Home() {
 		                  <BlurFade delay={0.05}>
 		                    <div className="flex items-center justify-between">
 		                      <h2 className="text-sm font-semibold text-gray-900 tracking-tight">Dein Einstieg</h2>
-		                      <p className="text-xs text-gray-500">Workflows & Module</p>
+		                      <p className="text-xs text-gray-500">
+                            {showAllModules ? 'Alle Module' : 'Nur das Wichtigste'}
+                          </p>
 		                    </div>
 		                  </BlurFade>
 
@@ -896,14 +901,14 @@ export default function Home() {
 		                        }
 		                      />
 
-	                      <BentoCard
-	                        Icon={GitCompare}
-	                        name="Plan vs. Ist"
-	                        description="Dreifachvergleich: Plan, Ist und Vorjahr. Ideal für Budget-Reviews und Forecasts."
-	                        tag="Plan/Ist/VJ"
-	                        cta="Öffnen"
-	                        onClick={() => setMode('triple')}
-	                        className="md:col-span-1"
+		                      <BentoCard
+		                        Icon={GitCompare}
+		                        name="Plan vs. Ist"
+		                        description="Dreifachvergleich: Plan, Ist und Vorjahr. Ideal für Budget-Reviews und Forecasts."
+		                        tag="Plan/Ist/VJ"
+		                        cta="Öffnen"
+		                        onClick={() => setMode('triple')}
+		                        className="md:col-span-1"
 		                        background={
 		                          <div className="absolute inset-0">
 		                            <GitCompare className="absolute -bottom-10 -right-10 h-52 w-52 text-[#5e5ce6]/10" />
@@ -913,61 +918,13 @@ export default function Home() {
 		                      />
 
 	                      <BentoCard
-	                        Icon={TrendingUp}
-	                        name="Liquidität"
-	                        description="13-Wochen Cashflow-Prognose mit Plausibilisierung aus geladenen Buchungen."
-	                        tag="13 Wochen"
-	                        cta="Öffnen"
-	                        onClick={() => setMode('liquidity')}
-	                        className="md:col-span-1"
-		                        background={
-		                          <div className="absolute inset-0">
-		                            <TrendingUp className="absolute -bottom-10 -right-10 h-52 w-52 text-emerald-700/10" />
-		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
-		                          </div>
-		                        }
-		                      />
-
-	                      <BentoCard
-	                        Icon={CheckCircle}
-	                        name="Abschluss"
-	                        description="Monatsabschluss mit 12 Checks, Aufgabenliste und Review-ready Dokumentation."
-	                        tag="12 Checks"
-	                        cta="Öffnen"
-	                        onClick={() => setMode('closing')}
-	                        className="md:col-span-1"
-		                        background={
-		                          <div className="absolute inset-0">
-		                            <CheckCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-green-700/10" />
-		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
-		                          </div>
-		                        }
-		                      />
-
-	                      <BentoCard
-	                        Icon={AlertCircle}
-	                        name="Fehler-Scan"
-	                        description="KI-Buchungsfehler-Erkennung: Duplikate, fehlende Belege, ungewöhnliche Buchungen."
-	                        tag="KI"
-	                        cta="Öffnen"
-	                        onClick={() => setMode('errors')}
-	                        className="md:col-span-1"
-		                        background={
-		                          <div className="absolute inset-0">
-		                            <AlertCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-orange-700/10" />
-		                            <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
-		                          </div>
-		                        }
-		                      />
-
-	                      <BentoCard
 	                        Icon={FolderOpen}
 	                        name="Dokumente"
-	                        description="KI-Reports und Dokumenten-Archiv. Optional token-geschützt für Betrieb und Sharing."
+	                        description="KI-Reports und Dokumenten-Archiv. Export nach Word/Excel, Workflow-Status und Evidence."
 	                        tag="Archive"
 	                        cta="Öffnen"
 	                        onClick={() => setMode('docs')}
-	                        className="md:col-span-3"
+	                        className={showAllModules ? "md:col-span-1" : "md:col-span-3"}
 		                        background={
 		                          <div className="absolute inset-0">
 		                            <FolderOpen className="absolute -bottom-12 -right-12 h-64 w-64 text-amber-700/10" />
@@ -975,8 +932,78 @@ export default function Home() {
 		                          </div>
 		                        }
 		                      />
+
+                          {showAllModules ? (
+                            <>
+                              <BentoCard
+                                Icon={TrendingUp}
+                                name="Liquidität"
+                                description="13-Wochen Cashflow-Prognose mit Plausibilisierung aus geladenen Buchungen."
+                                tag="13 Wochen"
+                                cta="Öffnen"
+                                onClick={() => setMode('liquidity')}
+                                className="md:col-span-1"
+                                background={
+                                  <div className="absolute inset-0">
+                                    <TrendingUp className="absolute -bottom-10 -right-10 h-52 w-52 text-emerald-700/10" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+                                  </div>
+                                }
+                              />
+
+                              <BentoCard
+                                Icon={CheckCircle}
+                                name="Abschluss"
+                                description="Monatsabschluss mit 12 Checks, Aufgabenliste und Review-ready Dokumentation."
+                                tag="12 Checks"
+                                cta="Öffnen"
+                                onClick={() => setMode('closing')}
+                                className="md:col-span-1"
+                                background={
+                                  <div className="absolute inset-0">
+                                    <CheckCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-green-700/10" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+                                  </div>
+                                }
+                              />
+
+                              <BentoCard
+                                Icon={AlertCircle}
+                                name="Fehler-Scan"
+                                description="KI-Buchungsfehler-Erkennung: Duplikate, fehlende Belege, ungewöhnliche Buchungen."
+                                tag="KI"
+                                cta="Öffnen"
+                                onClick={() => setMode('errors')}
+                                className="md:col-span-1"
+                                background={
+                                  <div className="absolute inset-0">
+                                    <AlertCircle className="absolute -bottom-10 -right-10 h-52 w-52 text-orange-700/10" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-white/85 via-transparent to-transparent" />
+                                  </div>
+                                }
+                              />
+                            </>
+                          ) : null}
 	                    </BentoGrid>
 	                  </BlurFade>
+
+                    <div className="mt-5 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setShowAllModules((v) => !v)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-black/[0.10] bg-white/60 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-white/80 transition-colors shadow-[0_10px_30px_-22px_rgba(0,0,0,0.20)]"
+                      >
+                        {showAllModules ? (
+                          <>
+                            Weniger anzeigen <ChevronUp className="h-4 w-4 text-gray-500" />
+                          </>
+                        ) : (
+                          <>
+                            Weitere Module <ChevronDown className="h-4 w-4 text-gray-500" />
+                          </>
+                        )}
+                      </button>
+                    </div>
 	                </div>
 
 	                <div className="mt-10">
@@ -1643,28 +1670,28 @@ export default function Home() {
             {/* KPI Cards with NumberTicker */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <BlurFade delay={0.05} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={80} duration={12} colorFrom="#ec4899" colorTo="#a855f7" />
-                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
-                <p className="text-2xl font-bold text-white tracking-tight">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+                <BorderBeam size={80} duration={12} colorFrom="#0071e3" colorTo="#5e5ce6" />
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-600 mb-1.5">{mode === 'multi' ? 'Gesellschaften' : 'Buchungen VJ'}</p>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight">
                   <NumberTicker value={mode === 'multi' ? (konzernResult?.entities.length ?? 0) : currentResult.meta.bookings_prev} />
                 </p>
               </motion.div>
               </BlurFade>
               <BlurFade delay={0.1} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={80} duration={12} delay={3} colorFrom="#a855f7" colorTo="#ec4899" />
-                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Vorjahr</p>
-                <p className="text-2xl font-bold text-white tracking-tight">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+                <BorderBeam size={80} duration={12} delay={3} colorFrom="#5e5ce6" colorTo="#0071e3" />
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-600 mb-1.5">Vorjahr</p>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_prev)} prefix="" suffix=" €" />
                 </p>
               </motion.div>
               </BlurFade>
               <BlurFade delay={0.15} inView>
-              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/[0.03] backdrop-blur-xl rounded-xl border border-white/[0.06] p-5 overflow-hidden group hover:border-white/[0.12] transition-colors">
-                <BorderBeam size={80} duration={12} delay={6} colorFrom="#ec4899" colorTo="#22c55e" />
-                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Aktuell</p>
-                <p className="text-2xl font-bold text-white tracking-tight">
+              <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className="relative bg-white/70 backdrop-blur-xl rounded-xl border border-black/[0.10] p-5 overflow-hidden group hover:border-black/[0.14] transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+                <BorderBeam size={80} duration={12} delay={6} colorFrom="#0071e3" colorTo="#5e5ce6" />
+                <p className="text-[11px] uppercase tracking-[0.08em] text-gray-600 mb-1.5">Aktuell</p>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight">
                   <NumberTicker value={Math.round(currentResult.meta.total_curr)} prefix="" suffix=" €" />
                 </p>
               </motion.div>
@@ -1673,7 +1700,7 @@ export default function Home() {
               <motion.div whileHover={{ scale: 1.02 }} transition={{ type: 'spring', stiffness: 300 }} className={`relative rounded-xl border p-5 overflow-hidden ${
                 currentResult.summary.total_delta > 0 ? 'bg-red-500/10 border-red-500/20' : 'bg-green-500/10 border-green-500/20'
               }`}>
-                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#a855f7'} />
+                <BorderBeam size={80} duration={12} delay={9} colorFrom={currentResult.summary.total_delta > 0 ? '#ef4444' : '#22c55e'} colorTo={currentResult.summary.total_delta > 0 ? '#f97316' : '#5e5ce6'} />
                 <p className="text-[11px] uppercase tracking-[0.08em] text-gray-500 mb-1.5">Abweichung</p>
                 <p className={`text-2xl font-bold flex items-center gap-2 tracking-tight ${
                   currentResult.summary.total_delta > 0 ? 'text-red-400' : 'text-green-400'

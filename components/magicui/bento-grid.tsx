@@ -82,7 +82,9 @@ export function BentoCard({
 
         <div className="mt-5">
           <p className="text-lg font-semibold tracking-tight text-gray-900">{name}</p>
-          <p className="mt-2 text-sm leading-relaxed text-gray-600">{description}</p>
+          <p className="bento-desc mt-2 text-sm leading-relaxed text-gray-600">
+            {description}
+          </p>
         </div>
 
         {cta ? (

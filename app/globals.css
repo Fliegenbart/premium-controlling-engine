@@ -199,6 +199,14 @@ body {
   mask-composite: exclude;
 }
 
+/* Prevent text collisions inside fixed-height Bento cards */
+.bento-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
 /* ─── Typewriter cursor ─── */
 @keyframes blink-cursor {
   0%, 50% { opacity: 1; }

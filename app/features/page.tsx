@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 
 import MarketingShell from "@/components/marketing/MarketingShell";
 import { marketing } from "@/components/marketing/site-config";
+import { BentoUSPSection, CTASection, FAQSection, HowItWorks } from "@/components/marketing/LandingSections";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 
 export default function FeaturesPage() {
@@ -54,33 +55,11 @@ export default function FeaturesPage() {
           </div>
         </section>
 
-        <section className="mt-12">
-          <div className="rounded-3xl border border-black/10 bg-white/70 backdrop-blur-2xl p-8 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
-            <h2 className="text-xl font-semibold text-gray-900">Alles, was du fuer Review brauchst</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Fokus auf Nachvollziehbarkeit, nicht auf buntes Dashboard-Bingo.
-            </p>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {marketing.usp.map((u) => (
-                <div
-                  key={u.title}
-                  className="rounded-2xl border border-black/10 bg-white/60 p-5 shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-black/[0.04] ring-1 ring-black/[0.08]">
-                      <u.icon className="h-5 w-5 text-[#0a6cff]" />
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">{u.title}</p>
-                      <p className="mt-1 text-sm text-gray-600 leading-relaxed">{u.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <div className="mt-2" />
+        <BentoUSPSection />
+        <HowItWorks />
+        <FAQSection />
+        <CTASection />
       </main>
     </MarketingShell>
   );

@@ -1,10 +1,8 @@
 import MarketingShell from "@/components/marketing/MarketingShell";
 import {
-  BentoUSPSection,
   CTASection,
-  FAQSection,
   HeroSection,
-  HowItWorks,
+  HighLevelUSPSection,
   LogoMarquee,
 } from "@/components/marketing/LandingSections";
 
@@ -14,12 +12,9 @@ export default function LandingPage() {
       <main>
         <HeroSection />
         <LogoMarquee />
-        <BentoUSPSection />
-        <HowItWorks />
-        <FAQSection />
+        <HighLevelUSPSection />
         <CTASection />
       </main>
     </MarketingShell>
   );
 }
-

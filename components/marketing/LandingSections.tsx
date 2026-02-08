@@ -65,7 +65,7 @@ export function HeroSection() {
                 High level USPs
               </p>
               <ul className="mt-4 space-y-3 text-sm text-gray-800">
-                {marketing.usp.slice(0, 5).map((u) => (
+                {marketing.usp.slice(0, 3).map((u) => (
                   <li key={u.title} className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-lg bg-black/[0.04] ring-1 ring-black/[0.08]">
                       <u.icon className="h-4 w-4 text-[#0a6cff]" />
@@ -114,6 +114,61 @@ export function LogoMarquee() {
             </span>
           ))}
         </Marquee>
+      </div>
+    </section>
+  );
+}
+
+export function HighLevelUSPSection() {
+  return (
+    <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
+      <div className="flex items-end justify-between gap-6">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+            High Level USPs
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Kurz und klar: warum das Tool den Review beschleunigt.
+          </p>
+        </div>
+        <Link
+          href="/features"
+          className="hidden sm:inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-white/90 transition shadow-[0_16px_45px_-28px_rgba(0,0,0,0.22)]"
+        >
+          Details ansehen <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {marketing.usp.slice(0, 3).map((u) => (
+          <div
+            key={u.title}
+            className="rounded-2xl border border-black/10 bg-white/70 backdrop-blur-2xl p-6 shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]"
+          >
+            <div className="flex items-start gap-3">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-black/[0.04] ring-1 ring-black/[0.08]">
+                <u.icon className="h-5 w-5 text-[#0a6cff]" />
+              </span>
+              <div>
+                <p className="text-base font-semibold text-gray-900 tracking-tight">
+                  {u.title}
+                </p>
+                <p className="mt-1 text-sm text-gray-600 leading-relaxed">
+                  {u.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 sm:hidden">
+        <Link
+          href="/features"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-black/10 bg-white/70 px-4 py-2.5 text-sm font-semibold text-gray-900 hover:bg-white/90 transition shadow-[0_16px_45px_-28px_rgba(0,0,0,0.22)]"
+        >
+          Details ansehen <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );
@@ -296,4 +351,3 @@ export function CTASection() {
     </section>
   );
 }
-
