@@ -90,7 +90,6 @@ export async function initDatabase(persistPath?: string): Promise<void> {
         (err: any) => {
           if (err) reject(err);
           else {
-            console.log('DuckDB initialized successfully');
             resolve();
           }
         }

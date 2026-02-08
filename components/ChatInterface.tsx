@@ -56,7 +56,7 @@ function formatMessageWithEvidence(content: string, onDocClick?: (docNo: string)
       <button
         key={`${docNo}-${match.index}`}
         onClick={() => onDocClick?.(docNo)}
-        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#0071e3]/10 hover:bg-[#0071e3]/15 rounded text-[#005bb5] font-mono text-xs transition-colors"
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#007AFF]/10 hover:bg-[#007AFF]/15 rounded text-[#007AFF] font-mono text-xs transition-colors"
         title={`Beleg ${docNo} anzeigen`}
       >
         <FileText className="w-3 h-3" />
@@ -148,7 +148,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full bg-gradient-to-r from-[#0071e3] to-[#5e5ce6] text-white shadow-[0_18px_60px_-25px_rgba(0,113,227,0.45)] hover:shadow-[0_22px_70px_-28px_rgba(0,113,227,0.60)] transition-all hover:scale-105 ${
+        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full bg-[#007AFF] text-white shadow-apple-lg hover:shadow-apple-xl transition-all hover:scale-105 ${
           isOpen ? 'hidden' : ''
         }`}
       >
@@ -170,7 +170,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
           />
 
           {/* Panel */}
-          <div className="relative w-full max-w-md h-[80vh] max-h-[600px] bg-white/80 backdrop-blur-2xl rounded-2xl border border-black/[0.10] shadow-[0_40px_120px_-80px_rgba(0,0,0,0.45)] flex flex-col pointer-events-auto overflow-hidden">
+          <div className="relative w-full max-w-md h-[80vh] max-h-[600px] bg-white/80 backdrop-blur-2xl rounded-2xl border border-black/[0.06] shadow-apple-xl flex flex-col pointer-events-auto overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-black/[0.08]">
               <div>
@@ -218,7 +218,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                         onClick={() => handleSuggestion(q)}
                         className="block w-full text-left px-3 py-2 bg-white/60 hover:bg-white/80 rounded-lg text-sm text-gray-700 transition-colors group border border-black/[0.06]"
                       >
-                        <span className="text-[#0071e3] mr-2">→</span>
+                        <span className="text-[#007AFF] mr-2">→</span>
                         {q}
                       </button>
                     ))}
@@ -236,7 +236,7 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                           msg.role === 'user'
-                            ? 'bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] text-white rounded-br-md'
+                            ? 'bg-gradient-to-br from-[#007AFF] to-[#5856D6] text-white rounded-br-md'
                             : 'bg-black/[0.04] text-gray-800 rounded-bl-md border border-black/[0.06]'
                         }`}
                       >
@@ -279,12 +279,12 @@ export function ChatInterface({ analysisResult, onShowEvidence }: ChatInterfaceP
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Frage eingeben..."
                   disabled={isLoading}
-                  className="flex-1 bg-white/80 border border-black/[0.10] rounded-xl px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#0071e3]/60 focus:ring-4 focus:ring-[#0071e3]/10 text-sm disabled:opacity-50"
+                  className="flex-1 bg-white/80 border border-black/[0.06] rounded-xl px-4 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#007AFF]/60 focus:ring-4 focus:ring-[#007AFF]/10 text-sm disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="p-2 rounded-xl text-white transition-colors bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] hover:opacity-95 active:translate-y-px disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500"
+                  className="p-2 rounded-xl text-white transition-colors bg-[#007AFF] hover:bg-[#0068DD] active:translate-y-px disabled:bg-gray-300 disabled:text-gray-500"
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

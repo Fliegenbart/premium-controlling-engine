@@ -73,7 +73,7 @@ export function NLQueryBar() {
     <div className="mb-6">
       {/* Search Bar */}
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-center bg-white/80 backdrop-blur-2xl rounded-xl border border-black/[0.10] focus-within:border-[#0071e3]/60 focus-within:ring-4 focus-within:ring-[#0071e3]/10 transition-colors shadow-[0_20px_70px_-55px_rgba(0,0,0,0.30)]">
+        <div className="flex items-center bg-white/80 backdrop-blur-2xl rounded-xl border border-black/[0.06] focus-within:border-[#007AFF]/60 focus-within:ring-4 focus-within:ring-[#007AFF]/10 transition-colors shadow-apple-sm">
           <Search className="w-5 h-5 text-gray-500 ml-4" />
           <input
             type="text"
@@ -94,7 +94,7 @@ export function NLQueryBar() {
           <button
             type="submit"
             disabled={!query.trim() || isLoading}
-            className="m-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors flex items-center gap-2 bg-gradient-to-br from-[#0071e3] to-[#5e5ce6] hover:opacity-95 active:translate-y-px disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500"
+            className="m-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors flex items-center gap-2 bg-gradient-to-br from-[#007AFF] to-[#5856D6] hover:opacity-95 active:translate-y-px disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             Abfragen
@@ -126,11 +126,11 @@ export function NLQueryBar() {
 
       {/* Results */}
       {result && (
-        <div className="mt-4 bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.10] overflow-hidden shadow-[0_30px_100px_-70px_rgba(0,0,0,0.35)]">
+        <div className="mt-4 bg-white/70 backdrop-blur-2xl rounded-xl border border-black/[0.06] overflow-hidden shadow-apple-md">
           {/* Result Header */}
           <div className="flex items-center justify-between p-4 border-b border-black/[0.08]">
             <div className="flex items-center gap-3">
-              <Database className="w-4 h-4 text-[#0071e3]" />
+              <Database className="w-4 h-4 text-[#007AFF]" />
               <span className="text-gray-900 text-sm font-medium">
                 {result.result.rowCount} Ergebnis{result.result.rowCount !== 1 ? 'se' : ''}
               </span>

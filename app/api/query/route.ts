@@ -117,7 +117,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           ? queryToRun
           : `EXPLAIN ${queryToRun}`;
         const explainResult = await executeSQL(explainSql);
-        console.log('Query Plan:', explainResult.rows);
+        // Query plan logged for debugging
       } catch (e) {
         // Non-critical
       }

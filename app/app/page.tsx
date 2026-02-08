@@ -1359,7 +1359,7 @@ export default function Home() {
 	                onClick={() => setUseMagicUpload(!useMagicUpload)}
 	                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
 	                  useMagicUpload
-	                    ? 'bg-[#007AFF]/10 text-[#005bb5] border border-[#007AFF]/20'
+	                    ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20'
 	                    : 'bg-black/[0.04] text-gray-700 hover:text-gray-900 border border-black/[0.06]'
 	                }`}
 	              >
@@ -1459,7 +1459,7 @@ export default function Home() {
 	                      type="file"
 	                      accept=".csv"
 	                      onChange={e => updateEntity(entity.id, { prevFile: e.target.files?.[0] || null })}
-	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#007AFF] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
+	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#007AFF] file:text-white hover:file:bg-[#0068DD] file:cursor-pointer"
 	                    />
                   </div>
                   <div>
@@ -1468,7 +1468,7 @@ export default function Home() {
 	                      type="file"
 	                      accept=".csv"
 	                      onChange={e => updateEntity(entity.id, { currFile: e.target.files?.[0] || null })}
-	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#007AFF] file:text-white hover:file:bg-[#0077ed] file:cursor-pointer"
+	                      className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#007AFF] file:text-white hover:file:bg-[#0068DD] file:cursor-pointer"
 	                    />
                   </div>
                 </div>
@@ -1856,7 +1856,7 @@ export default function Home() {
 	                            onClick={() => setRootCauseDeviation(rootCauseDeviation?.account === dev.account ? null : dev)}
 		                            className={`px-3 py-1 text-xs rounded-lg transition-colors flex items-center gap-1.5 ${
 		                              rootCauseDeviation?.account === dev.account
-		                                ? 'bg-[#007AFF]/10 text-[#005bb5] border border-[#007AFF]/20'
+		                                ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20'
 		                                : 'bg-black/[0.04] hover:bg-black/[0.06] text-gray-700 hover:text-gray-900 border border-black/[0.06]'
 		                            }`}
 		                          >
@@ -1906,7 +1906,7 @@ export default function Home() {
 	                                onClick={() => { setSelectedDeviation(acc); setShowEvidenceModal(true); }}
 	                                className="p-1.5 hover:bg-[#007AFF]/10 rounded-lg transition-colors group"
 	                              >
-	                                <Link2 className="w-4 h-4 text-[#007AFF] group-hover:text-[#005bb5]" />
+	                                <Link2 className="w-4 h-4 text-[#007AFF] group-hover:text-[#007AFF]" />
 	                              </button>
 	                            </td>
 	                          </tr>
