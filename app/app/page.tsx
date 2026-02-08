@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -85,9 +86,8 @@ import { BWADashboard } from '@/components/BWADashboard';
 	import { NumberTicker } from '@/components/magicui/number-ticker';
 	import { ShimmerButton } from '@/components/magicui/shimmer-button';
 	import { BorderBeam } from '@/components/magicui/border-beam';
-	import { BlurFade } from '@/components/magicui/blur-fade';
-	import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid';
-	import LoginScreen from '@/components/LoginScreen';
+		import { BlurFade } from '@/components/magicui/blur-fade';
+		import { BentoCard, BentoGrid } from '@/components/magicui/bento-grid';
 
 
 interface EntityUpload {
@@ -137,6 +137,7 @@ const formatPercent = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixe
 
 
 export default function Home() {
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<{
     id: string;
     email: string;
@@ -174,6 +175,12 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!authChecking && !currentUser) {
+      router.replace('/login?next=%2Fapp');
+    }
+  }, [authChecking, currentUser, router]);
 
   const handleLogout = async () => {
     try {
@@ -449,14 +456,7 @@ export default function Home() {
   }
 
   if (!currentUser) {
-    return (
-      <LoginScreen
-        onLoggedIn={(user) => {
-          setCurrentUser(user);
-          setMode('start');
-        }}
-      />
-    );
+    return null;
   }
 
   // Mode config for sidebar navigation
